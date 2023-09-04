@@ -1,0 +1,36 @@
+{
+      "$schema": "./settings.schema.json",
+      "host": "http://localhost:4416",
+      "language-support": {
+            "ko-KR": "한국어"
+      },
+      "board": {
+            "listLen": 10,
+            "contentsLen": 500,
+            "tagCnt": 7
+      },
+      "follow": {
+            "limit": 300
+      },
+      "block": {
+            "limit": 300
+      },
+      "session": {
+            "maxAge": 10800000
+      },
+      "cookie": {
+            "maxAge": 86400,
+            "secret": "corner"
+      },
+      "database": {
+            "host": "127.0.0.1",
+            "port": 3306,
+            "username": "root",
+            "password": "ekfkfktk2!",
+            "database": "corner"
+      },
+      "log": {
+            "interval": 8640000000,
+            "directory": "logs"
+      }
+}

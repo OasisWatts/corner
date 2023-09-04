@@ -1,0 +1,48 @@
+{
+      "name": "Corner",
+      "version": "1.0.3",
+      "description": "test of Corner",
+      "icons": {
+            "48": "mdpi-foreground.png",
+            "128": "xxhdpi-foreground.png"
+      },
+      "background": {
+            "service_worker": "background.js"
+      },
+      "content_scripts": [
+            {
+                  "matches": [
+                        "*://*/*"
+                  ],
+                  "js": [
+                        "/content.js"
+                  ],
+                  "css": [
+                        "/corner.css"
+                  ],
+                  "run_at": "document_idle"
+            }
+      ],
+      "web_accessible_resources": [
+            {
+                  "resources": [
+                        "img/corner-icon.svg",
+                        "img/off.svg",
+                        "img/enlarge.svg",
+                        "img/reduce.svg"
+                  ],
+                  "matches": [
+                        "<all_urls>"
+                  ]
+            }
+      ],
+      "action": {},
+      "manifest_version": 3,
+      "permissions": [
+            "tabs",
+            "scripting"
+      ],
+      "host_permissions": [
+            "*://*/*"
+      ]
+}
