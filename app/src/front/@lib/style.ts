@@ -48,13 +48,13 @@ export const pageSt = setStyle({
       position: "absolute",
       top: "50px",
       width: "calc(100% - 400px)",
-      minHeight: "calc(100vh - 50px)",
+      height: "calc(100vh - 50px)",
       borderTopLeftRadius: "20px",
       borderTopRightRadius: "20px"
 })
 export const slimPageSt = setStyle({
-      left: "50px",
-      width: "calc(100% - 100px)"
+      left: "65px",
+      width: "calc(100% - 130px)"
 })
 export const widePageSt = setStyle({
       left: "200px",

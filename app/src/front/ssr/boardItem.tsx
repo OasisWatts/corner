@@ -5,7 +5,7 @@ import { View, Text, Image, Pressable, TextInput } from "reactNative"
 import { blockSt, buttonSetSt, composeStyle, contentsSt, dateSt, followButtonSt, followImgSt, hoveredComment, hoveredUp, upButtonSt, commentButtonSt, importantImageSt, inlineBlockSt, itemSt, mainButtonStyle, mainButtonTextStyle, numSt, numSt1, rightButtonSt, pressableSt1, profileImgSt, profileSt, rightButtonSetSt, setStyle, tDeepGray, tLightGray, updatedSt, writerSt, whiteSt, contentFontSizeSt, tWhite, lightGray } from "front/@lib/style"
 import { boardWrapSt, upColorSt } from "./board"
 import { getHumanNumber, getHumanTimeDistance } from "front/@lib/Language"
-import { CLIENT_SETTINGS, userKey } from "front/@lib/util"
+import { CLIENT_SETTINGS, PROPS, userKey } from "front/@lib/util"
 // import { CLIENT_SETTINGS } from "front/@lib/util"
 
 const MAX_CONTENTS_LEN = 100// CLIENT_SETTINGS.board.contentsLen
@@ -86,7 +86,8 @@ export class BoardItem extends Action<Props, State> {
             this.loadBoard(item.id)
       }
       private handleHoverInUp = () => {
-            this.setState({ hoverUp: true })
+            const { item } = this.props
+            if (item.writerId !== PROPS.data.userKey) this.setState({ hoverUp: true })
       }
       private handleHoverOutUp = () => {
             this.setState({ hoverUp: false })

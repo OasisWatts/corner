@@ -5,9 +5,12 @@ declare type Settings = {
             listLen: number
             contentsLen: number
             tagCnt: number
+            tagLen: number
       }
       follow: {
             limit: number
+            recommendLen: number
+            followLen: number
       }
       block: {
             limit: number

@@ -12,7 +12,9 @@ import CookieParser from "cookie-parser"
 import { StatementUser } from "./database/statementUser"
 
 const app = express()
-const userKey = 1
+const userKey = 3
+const MAX_CONTENTS_LEN = SETTINGS.board.contentsLen
+const MAX_TAG_LEN = SETTINGS.board.tagLen
 
 declare module "express-session" {
       export interface SessionData {
@@ -100,6 +102,14 @@ DB.initialize().then(() => {
             console.log("result", JSON.stringify(result))
             res.send(JSON.stringify(result))
       })
+      // 유저의 게시글 목록 조회.
+      app.get("/userboards", async (req, res, next) => {
+            const startId = Number(req.query.sid)
+            const searchUser = Number(req.query.u)
+            console.log("ub", startId, searchUser)
+            const result = await StatementBoard.boardList(startId, BOARD_CATEGORY.userBoards, userKey, undefined, undefined, undefined, searchUser)
+            res.send(JSON.stringify(result))
+      })
       // 댓글 조회.
       app.get("/comments", async (req, res) => {
             const boardId = Number(req.query.id)
@@ -116,8 +126,11 @@ DB.initialize().then(() => {
             const hashTag = req.body.t
             let url = req.body.u
             let hostname = req.body.h
+            if (contents.length > MAX_CONTENTS_LEN) return
+            if (hashTag.length > MAX_TAG_LEN) return
             if (url === "") url = null
             if (hostname === "" || url === hostname) hostname = null
+            console.log("u", url, hostname)
             const result = await DB.Manager.transaction(() => StatementBoard.boardInsert(userKey, contents, hashTag, url, hostname))
             if (result) res.send(true)
       })
@@ -171,14 +184,6 @@ DB.initialize().then(() => {
             const result = await DB.Manager.transaction(() => StatementBoard.commentUp(commentId, userKey))
             res.send(JSON.stringify(result))
       })
-      // 게시글 조회.
-      app.get("/board/:id", async (req, res, next) => {
-            console.log('req', req)
-            const boardId = Number(req.params.id)
-            //const userKey = req.session.key
-            const { id, writer, writerId, writerImage, date, updated, up, numComment, uped, contents, comments, tags } = await StatementBoard.boardSelect(boardId, userKey)
-            res.send(JSON.stringify({ id, writer, writerId, writerImage, date, updated, up, numCom: numComment, uped, contents, comments, tags }))
-      })
       // 팔로우.
       app.get("/follow", async (req, res, next) => {
             const followId = Number(req.query.id)
@@ -189,14 +194,48 @@ DB.initialize().then(() => {
       app.get("/tag", async (req, res, next) => {
             const url = String(req.query.u)
             const hot = Boolean(req.query.h)
-            console.log("url", url)
+            console.log("tag", url, hot)
             if (hot) {
-                  const result = await StatementBoard.getHotTag()
+                  const result = await StatementBoard.getHotTag(userKey)
                   res.send(JSON.stringify(result))
             } else if (url) {
                   const result = await StatementBoard.getUrlTag(url)
                   res.send(JSON.stringify(result))
             }
+      })
+      app.get("/getfollow", async (req, res, next) => {
+            const hot = Boolean(req.query.h)
+            const tag = req.query.t ? String(req.query.t) : null
+            const startId = Number(req.query.sid)
+            const zero = Boolean(req.query.z)
+            console.log("getfollow", hot, tag, startId, zero)
+            if (hot) {
+                  const result_recommend = await StatementUser.getFollowRecommend(userKey, tag)
+                  const result_follow = await StatementUser.getFollow(userKey, tag, 0, zero)
+                  const result = { recomm: result_recommend, follow: result_follow }
+                  res.send(JSON.stringify(result))
+            } else {
+                  const result_follow = await StatementUser.getFollow(userKey, tag, startId, zero)
+                  const result = { recomm: null, follow: result_follow }
+                  res.send(JSON.stringify(result))
+            }
+      })
+      // 게시글 조회.(랜더링된 화면에서)
+      app.get("/boardload", async (req, res, next) => {
+            console.log('req', req)
+            const boardId = Number(req.query.id)
+            //const userKey = req.session.key
+            const board = await StatementBoard.boardSelect(boardId, userKey)
+            res.send(JSON.stringify(board))
+      })
+      // 게시글 조회. (새로 랜더링. (유저가 url로 바로 게시글 페이지로 접근할 수 있게 하기 위함) 이렇게 접근하는 경우는, 웹에서 접근할 때이므로, url과 hostname이 null)
+      app.get("/board/:id", async (req, res, next) => {
+            console.log('req', req)
+            const boardId = Number(req.params.id)
+            //const userKey = req.session.key
+            const board = await StatementBoard.boardSelect(boardId, userKey)
+            res.set("Access-Control-Allow-Origin", "*")
+            pageBuilder("ssr", { url: null, hostname: null, ext: false, userKey: userKey, boardAccess: true, board })(req, res, next)
       })
       app.get("/*", (req, res, next) => {
             const { u, h } = req.query

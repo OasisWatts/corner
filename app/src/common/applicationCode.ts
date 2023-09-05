@@ -29,7 +29,13 @@ export enum ErrorCode {
       comment_like_increment,
       comment_like_decrement,
       tag_find_failed,
-      url_find_failed
+      tag_update_failed,
+      tag_save_failed,
+      url_find_failed,
+      urltagcount_save_failed,
+      urltagcount_update_failed,
+      follow_find_failed,
+      follow_recommend_find_failed
 }
 
 export enum BOARD_CATEGORY {
@@ -38,5 +44,6 @@ export enum BOARD_CATEGORY {
       tagBoards,
       urlBoards,
       boards,
-      searchBoards
+      searchBoards,
+      userBoards
 }

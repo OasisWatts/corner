@@ -34,10 +34,10 @@ export default class Navigator extends Action<Props, State> {
             Action.trigger("searchShow", true)
       }
       private handlePressMyBoard = () => {
-            Action.trigger("boardListMyBoard")
+            Action.trigger("page", boardPage.boardList, () => Action.trigger("boardListMyBoard"))
       }
       private handlePressMyUp = () => {
-            Action.trigger("boardListMyUp")
+            Action.trigger("page", boardPage.boardList, () => Action.trigger("boardListMyUp"))
       }
       private handlePressSetting = () => {
             Action.trigger("setting")

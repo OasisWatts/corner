@@ -17,6 +17,7 @@ type State = {
       url: string | null
       tag: string | null
       search: string | null
+      searchUser: string | null
 }
 export class BoardList extends Action<Props, State> {
       constructor(props: Props) {
@@ -28,6 +29,7 @@ export class BoardList extends Action<Props, State> {
                   url: PROPS.data.ext ? PROPS.data.url : null,
                   tag: null,
                   search: "",
+                  searchUser: "",
                   endOfList: false
             }
       }
@@ -54,6 +56,10 @@ export class BoardList extends Action<Props, State> {
             },
             "boardListMyUp": () => {
                   this.setState({ startId: 0, boards: [], endOfList: false, categ: BOARD_CATEGORY.myUpBoards }, () => this.getBoards())
+            },
+            "boardListUser": (searchUser) => {
+                  console.log("blu")
+                  this.setState({ startId: 0, boards: [], endOfList: false, categ: BOARD_CATEGORY.userBoards, searchUser }, () => this.getBoards())
             }
       }
       componentDidMount(): void {
@@ -72,9 +78,9 @@ export class BoardList extends Action<Props, State> {
             } this.previousWidth = window.innerWidth
       }
       private getBoards = () => {
-            const { startId, boards, endOfList, categ, url, tag, search } = this.state
+            const { startId, boards, endOfList, categ, url, tag, search, searchUser } = this.state
             if (endOfList) return
-            console.log("getBoards", startId, boards, endOfList, categ, url, tag, search)
+            console.log("getBoards", startId, boards, endOfList, categ, url, tag, search, searchUser)
             let req
             switch (categ) {
                   case BOARD_CATEGORY.tagBoards:
@@ -94,48 +100,56 @@ export class BoardList extends Action<Props, State> {
                         break
                   case BOARD_CATEGORY.searchBoards:
                         req = "/searchboards?sid=" + startId + "&s=" + search
+                  case BOARD_CATEGORY.userBoards:
+                        req = "/userboards?sid=" + startId + "&u=" + searchUser
                   default:
             }
             if (req) {
                   fetch(req).then((r) => r.json()).then((o) => {
                         console.log("boards o", o)
-                        if (o.end) this.setState({ endOfList: true })
-                        else {
-                              this.setState({
-                                    boards: boards.concat(o.boardList),
-                                    startId: o.endId
-                              })
-                        }
+                        this.setState({
+                              boards: boards.concat(o.boardList),
+                              startId: o.endId,
+                              endOfList: o.end ? true : false
+                        })
                   })
             }
       }
       private handleLoadMore = () => {
+            console.log("loadmore")
             this.getBoards()
       }
       private renderItem = ({ item }) => <BoardItem item={item} />
 
       render(): React.ReactNode {
-            const { boards } = this.state
+            const { boards, categ } = this.state
             const slim = window.innerWidth < slimThreshold
             if (boards.length > 0) {
                   return (
-                        <FlatList
-                              style={[pageSt, transparentWhiteSt, slim ? slimPageSt : widePageSt]}
-                              data={boards}
-                              renderItem={this.renderItem}
-                              keyExtractor={(item: any) => item.id}
-                              onEndReached={this.handleLoadMore}
-                              onEndReachedThreshold={1} />
+                        <View style={[pageSt, transparentWhiteSt, slim ? slimPageSt : widePageSt]}>
+                              <FlatList
+                                    style={flatListSt}
+                                    data={boards}
+                                    renderItem={this.renderItem}
+                                    keyExtractor={(item: any) => item.id}
+                                    onEndReached={this.handleLoadMore}
+                                    onEndReachedThreshold={0.5}
+                              />
+                        </ View>
                   )
             } else {
                   return (
                         <View style={[pageSt, transparentWhiteSt, slim ? slimPageSt : widePageSt]}>
-                              <Text style={vacancyTextSt}>첫번째 게시글의 주인이 되어보세요.</Text>
+                              <Text style={vacancyTextSt}>{categ === BOARD_CATEGORY.userBoards ? "게시글이 없습니다." : "첫번째 게시글의 주인이 되어보세요."}</Text>
                         </View>
                   )
             }
       }
 }
+const flatListSt = setStyle({
+      borderTopLeftRadius: "20px",
+      borderTopRightRadius: "20px"
+})
 export const transparentWhiteSt = setStyle({
       backgroundColor: tWhite
 })

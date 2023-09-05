@@ -1,32 +1,39 @@
 
 import { deepGray, fontBlackSt, gray, lightGray, setStyle, slimThreshold, smallFontSize } from "front/@lib/style"
-import { CLIENT_SETTINGS, extension, fullStyle } from "front/@lib/util"
+import { CLIENT_SETTINGS, PROPS, extension, fullStyle } from "front/@lib/util"
 import Action from "front/reactCom"
 import React from "react"
 import { FlatList, Image, Pressable, Text, View } from "reactNative"
 import FollowItem from "./followItem"
 
 type State = {
-      key: string,
+      tag: string,
       startId: number,
+      recommends: UserType[]
       follows: UserType[],
       endOfList: boolean
-      followsOnly: boolean
+      zero: boolean
 }
 export default class Follows extends Action<Props, State> {
       constructor(props: Props) {
             super(props)
             this.state = {
-                  key: "",
+                  tag: PROPS.data.ext ? PROPS.data.url : null,
                   startId: 0,
+                  recommends: [],
                   follows: [],
                   endOfList: false,
-                  followsOnly: false
+                  zero: false
             }
       }
-
+      protected ACTION_RECEIVER_TABLE: any = {
+            followListTag: (tag) => {
+                  this.setState({ tag, recommends: [], startId: 0, follows: [], endOfList: false }, () => this.getFollows(true))
+            }
+      }
       componentDidMount(): void {
             super.componentDidMount()
+            this.getFollows(true)
             window.addEventListener("resize", this.resize)
       }
       componentWillUnmount() {
@@ -39,68 +46,61 @@ export default class Follows extends Action<Props, State> {
                   this.forceUpdate()
             } this.previousWidth = window.innerWidth
       }
-      private getFollows = () => {
-            const { startId, follows, endOfList } = this.state
+      private getFollows = (hot?: boolean) => {
+            const { tag, startId, follows, endOfList, zero } = this.state
             if (endOfList) return
-            console.log("getFollows")
-            fetch("/follows?sid=" + startId)
-                  .then((r) => r.json())
-                  .then((o) => {
-                        if (o.end) this.setState({ endOfList: true })
-                        else {
-                              this.setState({
-                                    follows: follows.concat(o.followList),
-                                    startId: o.endId
-                              })
-                        }
+            console.log("getFollows", tag, startId, follows, hot)
+            if (hot) {
+                  console.log("fe", "/getfollow?h=1" + (tag ? ("&t=" + tag) : ""))
+                  fetch("/getfollow?h=1" + (tag ? ("&t=" + tag) : "")).then((r) => r.json()).then((o) => {
+                        console.log("hotFollowO", o)
+                        this.setState({
+                              recommends: o.recomm,
+                              follows: o.follow.users,
+                              startId: o.follow.endId,
+                              endOfList: o.follow.end ? true : false,
+                              zero: o.follow.zero
+                        })
                   })
+            } else {
+                  fetch("/getfollow?sid=" + startId + (tag ? ("&t=" + tag) : "") + (zero ? "&z=1" : "")).then((r) => r.json()).then((o) => {
+                        console.log("followO", o)
+                        this.setState({
+                              follows: follows.concat(o.follow.users),
+                              startId: o.follow.endId,
+                              endOfList: o.follow.end,
+                              zero: o.follow.zero
+                        })
+                  })
+            }
       }
       private handleLoadMore = () => {
             this.getFollows()
       }
-      private renderItem = ({ item }) => <FollowItem item={item} />
-      private handleFindMore = () => {
-            this.setState({ followsOnly: true })
-      }
+      private renderItem = ({ item }) => <FollowItem userKey={item.key} name={item.name} image={item.image} />
 
       render(): React.ReactNode {
-            const { follows, followsOnly } = this.state
+            const { recommends, follows } = this.state
             const slim = window.innerWidth < slimThreshold
-            if (followsOnly) {
-                  return (
-                        <View style={[sideBarSt, fullStyle ? fullSt : null, slim ? slimSideBarSt : wideSideBarSt]}>
-                              <Pressable onPress={this.handleFindMore}>
-                                    <Text style={textButtonSt}>닫기</Text>
-                              </Pressable>
-                              <Image style={iconSt} source={{ uri: CLIENT_SETTINGS.host + "/images/heart.svg" }} />
+            return (
+                  <View style={[sideBarSt, fullStyle ? fullSt : null, slim ? slimSideBarSt : wideSideBarSt]}>
+                        <Image style={[iconSt, slim ? slimSideBarIconSt : wideSideBarIconSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/hot.svg" }} />
+                        <View>
                               <FlatList
-                                    style={listSt}
-                                    data={follows}
+                                    data={recommends}
                                     renderItem={this.renderItem}
-                                    keyExtractor={(item: any) => item.id} />
+                                    keyExtractor={(item: any) => item.key} />
                         </View>
-                  )
-            } else {
-                  return (
-                        <View style={[sideBarSt, fullStyle ? fullSt : null, slim ? slimSideBarSt : wideSideBarSt]}>
-                              <Image style={[iconSt, slim ? slimSideBarIconSt : wideSideBarIconSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/heartBlack.svg" }} />
-                              <FlatList
-                                    style={listSt}
-                                    data={follows}
-                                    renderItem={this.renderItem}
-                                    keyExtractor={(item: any) => item.id} />
-                              <Pressable onPress={this.handleFindMore}>
-                                    <Text style={textButtonSt}>더보기</Text>
-                              </Pressable>
-                              <Image style={[iconSt, slim ? slimSideBarIconSt : wideSideBarIconSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/hot.svg" }} />
-                              <FlatList
-                                    style={listSt}
-                                    data={follows}
-                                    renderItem={this.renderItem}
-                                    keyExtractor={(item: any) => item.id} />
-                        </View>
-                  )
-            }
+                        <Image style={[iconSt, slim ? slimSideBarIconSt : wideSideBarIconSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/heartBlack.svg" }} />
+                        <FlatList
+                              data={follows}
+                              renderItem={this.renderItem}
+                              keyExtractor={(item: any) => item.key}
+                              onEndReached={this.handleLoadMore}
+                              onEndReachedThreshold={0.5}
+                        />
+                  </View>
+            )
       }
 }
 export const sideBarSt = setStyle({
@@ -114,29 +114,20 @@ const fullSt = setStyle({
       borderRightColor: lightGray
 })
 export const slimSideBarSt = setStyle({
-      width: "50px"
+      width: "65px"
 })
 export const wideSideBarSt = setStyle({
       width: "190px"
 })
 const slimSideBarIconSt = setStyle({
-      left: "12px"
+      left: "14px"
 })
 const wideSideBarIconSt = setStyle({
       left: "88px"
 })
-const listSt = setStyle({
-      height: "250px"
-})
 const iconSt = setStyle({
-      height: "25px",
-      width: "25px",
-      marginTop: "7px"
-})
-const textButtonSt = setStyle({
-      textAlign: "center",
-      marginTop: "5px",
-      marginBottom: "5px",
-      fontSize: smallFontSize,
-      color: "black"
+      height: "20px",
+      width: "20px",
+      marginTop: "10px",
+      marginBottom: "5px"
 })

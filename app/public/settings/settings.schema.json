@@ -25,6 +25,9 @@
                         },
                         "tagCnt": {
                               "type": "number"
+                        },
+                        "tagLen": {
+                              "type": "number"
                         }
                   }
             },
@@ -32,6 +35,12 @@
                   "type": "object",
                   "properties": {
                         "limit": {
+                              "type": "number"
+                        },
+                        "recommendLen": {
+                              "type": "number"
+                        },
+                        "followLen": {
                               "type": "number"
                         }
                   }

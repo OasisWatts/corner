@@ -38,7 +38,11 @@ export default class Tag extends Action<Props, State> {
       private handlePress = () => {
             const { name, isUrl, total } = this.props
             this.setState({ activated: true }, () => {
-                  Action.trigger("page", boardPage.boardList, () => Action.trigger("boardListTag", name, isUrl, total))
+                  Action.trigger("page", boardPage.boardList, () => {
+                        Action.trigger("boardListTag", name, isUrl, total)
+                        if (name === "전체") Action.trigger("followListTag", null)
+                        else Action.trigger("followListTag", name)
+                  })
             })
       }
       private handleHoverIn = () => {

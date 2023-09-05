@@ -43,27 +43,55 @@ type Props = {
 export class Board extends Action<Props, State> {
       constructor(props: Props) {
             super(props)
-            this.state = {
-                  commentStartId: 0,
-                  comments: [],
-                  commentText: "",
-                  focusedArea: false,
-                  endOfList: false,
-                  id: -1,
-                  writer: "",
-                  writerId: -1,
-                  writerImage: "",
-                  writerFollowed: false,
-                  date: "",
-                  updated: false,
-                  up: 0,
-                  numComment: 0,
-                  uped: false,
-                  contents: "",
-                  tags: [],
-                  hoverUp: false,
-                  hoverComment: false,
-                  hoverFollow: false
+            if (PROPS.data.boardAccess) {
+                  console.log("board", PROPS.data.board)
+                  const { id, writer, writerId, writerImage, writerFollowed, contents, date, up, numComment, uped, updated, comments, tags } = PROPS.data.board
+                  this.state = {
+                        commentStartId: comments.length ? comments[comments.length - 1]?.id : -1,
+                        comments,
+                        commentText: "",
+                        focusedArea: false,
+                        endOfList: false,
+                        id,
+                        writer,
+                        writerId,
+                        writerImage,
+                        writerFollowed,
+                        date,
+                        updated,
+                        up,
+                        numComment,
+                        uped,
+                        contents,
+                        tags,
+                        hoverUp: false,
+                        hoverComment: false,
+                        hoverFollow: false
+                  }
+                  // PROPS.data.boardAccess = false
+            } else {
+                  this.state = {
+                        commentStartId: 0,
+                        comments: [],
+                        commentText: "",
+                        focusedArea: false,
+                        endOfList: false,
+                        id: this.props.boardId,
+                        writer: "",
+                        writerId: -1,
+                        writerImage: "",
+                        writerFollowed: false,
+                        date: "",
+                        updated: false,
+                        up: 0,
+                        numComment: 0,
+                        uped: false,
+                        contents: "",
+                        tags: [],
+                        hoverUp: false,
+                        hoverComment: false,
+                        hoverFollow: false
+                  }
             }
       }
 
@@ -86,7 +114,9 @@ export class Board extends Action<Props, State> {
       }
       componentDidMount(): void {
             super.componentDidMount()
-            this.getBoard()
+            if (!PROPS.data.boardAccess) {
+                  this.getBoard()
+            }
             window.addEventListener("resize", this.resize)
       }
       componentWillUnmount() {
@@ -136,10 +166,11 @@ export class Board extends Action<Props, State> {
             fetch("/comments?id=" + id + "&startId=" + commentStartId)
                   .then(r => r.json())
                   .then((o) => {
-                        if (o.end) this.setState({ endOfList: true })
-                        else this.setState({
+                        console.log("comment o", o)
+                        this.setState({
                               comments: comments.concat(o.comments),
-                              commentStartId: o.endId
+                              commentStartId: o.endId,
+                              endOfList: o.end ? true : false
                         })
                   })
       }
@@ -151,22 +182,27 @@ export class Board extends Action<Props, State> {
             return <CommentItem item={item} boardId={id} />
       }
       private getBoard = () => {
-            const { boardId } = this.props
-            fetch("/board/" + String(boardId)).then((r) => r.json()).then((res) => {
+            const { id } = this.state
+            console.log("board", id, this.props.boardId)
+            fetch("/boardload?id=" + String(id)).then((r) => r.json()).then((res) => {
                   console.log("res board", res)
                   this.setState({
                         id: res.id,
                         writer: res.writer,
                         writerId: res.writerId,
                         writerImage: res.writerImage,
+                        writerFollowed: res.writerFollowed,
                         date: res.date,
                         updated: res.updated,
                         up: res.up,
-                        numComment: res.numCom,
+                        numComment: res.numComment,
                         uped: res.uped,
                         contents: res.contents,
                         comments: res.comments,
-                        tags: res.tags
+                        commentStartId: res.endId,
+                        endOfList: res.end ? true : false,
+                        tags: res.tags,
+                        commentText: ""
                   })
             })
       }
@@ -177,7 +213,8 @@ export class Board extends Action<Props, State> {
             })
       }
       private handleHoverInUp = () => {
-            this.setState({ hoverUp: true })
+            const { writerId } = this.state
+            if (writerId !== PROPS.data.userKey) this.setState({ hoverUp: true })
       }
       private handleHoverOutUp = () => {
             this.setState({ hoverUp: false })
@@ -249,12 +286,14 @@ export class Board extends Action<Props, State> {
                                     </Pressable>
                               </View>
                         </Pressable>
-                        <FlatList
-                              data={comments}
-                              renderItem={this.renderItem}
-                              keyExtractor={(item: any) => item.id}
-                              onEndReached={this.handleLoadMore}
-                              onEndReachedThreshold={1} />
+                        <View style={commentListSt}>
+                              <FlatList
+                                    data={comments}
+                                    renderItem={this.renderItem}
+                                    keyExtractor={(item: any) => item.id}
+                                    onEndReached={this.handleLoadMore}
+                                    onEndReachedThreshold={0.5} />
+                        </View>
                   </View >
             )
       }
@@ -304,4 +343,7 @@ const tagSt = setStyle({
 })
 export const marginRightButtonSt = setStyle({
       marginRight: "10px"
+})
+const commentListSt = setStyle({
+      height: "100vh"
 })

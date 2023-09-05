@@ -24,6 +24,11 @@ export class Tags extends Action<Props, State> {
                   offsetIndex: 0
             }
       }
+      protected ACTION_RECEIVER_TABLE: any = {
+            "tagReload": () => {
+                  this.getTag()
+            }
+      }
       componentDidMount(): void {
             super.componentDidMount()
             window.addEventListener("resize", this.resize)
@@ -45,14 +50,14 @@ export class Tags extends Action<Props, State> {
             if (PROPS.data.ext) {
                   fetch("/tag?u=" + PROPS.data.url).then((r) => r.json()).then((tags) => {
                         console.log("tag url", tags)
-                        if (tags.length < 1 && PROPS.data.ext) Action.trigger("boardListTag", PROPS.data.hostname, false)
-                        else {
-                              tags.forEach((t, idx) => {
-                                    if (t.isUrl == true) tags[idx].isHere = true
-                              })
-                              console.log("tags", tags)
-                              this.setState({ tags })
-                        }
+                        // if (tags.length < 1 && PROPS.data.ext) Action.trigger("boardListTag", PROPS.data.hostname, false)
+                        // else {
+                        tags.forEach((t, idx) => {
+                              if (t.isUrl == true) tags[idx].isHere = true
+                        })
+                        console.log("tags", tags)
+                        this.setState({ tags })
+                        // }
                   })
             } else {
                   fetch("/tag?h=true").then((r) => r.json()).then((tags) => {
@@ -106,6 +111,9 @@ export class Tags extends Action<Props, State> {
             const slim = window.innerWidth < slimThreshold
             return (
                   <View style={[tagsWrapperSt, slim ? slimTagsWrapperSt : null]}>
+                        {renderOne ? <Tag name={PROPS.data.url} isUrl={true} isHere={true} activatedDefault={true} /> :
+                              null
+                        }
                         {renderOne ? <Tag name={PROPS.data.hostname} isUrl={false} isHere={false} activatedDefault={true} /> :
                               <FlatList ref={this.flatListRef} horizontal={true} showsHorizontalScrollIndicator={false} onContentSizeChange={this.handleContentSizeChange} onScroll={this.handleScroll} data={tags} renderItem={this.renderItem} keyExtractor={(item) => item.name} />
                         }

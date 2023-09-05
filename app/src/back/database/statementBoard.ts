@@ -34,7 +34,6 @@ export class StatementBoard {
                               from ( select id ${fromQuery} ${whereQuery} ${orderQuery}
                               ) b join \`board\` a on b.id = a.id;`
             ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put(err).out())
-            console.log("bLisF", bList)
             return bList
       }
       /** 차단한 상대가 쓴 것이 아닌 게시글 가져오기. */
@@ -52,7 +51,6 @@ export class StatementBoard {
                               from ( select id ${fromQuery} ${whereQuery} ${orderQuery}
                               ) b join \`board\` a on b.id = a.id;`
             ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put(err).out())
-            console.log("bLisF", bList)
             bList.forEach((b, idx) => { bList[idx].uped = 1 })
             return bList
       }
@@ -72,7 +70,6 @@ export class StatementBoard {
                                     ) b join \`board\` a on b.id = a.id;`
                   ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put(err).out())
                   let bListFiltered = bList.filter((b: any) => !blockeds.includes(b.writer))
-                  console.log("bLisF", bListFiltered)
                   return bListFiltered.sort((b1, b2) => b2.up - b1.up)
             } else return []
       }
@@ -80,6 +77,7 @@ export class StatementBoard {
       private static async getTagBoards(startId: number, userKey: number, blockeds: number[], tag: string): Promise<any[]> {
             const tagObj = await DB.Manager.findOne(Tag, { where: { name: tag }, select: ["id"] }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put(err).out())
             if (tagObj) {
+                  console.log("tagObj", tagObj)
                   const tagId = tagObj.id
                   let selectAndQuery = `, (select count(*) from \`user_uped_boards_board\` where userKey = ${userKey} and boardId = a.id) as uped`
                   let joinQuery = `from (select boardId from \`board_tags_tag\` where tagId = ${tagId} ${startId ? ` and boardId < ${startId}` : ""} order by boardId desc limit ${MAX_LIST_LEN} ) b join corner.board a on b.boardId = a.id`
@@ -89,7 +87,6 @@ export class StatementBoard {
                               ${joinQuery};`
                   ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put(err).out())  // 차단 대상 제외.
                   let bListFiltered = bList.filter((b: any) => !blockeds.includes(b.writer))
-                  console.log("bLisF", bListFiltered)
                   return bListFiltered.sort((b1, b2) => b2.up - b1.up)
             } else return []
       }
@@ -106,7 +103,6 @@ export class StatementBoard {
                               ) b join \`board\` a on b.id = a.id;`,
             ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put(err).out())  // 차단 대상 제외.
             let bListFiltered = bList.filter((b: any) => !blockeds.includes(b.writer))
-            console.log("bLisF", bListFiltered, bList)
             return bListFiltered.sort((b1, b2) => b2.up - b1.up)
       }
       private static async getSearchBoards(startId: number, userKey: number, blockeds: number[], search: string): Promise<any[]> {
@@ -123,9 +119,22 @@ export class StatementBoard {
                                     ) b join \`board\` a on b.id = a.id;`,
                   ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put(err).out())  // 차단 대상 제외.
                   let bListFiltered = bList.filter((b: any) => !blockeds.includes(b.writer))
-                  console.log("bLisF", bListFiltered, bList)
                   return bListFiltered.sort((b1, b2) => b2.up - b1.up)
             }
+      }
+      private static async getUserBoards(startId: number, userKey: number, searchUser: number): Promise<any[]> {
+            let whereQuery: string = (startId ? `where id < ${startId} and ` : "where ") + `writer = ${searchUser}`
+            let fromQuery: string = "from \`board\`"
+            let orderQuery = `order by id desc limit ${MAX_LIST_LEN}`
+            let selectAndQuery = `, (select count(*) from \`user_uped_boards_board\` where userKey = ${userKey} and boardId = a.id) as uped`
+            console.log("gub", searchUser)
+            const bList = await DB.Manager.query(
+                  `select *, (select count(id) from \`comment\` where boardId = a.id) as comNum ${selectAndQuery}
+                                    from ( select id ${fromQuery} ${whereQuery} ${orderQuery}
+                                    ) b join \`board\` a on b.id = a.id;`,
+            ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put(err).out())  // 차단 대상 제외.
+            console.log("bList", bList)
+            return bList.sort((b1, b2) => b2.up - b1.up)
       }
       /** 차단한 상대가 쓴 것이 아닌 게시글 가져오기. */
       private static async getBoard(boardId: number, userKey: number): Promise<any> {
@@ -146,7 +155,7 @@ export class StatementBoard {
                   board.tags = tags
             } return board
       }
-      public static async categorizedBoardList(startId: number, categ: number, userKey: number, url?: string, tag?: string, search?: string) {
+      public static async categorizedBoardList(startId: number, categ: number, userKey: number, url?: string, tag?: string, search?: string, searchUser?: number) {
             const user = await DB.Manager.findOne(User, { relations: ["blockeds"], where: { key: userKey } }).catch((err) => {
                   Logger.errorApp(ErrorCode.user_find_failed).put(err).out()
             })
@@ -167,6 +176,9 @@ export class StatementBoard {
                         case BOARD_CATEGORY.searchBoards:
                               if (search) return await this.getSearchBoards(startId, userKey, user.blockeds.map((b) => b.key), search)
                               else return null
+                        case BOARD_CATEGORY.userBoards:
+                              if (searchUser) return await this.getUserBoards(startId, userKey, searchUser)
+                              else return null
                         default: return null
                   }
             } else return null
@@ -178,16 +190,20 @@ export class StatementBoard {
       * @param userKey 사용자 식별자.
       * @returns 조회한 게시글 목록, 끝 식별자 또는 오류 전송.
       */
-      public static async boardList(startId: number, categ: number, userKey: number, url?: string, tag?: string, search?: string) {
+      public static async boardList(startId: number, categ: number, userKey: number, url?: string, tag?: string, search?: string, searchUser?: number) {
             return new Promise(async (resolve, _) => {
-                  const bList = await this.categorizedBoardList(startId, categ, userKey, url, tag, search)
+                  console.log("1")
+                  const bList = await this.categorizedBoardList(startId, categ, userKey, url, tag, search, searchUser)
+                  console.log("bl", bList)
                   if (bList) {
-                        console.log("3")
                         const boardList: boardType[] = []
                         const where: { key: number }[] = []
-                        if (bList.length < 1) {
-                              resolve({ end: true })
+                        let endOfList = false
+                        if (bList.length === 0) {
+                              resolve({ boardList: [], endId: startId, end: true })
                               return
+                        } else if (bList.length < MAX_LIST_LEN) {
+                              endOfList = true
                         }
                         const endId = bList[bList.length - 1].id
                         for (const item of bList) {
@@ -195,12 +211,10 @@ export class StatementBoard {
                                     key: item.writer,
                               })
                         } // 게시물 글쓴이 정보 조회.
-                        console.log("4")
                         DB.Manager.find(User, {
                               where,
                               relations: ["followers"]
                         }).then((r) => {
-                              console.log("r", r)
                               const userTable = reduceToTable(r, (v) => v, (v) => v.key)
                               for (const item of bList) {
                                     const u: any = userTable[item.writer]
@@ -218,9 +232,8 @@ export class StatementBoard {
                                           updated: item.updated
                                     })
                               }
-                              console.log("boardList", boardList, "endId", endId)
                               Logger.passApp("boardList").out()
-                              resolve({ boardList, endId })
+                              resolve({ boardList, endId, end: endOfList })
                         }).catch((err) => Logger.errorApp(ErrorCode.user_find_failed).put(err).out())
                   } else {
                         Logger.errorApp(ErrorCode.board_find_failed).out()
@@ -234,29 +247,26 @@ export class StatementBoard {
        * @param userKey 사용자 디비 식별자.
        * @returns 조회한 게시글 내용 및 댓글.
        */
-      public static boardSelect(boardId: number, userKey: number): Promise<boardType> {
+      public static boardSelect(boardId: number, userKey: number): Promise<any> {
             return new Promise((resolve, _) => {
                   this.getBoard(boardId, userKey).then((board: any) => {
                         if (board) {
-                              console.log("board", board)
                               DB.Manager.findOne(User, {
                                     where: { key: board?.writer },
                                     relations: ["followers"]
                               }).then((user) => {
-                                    console.log("usr", user)
-                                    console.log("f", user?.followers)
                                     DB.Manager.query(
                                           `select comment.id, comment.contents, comment.up, comment.writer, comment.date
                         , (select count(*) from \`user_uped_comments_comment\` where userKey = ${userKey} and commentId = comment.id) as uped
                               from (
                                     select id
                                     from \`board\`
-                                    where id = ${boardId}
-                              ) board left join \`comment\` comment on board.id = comment.boardId order by id desc limit ${MAX_LIST_LEN};`
-                                    ).then((result) => {
-                                          console.log("result", result)
+                                    where board.id = ${boardId}
+                              ) board left join \`comment\` comment on board.id = comment.boardId order by comment.id desc limit ${MAX_LIST_LEN};`
+                                    ).then((cList) => {
+                                          console.log("result", cList)
                                           const where: { key: number }[] = []
-                                          if (result[0]?.id === null) {
+                                          if (cList[0]?.id === null) {
                                                 console.log("no comment", board, board?.contents)
                                                 resolve({
                                                       id: boardId,
@@ -271,11 +281,18 @@ export class StatementBoard {
                                                       uped: board?.uped,
                                                       contents: board?.contents.slice(0, MAX_CONTENTS_LEN),
                                                       comments: [],
+                                                      endId: 0, // comment 관련
+                                                      end: true,
                                                       tags: board?.tags
                                                 })
                                                 return
                                           } console.log("1")
-                                          for (const c of result) {
+                                          let endOfList = false
+                                          let endId = cList[cList.length - 1].id
+                                          if (cList.length < MAX_LIST_LEN) {
+                                                endOfList = true
+                                          }
+                                          for (const c of cList) {
                                                 where.push({
                                                       key: c.writer,
                                                 })
@@ -288,7 +305,7 @@ export class StatementBoard {
                                                 const userTable = reduceToTable(r, (v) => v, (v) => v.key)
                                                 console.log("usert", userTable)
                                                 const comments: commentType[] = []
-                                                for (const c of result) {
+                                                for (const c of cList) {
                                                       console.log("c", c)
                                                       const u = userTable[c.writer]
                                                       comments.push({
@@ -317,6 +334,8 @@ export class StatementBoard {
                                                       uped: board.uped,
                                                       contents: board.contents.slice(0, MAX_CONTENTS_LEN),
                                                       comments,
+                                                      endId,
+                                                      end: endOfList,
                                                       tags: board.tags
                                                 })
                                           }).catch((err) => Logger.errorApp(ErrorCode.user_find_failed).put(err).out())
@@ -340,11 +359,17 @@ export class StatementBoard {
                               from (
                                     select id
                                     from \`board\`
-                                    where id = ${boardId}
-                              ) board left join \`comment\` comment on board.id = comment.boardId where ${commentStartId ? `id < ${commentStartId}` : ""} order by id desc limit ${MAX_LIST_LEN};`,
+                                    where board.id = ${boardId}
+                              ) board left join \`comment\` comment on board.id = comment.boardId where ${commentStartId ? `comment.id < ${commentStartId}` : ""} order by comment.id desc limit ${MAX_LIST_LEN};`,
                   ).then((cList) => {
                         const where: { key: number }[] = []
-                        if (cList.length < 1) resolve({ end: true })
+                        let endOfList = false
+                        if (cList.length === 0) {
+                              resolve({ comments: [], endId: commentStartId, end: true })
+                              return
+                        } else if (cList.length < MAX_LIST_LEN) {
+                              endOfList = true
+                        }
                         for (const c of cList) {
                               where.push({
                                     key: c.writer,
@@ -374,7 +399,8 @@ export class StatementBoard {
                               }
                               resolve({
                                     comments: (comments[0].id === null ? [] : comments),
-                                    endId
+                                    endId,
+                                    end: endOfList
                               })
                         }).catch((err) => Logger.errorApp(ErrorCode.user_find_failed).put(err).out())
                   }).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put(err).out())
@@ -386,60 +412,92 @@ export class StatementBoard {
        * @param contents 게시글 내용.
        */
       public static async boardInsert(writerKey: number, contents: string, hashTag: string, url_?: string, hostname_?: string) {
-            let urlEntity: Url | null = null
             const hashTags = hashTag.split("#").map((t) => ({ tag: t.replace(/\n|\s/g, ""), isUrl: false })).filter((t) => t.tag.length)
-            console.log("uh", url_, hostname_)
-            if (url_) {
-                  const urlExist = await DB.Manager.findOne(Url, { where: { name: url_ } })
-                  if (urlExist) {
-                        urlEntity = urlExist
-                        await DB.Manager.increment(Url, { name: url_ }, "count", 1)
-                  } else {
-                        const parsedUrl = url.parse(url_)
-                        if (parsedUrl.path === "") {
-                              urlEntity = await DB.Manager.save(Url, { name: url_, count: 1, isHost: true })
-                        } else {
-                              urlEntity = await DB.Manager.save(Url, { name: url_, count: 1 })
-                        }
-                  }
-                  if (urlEntity) {
-                        const userUrlCount = await DB.Manager.findOne(UserUrlCount, { where: { user: { key: writerKey }, url: urlEntity } })
-                        if (userUrlCount) {
-                              await DB.Manager.increment(UserUrlCount, { user: { key: writerKey }, url: urlEntity }, "count", 1)
-                        } else await DB.Manager.save(UserUrlCount, { user: { key: writerKey }, url: urlEntity, count: 1 })
-                  }
-                  hashTags.push({ tag: url_, isUrl: true })
-            }
-            if (hostname_) hashTags.push({ tag: hostname_, isUrl: false })
             const hashTagEntities: Tag[] = []
-            console.log("hashtags", hashTags)
-            for (const tagObj of hashTags) {
-                  const tagExist = await DB.Manager.findOne(Tag, { where: { name: tagObj.tag } })
-                  let tagEntity: Tag
-                  console.log("tagExist", tagExist)
-                  if (tagExist) {
-                        tagEntity = tagExist
-                        await DB.Manager.increment(Tag, { name: tagObj.tag }, "count", 1)
-                        if (urlEntity) await DB.Manager.increment(UrlTagCount, { url: urlEntity, tag: tagExist }, "count", 1)
+            const promisesTags: Promise<any>[] = []
+            const promisesFunc: Promise<any>[] = []
+            let urlO_: Url
+            console.log("uh", url_, hostname_)
+            if (url_) hashTags.push({ tag: url_, isUrl: true })
+            if (hostname_) hashTags.push({ tag: hostname_, isUrl: false })
+            return new Promise(async (resolve, _) => {
+                  if (url_) {
+                        const urlO = await DB.Manager.findOne(Url, { where: { name: url_ } })
+                        if (urlO) {
+                              urlO_ = urlO
+                              const p = new Promise((res, _) => DB.Manager.increment(Url, { name: url_ }, "count", 1).then(() => res(urlO)))
+                              const p0 = new Promise((res, _) => DB.Manager.increment(UserUrlCount, { user: { key: writerKey }, url: urlO }, "count", 1).then(() => res(true)))
+                              promisesFunc.push(p, p0)
+                        } else {
+                              const parsedUrl = url.parse(url_)
+                              const urlO = await DB.Manager.save(Url, { name: url_, count: 1, isHost: parsedUrl.path === "" })
+                              urlO_ = urlO
+                              const p0 = new Promise((res, _) => DB.Manager.save(UserUrlCount, { user: { key: writerKey }, url: urlO, count: 1 }).then(() => res(urlO)))
+                              promisesFunc.push(p0)
+                        }
+                        await Promise.all(promisesFunc)
+                        for (const tagObj of hashTags) {
+                              const pt = new Promise(async (res, _) => {
+                                    const tagO = await DB.Manager.findOne(Tag, { where: { name: tagObj.tag } })
+                                    if (tagO) {
+                                          hashTagEntities.push(tagO)
+                                          const promisesInside: Promise<any>[] = []
+                                          const pi = new Promise((res, _) => DB.Manager.increment(Tag, { name: tagObj.tag }, "count", 1).then(() => res(true)))
+                                          const pi0 = new Promise((res, _) => DB.Manager.increment(UrlTagCount, { url: { id: urlO_?.id }, tag: { id: tagO.id } }, "count", 1).then(() => res(true)).catch((err) => Logger.errorApp(ErrorCode.urltagcount_update_failed).put(err).out()))
+                                          promisesInside.push(pi, pi0)
+                                          await Promise.all(promisesInside)
+                                          res(true)
+                                    } else {
+                                          console.log("no tag")
+                                          const tagO_ = await DB.Manager.save(Tag, { name: tagObj.tag, isUrl: tagObj.isUrl, count: 1 })
+                                          hashTagEntities.push(tagO_)
+                                          DB.Manager.save(UrlTagCount, { url: { id: urlO_?.id }, tag: { id: tagO_.id }, count: 1 }).then(() => res(true)).catch((err) => Logger.errorApp(ErrorCode.urltagcount_save_failed).put(err).out())
+                                    }
+                              }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put(err).out())
+                              promisesTags.push(pt)
+                        }
                   } else {
-                        tagEntity = await DB.Manager.save(Tag, { name: tagObj.tag, isUrl: tagObj.isUrl, count: 1 })
-                        if (urlEntity && tagEntity) {
-                              await DB.Manager.save(UrlTagCount, { url: urlEntity, tag: tagEntity, count: 1 })
+                        console.log("1")
+                        for (const tagObj of hashTags) {
+                              console.log("tObj", tagObj)
+                              const pt = new Promise(async (res, _) => {
+                                    const tagO = await DB.Manager.findOne(Tag, { where: { name: tagObj.tag } })
+                                    if (tagO) {
+                                          hashTagEntities.push(tagO)
+                                          DB.Manager.increment(Tag, { name: tagObj.tag }, "count", 1).then(() => res(true))
+                                                .catch((err) => Logger.errorApp(ErrorCode.tag_update_failed).put(err).out())
+                                    } else {
+                                          DB.Manager.save(Tag, { name: tagObj.tag, isUrl: tagObj.isUrl, count: 1 }).then((tagO) => {
+                                                hashTagEntities.push(tagO)
+                                                res(true)
+                                          }).catch((err) => Logger.errorApp(ErrorCode.tag_save_failed).put(err).out())
+                                    }
+                              })
+                              promisesTags.push(pt)
                         }
                   }
-                  if (tagEntity) {
-                        hashTagEntities.push(tagEntity)
-                        const userTagCountExist = await DB.Manager.findOne(UserTagCount, { where: { user: { key: writerKey }, tag: tagEntity } })
-                        console.log("userTagCount", userTagCountExist)
-                        if (userTagCountExist) {
-                              await DB.Manager.increment(UserTagCount, { user: { key: writerKey }, tag: tagEntity }, "count", 1)
-                        } else await DB.Manager.save(UserTagCount, { user: { key: writerKey }, tag: tagEntity, count: 1 })
+                  const resultTag = await Promise.all(promisesTags)
+                  console.log("hashtags", hashTags, hashTagEntities)
+                  let promisesUserTag: Promise<any>[] = []
+                  for (let hE of hashTagEntities) {
+                        promisesUserTag.push(
+                              new Promise(async (resolve, _) => {
+                                    const userTagCountExist = await DB.Manager.findOne(UserTagCount, { where: { user: { key: writerKey }, tag: { id: hE.id } } })
+                                    console.log("userTagCount", userTagCountExist)
+                                    if (userTagCountExist) {
+                                          await DB.Manager.increment(UserTagCount, { user: { key: writerKey }, tag: { id: hE.id } }, "count", 1)
+                                    } else await DB.Manager.save(UserTagCount, { user: { key: writerKey }, tag: { id: hE.id }, count: 1 })
+                                    resolve(true)
+                              })
+                        )
                   }
-            }
-
-            if (urlEntity) await DB.Manager.save(Board, { contents: contents.slice(0, MAX_CONTENTS_LEN), writer: writerKey, tags: hashTagEntities, url: urlEntity })
-            else await DB.Manager.save(Board, { contents: contents.slice(0, MAX_CONTENTS_LEN), writer: writerKey, tags: hashTagEntities })
-            return true
+                  await Promise.all(promisesUserTag)
+                  console.log("promise result", resultTag, urlO_)
+                  if (urlO_) await DB.Manager.save(Board, { contents: contents.slice(0, MAX_CONTENTS_LEN), writer: writerKey, tags: hashTagEntities, url: urlO_ })
+                  else await DB.Manager.save(Board, { contents: contents.slice(0, MAX_CONTENTS_LEN), writer: writerKey, tags: hashTagEntities })
+                  Logger.passApp("boardEnroll all").out()
+                  resolve(true)
+            })
       }
 
       /**
@@ -483,6 +541,8 @@ export class StatementBoard {
       * @param userKey 사용자 디비 식별자.
       */
       public static async boardUp(boardId: number, userKey: number) {
+            const board = await DB.Manager.findOne(Board, { where: { id: boardId }, select: ["writer"] })
+            if (board?.writer === userKey) return
             const uped = await DB.Manager.query(`select * from \`user_uped_boards_board\` where userKey=${userKey} and boardId=${boardId}`)
             if (uped.length) {
                   await DB.Manager.query(`delete from \`user_uped_boards_board\` where userKey=${userKey} and boardId=${boardId}`)
@@ -578,6 +638,8 @@ export class StatementBoard {
        * @param userKey 사용자 식별자.
        */
       public static async commentUp(commentId: number, userKey: number) {
+            const board = await DB.Manager.findOne(Comment, { where: { id: commentId }, select: ["writer"] })
+            if (board?.writer === userKey) return
             const uped = await DB.Manager.query(`select * from \`user_uped_comments_comment\` where userKey=${userKey} and commentId=${commentId}`)
             if (uped.length) {
                   await DB.Manager.query(`delete from \`user_uped_comments_comment\` where userKey=${userKey} and commentId=${commentId}`)
@@ -614,8 +676,11 @@ export class StatementBoard {
       /** url에 사용된 태그 가져오기. */
       public static async getUrlTag(url: string) {
             return new Promise((resolve, _) => {
+                  console.log("url", url)
                   DB.Manager.findOne(Url, { select: ["id"], where: { name: url } }).then((url_) => {
+                        console.log("1", url_)
                         if (url_) {
+                              console.log("url_", url_)
                               const urlId = url_.id
                               DB.Manager.query(`select name, isUrl from (select tagId from \`urltagcount\` where urlId = ${urlId}  order by count desc limit ${MAX_TAG_CNT}) b join corner.tag a on a.id = b.tagid;`)
                                     .then((r) => {
@@ -628,24 +693,34 @@ export class StatementBoard {
                                                 Logger.errorApp(ErrorCode.tag_find_failed).out()
                                           }
                                     }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put(err).out())
-                        } else Logger.errorApp(ErrorCode.url_find_failed).out()
+                        } else {
+                              console.log("2")
+                              resolve([])
+                        }
                   }).catch((err) => Logger.errorApp(ErrorCode.url_find_failed).put(err).out())
             })
       }
 
       /** 핫한 태그 가져오기. */
-      public static async getHotTag() {
+      public static async getHotTag(userKey: number) {
+            const hotKeyLen = Math.ceil(MAX_TAG_CNT / 2)
+            const userHotKeyLen = MAX_TAG_CNT - hotKeyLen - 1
+            console.log("len", hotKeyLen, userHotKeyLen)
             return new Promise((resolve, _) => {
-                  DB.Manager.query(`select name, isUrl from (select tagId from \`urltagcount\` order by count desc limit ${MAX_TAG_CNT}) b join corner.tag a on a.id = b.tagid;`)
+                  DB.Manager.query(`select name, isUrl from (select tagId from \`usertagcount\` where userKey = ${userKey} order by count desc limit ${userHotKeyLen}) b join \`tag\` a on a.id = b.tagId;`)
                         .then((r) => {
                               console.log("tag", r)
-                              Logger.passApp("get tag").out()
-                              if (r) {
-                                    resolve(r)
-                                    return
-                              } else {
-                                    Logger.errorApp(ErrorCode.tag_find_failed).out()
-                              }
+                              const left_tag_cnt = hotKeyLen - (userHotKeyLen - r.length)
+                              const exclude_tag = r.map((t) => "\"" + t.name + "\"").join(" ,")
+                              console.log("exclude", exclude_tag)
+                              DB.Manager.query(`select name, isUrl from \`tag\` where name not in (${exclude_tag}) order by count desc limit ${left_tag_cnt}`)
+                                    .then((r2) => {
+                                          console.log("tag2", r2)
+                                          r.push(...r2)
+                                          Logger.passApp("get tag").out()
+                                          resolve(r)
+                                          return
+                                    }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put(err).out())
                         }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put(err).out())
             })
       }

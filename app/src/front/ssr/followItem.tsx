@@ -1,27 +1,57 @@
 
-import { composeStyle, contentFontSize, setStyle, tUpColor } from "front/@lib/style"
+import { composeStyle, contentFontSize, setStyle, slimThreshold, tUpColor, tWriteColor } from "front/@lib/style"
 import { CLIENT_SETTINGS } from "front/@lib/util"
 import Action from "front/reactCom"
 import React from "react"
 import { Image, Pressable, Text, View } from "reactNative"
+import { boardPage } from "."
 
 type State = {
       hoverItem: boolean
+      activated: boolean
 }
 type Props = {
-      item: UserType
+      name: string
+      image: string
+      userKey: number
 }
 export default class FollowItem extends Action<Props, State> {
       constructor(props: Props) {
             super(props)
             this.state = {
-                  hoverItem: false
+                  hoverItem: false,
+                  activated: false
             }
+      }
+      protected ACTION_RECEIVER_TABLE: any = {
+            followUserList: (key_) => { // 선택된 태그 외, 다른 태그는 취소.
+                  const { userKey } = this.props
+                  if (key_ !== userKey) this.setState({ activated: false })
+            }
+
+      }
+      componentDidMount(): void {
+            super.componentDidMount()
+            window.addEventListener("resize", this.resize)
+      }
+      componentWillUnmount() {
+            super.componentWillUnmount()
+            window.removeEventListener("resize", this.resize)
+      }
+      private previousWidth: number = window.innerWidth
+      private resize = () => {
+            if ((this.previousWidth > slimThreshold && window.innerWidth <= slimThreshold) || (this.previousWidth < slimThreshold && window.innerWidth >= slimThreshold)) {
+                  this.forceUpdate()
+            } this.previousWidth = window.innerWidth
       }
 
       private handlePressFollowItem = () => {
-            const { item } = this.props
-            Action.trigger("pageFollowBoardList", item.key)
+            const { userKey } = this.props
+            console.log("press follwitem", userKey)
+            Action.trigger("page", boardPage.boardList, () => {
+                  Action.trigger("boardListUser", userKey)
+                  Action.trigger("followUserList", userKey)
+            })
       }
       private handleHoverIn = () => {
             this.setState({ hoverItem: true })
@@ -31,23 +61,26 @@ export default class FollowItem extends Action<Props, State> {
       }
 
       render(): React.ReactNode {
-            const { hoverItem } = this.state
-            const { item } = this.props
+            const { hoverItem, activated } = this.state
+            const { name, image } = this.props
+            const slim = window.innerWidth < slimThreshold
             return (
-                  <Pressable onPress={this.handlePressFollowItem} style={followSt} onHoverIn={this.handleHoverIn} onHoverOut={this.handleHoverOut} >
-                        <Pressable style={[iconWrapSt, hoverItem ? iconBorderSt : null]}>
-                              <Image style={iconSt} source={{ uri: CLIENT_SETTINGS.host + "/users/" + item.image }} />
-                              <View style={iconCoverSt} />
+                  <View style={[followSt, slim ? null : wideFollowSt]}>
+                        <Pressable style={iconWrapSt} onPress={this.handlePressFollowItem} onHoverIn={this.handleHoverIn} onHoverOut={this.handleHoverOut} >
+                              <Image style={[iconSt, hoverItem || activated ? iconBorderSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/profiles/" + image }} />
+                              <Text style={[textSt, slim ? null : wideTextSt]}>{name}</Text>
                         </Pressable>
-                        <Text style={textSt}>{item.name}</Text>
-                  </Pressable>
+                  </View>
             )
       }
 }
 const followSt = setStyle({
-      height: "40px",
+      height: "50px",
       width: "100%",
-      paddingTop: "5px"
+      marginTop: "5px"
+})
+const wideFollowSt = setStyle({
+      height: "35px"
 })
 const iconWrapSt = setStyle({
       height: "30px",
@@ -57,25 +90,25 @@ const iconWrapSt = setStyle({
       marginLeft: "10px"
 })
 const iconBorderSt = setStyle({
-      borderWidth: "2px",
+      borderWidth: "5px",
       borderStyle: "solid",
-      borderColor: tUpColor
+      borderColor: tWriteColor
 })
 const iconSt = setStyle({
       height: "30px",
       width: "30px",
-      position: "absolute",
-      top: "0",
-      left: "0"
+      borderRadius: "20px"
 })
-const iconCoverSt = composeStyle(
-      iconSt,
-      {
-            borderRadius: "20px",
-            backdropFilter: "grayscale(1)",
-            zIndex: "1"
-      })
 const textSt = setStyle({
       fontSize: contentFontSize,
-      marginLeft: "10px"
+      overflowX: "clip",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+      width: "30px"
+})
+const wideTextSt = setStyle({
+      position: "absolute",
+      left: "45px",
+      lineHeight: "30px",
+      width: "120px"
 })

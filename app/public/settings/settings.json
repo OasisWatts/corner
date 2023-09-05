@@ -7,10 +7,13 @@
       "board": {
             "listLen": 10,
             "contentsLen": 500,
-            "tagCnt": 7
+            "tagCnt": 7,
+            "tagLen": 10
       },
       "follow": {
-            "limit": 300
+            "limit": 100,
+            "recommendLen": 4,
+            "followLen": 7
       },
       "block": {
             "limit": 300

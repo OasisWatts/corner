@@ -8,7 +8,7 @@ import { BoardItem } from "./boardItem"
 import { buttonsForWriteBoxSt, inputForWriteBoxSt, marginRightButtonSt, upColorSt, wrapForWriteBoxSt } from "./board"
 import { boardPage } from "."
 import { getHumanNumber, getHumanTimeDistance } from "front/@lib/Language"
-import { CLIENT_SETTINGS, fullStyle, userKey } from "front/@lib/util"
+import { CLIENT_SETTINGS, PROPS, fullStyle, userKey } from "front/@lib/util"
 import { } from "./write"
 
 const MAX_CONTENTS_LEN = 100 // CLIENT_SETTINGS.board.contentsLen
@@ -80,7 +80,8 @@ export class CommentItem extends Action<Props, State> {
             })
       }
       private handlePressEdit = () => {
-            this.setState({ updateToggle: true })
+            const { item } = this.props
+            this.setState({ updateToggle: true, text: item.contents })
       }
       private handlePressCancel = () => {
             this.setState({ updateToggle: false })
@@ -100,7 +101,8 @@ export class CommentItem extends Action<Props, State> {
             })
       }
       private handleHoverInUp = () => {
-            this.setState({ hoverUp: true })
+            const { item } = this.props
+            if (item.writerId !== PROPS.data.userKey) this.setState({ hoverUp: true })
       }
       private handleHoverOutUp = () => {
             this.setState({ hoverUp: false })

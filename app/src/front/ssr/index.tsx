@@ -63,7 +63,7 @@ export default class Index extends Action<Props, State> {
       constructor(props: Page.Props<"ssr">) {
             super(props)
             this.state = {
-                  page: boardPage.boardList,
+                  page: PROPS.data.boardAccess ? boardPage.board : boardPage.boardList,
                   boardId: -1,
             }
             console.log("front", FRONT)
@@ -83,18 +83,20 @@ export default class Index extends Action<Props, State> {
                   this.setState({ page: boardPage.update, boardId })
             },
             "pageBoard": (boardId) => {
+                  console.log("pb", boardId)
                   this.pushHistory(boardPage.board, boardId)
                   this.setState({ page: boardPage.board, boardId })
-            },
-            "pageFollowBoardList": (userId) => { // 해당 사람의 boardList 보여주기 [미완]
-                  this.pushHistory(boardPage.boardList)
-                  this.setState({ page: boardPage.boardList, userId })
             }
       }
       componentDidMount() {
             super.componentDidMount()
             const urlPage = location.href.split("/")[3] // localhost url 기준
-            window.history.pushState({ page_id: urlPage }, "", `/${urlPage}`)
+            if (PROPS.data.boardAccess) {
+                  console.log("index cm")
+                  const boardUrl = "/board/" + String(PROPS.data.board.id)
+                  window.history.pushState({ page_id: boardUrl }, "", boardUrl)
+                  PROPS.data.boardAccess = false // board로 바로 redering 용 (한 번 보여줬으면, 해당 board가 아닌 다른 반응을 해야하므로, false로 돌림, component did mount 마지막 호출이라 여기서 처리)
+            } else window.history.pushState({ page_id: urlPage }, "", `/${urlPage}`); console.log("index cm1")
       }
       private pushHistory = (page, boardId?: number) => {
             let url_ = windowHistory[page]

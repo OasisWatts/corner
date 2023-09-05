@@ -1,5 +1,3 @@
-import Action from "./reactCom";
-
 /** Window 타입 추가. */
 interface Window {
       __CLIENT_SETTINGS: any
@@ -26,6 +24,8 @@ declare namespace Page {
                   hostname: string | null
                   ext: boolean
                   userKey: number
+                  boardAccess?: boolean
+                  board?: BoardType
             }
       }
       interface Props<T extends Page.Key> {
@@ -50,7 +50,10 @@ declare type ActionReceiverTable = Partial<{
       "searchShow": Action<[boolean]>,
       "boardListMyBoard": Action,
       "boardListMyUp": Action,
-      "setting": Action
+      "boardListUser": Action<[number]>,
+      "setting": Action,
+      "tagReload": Action,
+      "followListUser": Action<[string]>
 }>
 
 declare type Props = {}

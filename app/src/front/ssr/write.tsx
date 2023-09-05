@@ -6,10 +6,10 @@ import React from "react"
 import { View, TextInput, Pressable, Text } from "reactNative"
 import { boardPage } from "."
 import { wrapForWriteBoxSt } from "./board"
-import { PROPS, extension, fullStyle } from "front/@lib/util"
+import { CLIENT_SETTINGS, PROPS, extension, fullStyle } from "front/@lib/util"
 
-const MAX_CONTENTS_LEN = 100// CLIENT_SETTINGS.board.contentsLen
-
+const MAX_CONTENTS_LEN = CLIENT_SETTINGS.board.contentsLen
+const MAX_TAG_LEN = CLIENT_SETTINGS.board.tagLen
 type Props = {
       update: boolean,
       boardId: number | null
@@ -32,8 +32,10 @@ export class Write extends Action<Props, State> {
       }
 
       componentDidMount(): void {
+            const { update } = this.props
             super.componentDidMount()
             window.addEventListener("resize", this.resize)
+            if (update) this.getBoard()
       }
       componentWillUnmount() {
             super.componentWillUnmount()
@@ -44,6 +46,17 @@ export class Write extends Action<Props, State> {
             if ((this.previousWidth > slimThreshold && window.innerWidth <= slimThreshold) || (this.previousWidth < slimThreshold && window.innerWidth >= slimThreshold)) {
                   this.forceUpdate()
             } this.previousWidth = window.innerWidth
+      }
+      private getBoard = () => {
+            const { boardId } = this.props
+            console.log("getBoard from update")
+            fetch("/board/" + String(boardId)).then((r) => r.json()).then((res) => {
+                  console.log("res board", res)
+                  this.setState({
+                        contentText: res.contents,
+                        hashTag: "#" + res.tags.join(" #")
+                  })
+            })
       }
       private onChangeContentText = (contentText) => {
             this.setState({ contentText })
@@ -66,19 +79,25 @@ export class Write extends Action<Props, State> {
                         "Content-Type": "application/json"
                   },
                   body: JSON.stringify({ c: contentText, t: hashTag, u: (PROPS.data.ext ? PROPS.data.url : "") || "", h: (PROPS.data.ext ? PROPS.data.hostname : "") || "" })
-            }).then(() => Action.trigger("page", boardPage.boardList))
+            }).then(() => {
+                  Action.trigger("page", boardPage.boardList)
+                  Action.trigger("tagReload")
+            })
       }
       private handlePressBoardUpdate = () => {
             const { boardId } = this.props
-            const { contentText } = this.state
+            const { contentText, hashTag } = this.state
             if (boardId) {
                   fetch("/boardUpdate?id=" + boardId, {
                         method: "POST",
                         headers: {
                               "Content-Type": "application/json"
                         },
-                        body: JSON.stringify({ c: contentText })
-                  }).then(() => Action.trigger("page", boardPage.boardList))
+                        body: JSON.stringify({ c: contentText, t: hashTag })
+                  }).then(() => {
+                        Action.trigger("page", boardPage.boardList)
+                        Action.trigger("tagReload")
+                  })
             }
       }
       private handlePressCancel = () => {
@@ -107,7 +126,7 @@ export class Write extends Action<Props, State> {
                         <TextInput style={[inputForWritePageSt, fullStyle ? fullStyleInputForWritePageSt : null, fullStyle ? almostWhiteSt : (focusedContentArea ? whiteSt : null)]} multiline numberOfLines={3} maxLength={MAX_CONTENTS_LEN} onChangeText={this.onChangeContentText} value={contentText} onFocus={this.handleFocusContent} onBlur={this.handleBlurContent} />
                         <Pressable style={[hashTagSt, fullStyle ? fullStyleHashTagSt : null, fullStyle ? almostWhiteSt : (focusedTagArea ? whiteSt : null)]} onHoverIn={this.handleFocusTag} onHoverOut={this.handleBlurTag}>
                               <Text style={hashTagTextSt}> hash tag </Text>
-                              <TextInput style={inputHashTagSt} onChangeText={this.onChangeHashTagText} value={hashTag} />
+                              <TextInput style={inputHashTagSt} onChangeText={this.onChangeHashTagText} value={hashTag} maxLength={MAX_TAG_LEN} />
                         </Pressable>
                         <View style={[buttonsForWritePageSt, fullStyle ? fullStyleButtonsForWritePageSt : null]}>
                               <Pressable style={rightButtonSt} onPress={this.handlePressCancel} >
