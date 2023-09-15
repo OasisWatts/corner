@@ -342,8 +342,8 @@ export class Logger {
        *
        * @param args 추가할 내용.
        */
-      public put(...args: any[]): this {
-            this.chunk.push(...args)
+      public put(arg: string): this {
+            this.chunk.push(arg + " ")
             return this
       }
 

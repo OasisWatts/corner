@@ -4,7 +4,7 @@ import { CLIENT_SETTINGS } from "front/@lib/util"
 import Action from "front/reactCom"
 import React from "react"
 import { Image, Pressable, Text, View } from "reactNative"
-import { boardPage } from "."
+import { Page } from "."
 
 type State = {
       hoverItem: boolean
@@ -48,7 +48,7 @@ export default class FollowItem extends Action<Props, State> {
       private handlePressFollowItem = () => {
             const { userKey } = this.props
             console.log("press follwitem", userKey)
-            Action.trigger("page", boardPage.boardList, () => {
+            Action.trigger("page", Page.boardList, () => {
                   Action.trigger("boardListUser", userKey)
                   Action.trigger("followUserList", userKey)
             })

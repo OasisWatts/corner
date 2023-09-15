@@ -2,7 +2,7 @@
 import { almostWhiteSt, composeStyle, lightGraySt, mainButtonTextStyle, setStyle, tagButtonTextSt, whiteSt } from "front/@lib/style"
 import { fullStyle } from "front/@lib/util"
 import Action from "front/reactCom"
-import { boardPage } from "front/ssr"
+import { Page } from "front/ssr"
 import React from "react"
 import { Pressable, Text, View } from "reactNative"
 
@@ -38,7 +38,7 @@ export default class Tag extends Action<Props, State> {
       private handlePress = () => {
             const { name, isUrl, total } = this.props
             this.setState({ activated: true }, () => {
-                  Action.trigger("page", boardPage.boardList, () => {
+                  Action.trigger("page", Page.boardList, () => {
                         Action.trigger("boardListTag", name, isUrl, total)
                         if (name === "전체") Action.trigger("followListTag", null)
                         else Action.trigger("followListTag", name)

@@ -5,6 +5,7 @@ import Action from "front/reactCom"
 import React from "react"
 import { Image, Pressable, TextInput, View } from "reactNative"
 import { slimTagsWrapperSt, tagsWrapperSt } from "./tags"
+import { Page } from "front/ssr"
 
 type State = {
       text: string
@@ -39,7 +40,9 @@ export default class Search extends Action<Props, State> {
       }
       private search = () => {
             const { text } = this.state
-            if (text.length > 0) Action.trigger("boardListSearch", text)
+            if (text.length > 0) {
+                  Action.trigger("page", Page.boardList, () => Action.trigger("boardListSearch", text))
+            }
       }
       private handlePressCancel = () => {
             this.setState({ text: "" }, () => {

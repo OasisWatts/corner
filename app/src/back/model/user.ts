@@ -13,6 +13,10 @@ export default class User {
 
       /** 아이디 */
       @Column({ type: "varchar" })
+      public socialId!: string
+
+      /** 아이디 */
+      @Column({ type: "varchar" })
       public name!: string
 
       /** 이메일 */

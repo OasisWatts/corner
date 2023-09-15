@@ -5,7 +5,7 @@ import { View, Text, Image, Pressable, FlatList, TextInput } from "reactNative"
 import { CommentItem } from "./commentItem"
 import { blockSt, composeStyle, contentsSt, upButtonSt, mainButtonTextStyle, rightButtonSt, profileSt, setStyle, pageSt, buttonSetSt, tWhite, tDeepGray, importantButtonTextStyle, slimPageSt, widePageSt, slimThreshold, dateSt, writerSt, numSt, numSt1, commentButtonSt, hoveredUp, hoveredComment, importantImageSt, profileImgSt, followImgSt, followButtonSt, tWriteColor, tUpColor, tLightGray, lightGray, writeColor, upColor, updatedSt, rightButtonSetSt, inputSt, whiteSt, almostWhiteSt, submitButtonTextSt, mainFontSizeSt, contentFontSize, contentFontSizeSt } from "front/@lib/style"
 import { BoardItem } from "./boardItem"
-import { boardPage } from "."
+import { Page } from "."
 import { CLIENT_SETTINGS, PROPS, extension, fullStyle, userKey } from "front/@lib/util"
 import Bind from "front/reactRoot"
 import { getHumanNumber, getHumanTimeDistance } from "front/@lib/Language"
@@ -147,7 +147,7 @@ export class Board extends Action<Props, State> {
       private handlePressDelete = () => {
             const { id } = this.state
             fetch("/boardDelete?id=" + id).then(() => {
-                  Action.trigger("page", boardPage.boardList)
+                  Action.trigger("page", Page.boardList)
             })
       }
       private handlePressUpdate = () => {

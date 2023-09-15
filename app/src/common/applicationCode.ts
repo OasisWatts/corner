@@ -10,6 +10,7 @@ export enum ErrorCode {
       max_blocks,
       user_unfound,
       user_find_failed,
+      user_save_failed,
       board_delete_failed,
       board_update_failed,
       board_update_bad_request,

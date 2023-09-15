@@ -4,7 +4,7 @@ import { buttonsForWriteBoxSt, buttonSetSt, composeStyle, inputForWriteBoxSt, in
 import Action from "front/reactCom"
 import React from "react"
 import { View, TextInput, Pressable, Text } from "reactNative"
-import { boardPage } from "."
+import { Page } from "."
 import { wrapForWriteBoxSt } from "./board"
 import { CLIENT_SETTINGS, PROPS, extension, fullStyle } from "front/@lib/util"
 
@@ -80,7 +80,7 @@ export class Write extends Action<Props, State> {
                   },
                   body: JSON.stringify({ c: contentText, t: hashTag, u: (PROPS.data.ext ? PROPS.data.url : "") || "", h: (PROPS.data.ext ? PROPS.data.hostname : "") || "" })
             }).then(() => {
-                  Action.trigger("page", boardPage.boardList)
+                  Action.trigger("page", Page.boardList)
                   Action.trigger("tagReload")
             })
       }
@@ -95,14 +95,14 @@ export class Write extends Action<Props, State> {
                         },
                         body: JSON.stringify({ c: contentText, t: hashTag })
                   }).then(() => {
-                        Action.trigger("page", boardPage.boardList)
+                        Action.trigger("page", Page.boardList)
                         Action.trigger("tagReload")
                   })
             }
       }
       private handlePressCancel = () => {
             console.log("cancel")
-            Action.trigger("page", boardPage.boardList)
+            Action.trigger("page", Page.boardList)
       }
       private handleFocusContent = () => {
             this.setState({ focusedContentArea: true })

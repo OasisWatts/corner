@@ -5,7 +5,7 @@ import React from "react"
 import { Image, Pressable, Text, View } from "reactNative"
 import { sideBarSt, slimSideBarSt, wideSideBarSt } from "./followList"
 import { CLIENT_SETTINGS, fullStyle } from "front/@lib/util"
-import { boardPage } from "."
+import { Page } from "."
 
 
 export default class Navigator extends Action<Props, State> {
@@ -28,19 +28,19 @@ export default class Navigator extends Action<Props, State> {
             } this.previousWidth = window.innerWidth
       }
       private handleWrite = () => {
-            Action.trigger("page", boardPage.write)
+            Action.trigger("page", Page.write)
       }
       private handlePressSearch = () => {
             Action.trigger("searchShow", true)
       }
       private handlePressMyBoard = () => {
-            Action.trigger("page", boardPage.boardList, () => Action.trigger("boardListMyBoard"))
+            Action.trigger("page", Page.boardList, () => Action.trigger("boardListMyBoard"))
       }
       private handlePressMyUp = () => {
-            Action.trigger("page", boardPage.boardList, () => Action.trigger("boardListMyUp"))
+            Action.trigger("page", Page.boardList, () => Action.trigger("boardListMyUp"))
       }
       private handlePressSetting = () => {
-            Action.trigger("setting")
+            Action.trigger("page", Page.setting)
       }
 
       render(): React.ReactNode {

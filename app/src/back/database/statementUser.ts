@@ -29,26 +29,26 @@ export class StatementUser {
                               const userKey = user.key
                               const numFriends = user.followings.length
                               if (targetKey === userKey) {
-                                    Logger.errorApp(ErrorCode.follow_self).out()
+                                    Logger.errorApp(ErrorCode.follow_self).put("follow").out()
                                     return
                               }
                               if (numFriends > MAX_FRIENDS) {
-                                    Logger.errorApp(ErrorCode.max_friends).out()
+                                    Logger.errorApp(ErrorCode.max_friends).put("follow").out()
                                     return
                               }
                               if (user.followings.some((f) => f.key === targetKey)) {
                                     DB.Manager.query(`delete from \`user_followings_user\` where followerKey = ${userKey} and followedKey = ${targetKey}`).then(() => {
                                           Logger.passApp().out()
                                           resolve({ followed: false })
-                                    }).catch((err) => { Logger.errorApp(ErrorCode.unfollow_failed).put(err).out() })
+                                    }).catch((err) => { Logger.errorApp(ErrorCode.unfollow_failed).put("follow").put(err).out() })
                               } else {
                                     DB.Manager.query(`insert into \`user_followings_user\`(followerKey, followedKey) value(${userKey}, ${targetKey})`).then(() => {
                                           Logger.passApp().out()
                                           resolve({ followed: true })
-                                    }).catch((err) => { Logger.errorApp(ErrorCode.follow_failed).put(err).out() })
+                                    }).catch((err) => { Logger.errorApp(ErrorCode.follow_failed).put("follow").put(err).out() })
                               }
-                        } else Logger.errorApp(ErrorCode.user_unfound).out()
-                  }).catch((err) => { Logger.errorApp(ErrorCode.user_unfound).put(err).out() })
+                        } else Logger.errorApp(ErrorCode.user_unfound).put("follow_0").out()
+                  }).catch((err) => { Logger.errorApp(ErrorCode.user_unfound).put("follow_1").put(err).out() })
             })
       }
 
@@ -75,7 +75,7 @@ export class StatementUser {
                               }
                               Logger.passApp("getFollow")
                               return
-                        }).catch((err) => Logger.errorApp(ErrorCode.follow_find_failed).put(err).out())
+                        }).catch((err) => Logger.errorApp(ErrorCode.follow_find_failed).put("getFollow_0").put(err).out())
                   } else if (tag) {
                         DB.Manager.findOne(Tag, { where: { name: tag }, select: ["id"] }).then((tagO) => {
                               if (tagO) {
@@ -93,9 +93,9 @@ export class StatementUser {
                                           }
                                           Logger.passApp("getFollow").out()
                                           return
-                                    }).catch((err) => Logger.errorApp(ErrorCode.follow_find_failed).put(err).out())
-                              } else Logger.errorApp(ErrorCode.tag_find_failed).out()
-                        }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put(err).out())
+                                    }).catch((err) => Logger.errorApp(ErrorCode.follow_find_failed).put("getFollow_1").put(err).out())
+                              } else Logger.errorApp(ErrorCode.tag_find_failed).put("getFollow_0").out()
+                        }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put("getFollow_1").put(err).out())
                   } else {
                         DB.Manager.query(`select userKey, (select name from corner.user where user.key = userKey) name, (select image from corner.user where user.key = userKey) image, count(*) as cnt from (select followedKey from corner.user_followings_user where followerKey = ${userKey}) followed left join corner.usertagcount usertagcount on usertagcount.userKey = followed.followedKey where userKey > 0 group by userKey order by cnt desc limit ${MAX_FOLLOW_LEN};
                         `).then((usersO) => {
@@ -120,10 +120,10 @@ export class StatementUser {
                                                 }
                                                 Logger.passApp("getFollow")
                                                 return
-                                          }).catch((err) => Logger.errorApp(ErrorCode.follow_find_failed).put(err).out())
+                                          }).catch((err) => Logger.errorApp(ErrorCode.follow_find_failed).put("getFollow_2").put(err).out())
                                     } else resolve({ users, end: false, endId })
                               }
-                        }).catch((err) => Logger.errorApp(ErrorCode.follow_find_failed).put(err).out())
+                        }).catch((err) => Logger.errorApp(ErrorCode.follow_find_failed).put("getFollow_3").put(err).out())
                   }
             })
       }
@@ -148,9 +148,9 @@ export class StatementUser {
                                           Logger.passApp("getFollowRecommend")
                                           resolve(users)
                                           return
-                                    }).catch((err) => Logger.errorApp(ErrorCode.follow_recommend_find_failed).put(err).out())
-                              } else Logger.errorApp(ErrorCode.tag_find_failed).out()
-                        }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put(err).out())
+                                    }).catch((err) => Logger.errorApp(ErrorCode.follow_recommend_find_failed).put("getFollowRecommend_0").put(err).out())
+                              } else Logger.errorApp(ErrorCode.tag_find_failed).put("getFollowRecommend_0").out()
+                        }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put("getFollowRecommend_1").put(err).out())
                   } else {
                         console.log("notag")
                         DB.Manager.query(`select userKey, (select name from corner.user where user.key = userKey) name, (select image from corner.user where user.key = userKey) image, count(*) as cnt from corner.usertagcount group by userKey order by cnt desc;`).then((usersO) => {
@@ -159,7 +159,7 @@ export class StatementUser {
                               Logger.passApp("getFollowRecommend")
                               resolve(users)
                               return
-                        }).catch((err) => Logger.errorApp(ErrorCode.follow_recommend_find_failed).put(err).out())
+                        }).catch((err) => Logger.errorApp(ErrorCode.follow_recommend_find_failed).put("getFollowRecommend_1").put(err).out())
                   }
             })
       }
@@ -193,11 +193,11 @@ export class StatementUser {
                                           Logger.passApp().out()
                                           resolve(true)
                                     }).catch((err) => {
-                                          Logger.errorApp(ErrorCode.block_add_failed).put(err).out()
+                                          Logger.errorApp(ErrorCode.block_add_failed).put("blockAdd_0").put(err).out()
                                     })
                         }
                   }).catch((err) => {
-                        Logger.errorApp(ErrorCode.block_add_failed).put(err).out()
+                        Logger.errorApp(ErrorCode.block_add_failed).put("blockAdd_1").put(err).out()
                   })
                   reject()
             })
@@ -217,7 +217,7 @@ export class StatementUser {
                               select: ["key"],
                         }).then((u) => {
                               if (u) res(u.key)
-                              else Logger.errorApp(ErrorCode.user_unfound).out()
+                              else Logger.errorApp(ErrorCode.user_unfound).put("boardSelect_0").out()
                         })
                   })
                   /** 친구를 삭제하려는 사용자 키 */
@@ -227,7 +227,7 @@ export class StatementUser {
                               select: ["key"],
                         }).then((u) => {
                               if (u) res(u.key)
-                              else Logger.errorApp(ErrorCode.user_unfound).out()
+                              else Logger.errorApp(ErrorCode.user_unfound).put("boardSelect_1").out()
                         })
                   })
                   Promise.all([targetKey, userKey]).then((v) => {
@@ -236,12 +236,34 @@ export class StatementUser {
                                     Logger.passApp().out()
                                     resolve(true)
                               }).catch((err) => {
-                                    Logger.errorApp(ErrorCode.block_delete_failed).put(err).out()
+                                    Logger.errorApp(ErrorCode.block_delete_failed).put("blockDelete_0").put(err).out()
                               })
                   }).catch((err) => {
-                        Logger.errorApp(ErrorCode.block_delete_failed).put(err).out()
+                        Logger.errorApp(ErrorCode.block_delete_failed).put("blockDelete_1").put(err).out()
                   })
                   reject()
+            })
+      }
+
+      /**
+       * 로그인 또는 계정 생성
+       * @param socialId 구글 소셜 로그인 생성 아이디
+       * @param name 
+       * @param email 
+       */
+      public static async signIn(socialId: string, name: string, email: string) {
+            return new Promise((resolve, reject) => {
+                  DB.Manager.findOne(User, { where: { socialId } }).then((user) => {
+                        if (user) {
+                              resolve({ signed: true, userKey: user.key })
+                        } else {
+                              DB.Manager.save(User, { socialId, name, email }).then((res) => {
+                                    Logger.passApp("signUp").put("signIn").out()
+                                    resolve({ signed: true, userKey: res.key })
+                                    return
+                              }).catch((err) => Logger.errorApp(ErrorCode.user_save_failed).put(err).out())
+                        }
+                  }).catch((err) => Logger.errorApp(ErrorCode.user_find_failed).put(err).out())
             })
       }
 }

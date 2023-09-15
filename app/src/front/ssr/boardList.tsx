@@ -60,6 +60,9 @@ export class BoardList extends Action<Props, State> {
             "boardListUser": (searchUser) => {
                   console.log("blu")
                   this.setState({ startId: 0, boards: [], endOfList: false, categ: BOARD_CATEGORY.userBoards, searchUser }, () => this.getBoards())
+            },
+            "boardList": () => {
+                  this.getBoards()
             }
       }
       componentDidMount(): void {
@@ -100,11 +103,13 @@ export class BoardList extends Action<Props, State> {
                         break
                   case BOARD_CATEGORY.searchBoards:
                         req = "/searchboards?sid=" + startId + "&s=" + search
+                        break
                   case BOARD_CATEGORY.userBoards:
                         req = "/userboards?sid=" + startId + "&u=" + searchUser
                   default:
             }
             if (req) {
+                  console.log("boards req", req)
                   fetch(req).then((r) => r.json()).then((o) => {
                         console.log("boards o", o)
                         this.setState({
@@ -150,7 +155,7 @@ const flatListSt = setStyle({
       borderTopLeftRadius: "20px",
       borderTopRightRadius: "20px"
 })
-export const transparentWhiteSt = setStyle({
+const transparentWhiteSt = setStyle({
       backgroundColor: tWhite
 })
 const vacancyTextSt = setStyle({

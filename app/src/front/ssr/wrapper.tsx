@@ -2,16 +2,18 @@
 import Action from "front/reactCom"
 import React from "react"
 import { View } from "reactNative"
-import { boardPage } from "."
+import { Page } from "."
 import { Write } from "./write"
 import { BoardList } from "./boardList"
 import { Board } from "./board"
 import Follows from "./followList"
 import Navigator from "./navigator"
 import { setStyle, slimThreshold } from "front/@lib/style"
+import Landing from "./landing"
+import Setting from "./setting"
 
 type Props = {
-      page: boardPage
+      page: Page
       boardId: number
 }
 
@@ -37,14 +39,16 @@ export default class Wrapper extends Action<Props, State> {
       private renderPage = () => {
             const { page, boardId } = this.props
             switch (page) {
-                  case boardPage.write:
+                  case Page.write:
                         return <Write update={false} boardId={null} />
-                  case boardPage.update:
+                  case Page.update:
                         return <Write update={true} boardId={boardId} />
-                  case boardPage.boardList:
+                  case Page.boardList:
                         return <BoardList />
-                  case boardPage.board:
+                  case Page.board:
                         return <Board boardId={boardId} />
+                  case Page.setting:
+                        return <Setting />
             }
       }
       render(): React.ReactNode {

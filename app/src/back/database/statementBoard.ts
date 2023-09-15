@@ -33,7 +33,7 @@ export class StatementBoard {
                   `select *, (select count(id) from \`comment\` where boardId = a.id) as comNum ${selectAndQuery}
                               from ( select id ${fromQuery} ${whereQuery} ${orderQuery}
                               ) b join \`board\` a on b.id = a.id;`
-            ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put(err).out())
+            ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put("getMyBoards").put(err).out())
             return bList
       }
       /** 차단한 상대가 쓴 것이 아닌 게시글 가져오기. */
@@ -50,7 +50,7 @@ export class StatementBoard {
                   `select *, (select count(id) from \`comment\` where boardId = a.id) as comNum ${selectAndQuery}
                               from ( select id ${fromQuery} ${whereQuery} ${orderQuery}
                               ) b join \`board\` a on b.id = a.id;`
-            ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put(err).out())
+            ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put("getMyUpBoards").put(err).out())
             bList.forEach((b, idx) => { bList[idx].uped = 1 })
             return bList
       }
@@ -60,7 +60,7 @@ export class StatementBoard {
             let fromQuery: string = "from \`board\`"
             let orderQuery = `order by id desc limit ${MAX_LIST_LEN}`
 
-            const urlObj = await DB.Manager.findOne(Url, { where: { name: url }, select: ["id"] }).catch((err) => Logger.errorApp(ErrorCode.url_find_failed).put(err).out())
+            const urlObj = await DB.Manager.findOne(Url, { where: { name: url }, select: ["id"] }).catch((err) => Logger.errorApp(ErrorCode.url_find_failed).put("getUrlBoards").put(err).out())
             if (urlObj) {
                   console.log("urlobj", urlObj)
                   let whereQuery = `where urlId = ${urlObj.id} ${startId ? ` and id < ${startId}` : ""}`
@@ -68,14 +68,14 @@ export class StatementBoard {
                         `select *, (select count(id) from \`comment\` where boardId = a.id) as comNum ${selectAndQuery}
                                     from ( select id ${fromQuery} ${whereQuery} ${orderQuery}
                                     ) b join \`board\` a on b.id = a.id;`
-                  ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put(err).out())
+                  ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put("getUrlBoards").put(err).out())
                   let bListFiltered = bList.filter((b: any) => !blockeds.includes(b.writer))
                   return bListFiltered.sort((b1, b2) => b2.up - b1.up)
             } else return []
       }
       /** 차단한 상대가 쓴 것이 아닌 게시글 가져오기. */
       private static async getTagBoards(startId: number, userKey: number, blockeds: number[], tag: string): Promise<any[]> {
-            const tagObj = await DB.Manager.findOne(Tag, { where: { name: tag }, select: ["id"] }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put(err).out())
+            const tagObj = await DB.Manager.findOne(Tag, { where: { name: tag }, select: ["id"] }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put("getTagBoards").put(err).out())
             if (tagObj) {
                   console.log("tagObj", tagObj)
                   const tagId = tagObj.id
@@ -85,7 +85,7 @@ export class StatementBoard {
                   const bList = await DB.Manager.query(
                         `select *, (select count(id) from \`comment\` where boardId = a.id) as comNum ${selectAndQuery}
                               ${joinQuery};`
-                  ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put(err).out())  // 차단 대상 제외.
+                  ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put("getTagBoards").put(err).out())  // 차단 대상 제외.
                   let bListFiltered = bList.filter((b: any) => !blockeds.includes(b.writer))
                   return bListFiltered.sort((b1, b2) => b2.up - b1.up)
             } else return []
@@ -101,7 +101,7 @@ export class StatementBoard {
                   `select *, (select count(id) from \`comment\` where boardId = a.id) as comNum ${selectAndQuery}
                               from ( select id ${fromQuery} ${whereQuery} ${orderQuery}
                               ) b join \`board\` a on b.id = a.id;`,
-            ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put(err).out())  // 차단 대상 제외.
+            ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put("getBoards").put(err).out())  // 차단 대상 제외.
             let bListFiltered = bList.filter((b: any) => !blockeds.includes(b.writer))
             return bListFiltered.sort((b1, b2) => b2.up - b1.up)
       }
@@ -117,7 +117,7 @@ export class StatementBoard {
                         `select *, (select count(id) from \`comment\` where boardId = a.id) as comNum ${selectAndQuery}
                                     from ( select id ${fromQuery} ${whereQuery} ${orderQuery}
                                     ) b join \`board\` a on b.id = a.id;`,
-                  ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put(err).out())  // 차단 대상 제외.
+                  ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put("getSearchBoards").put(err).out())  // 차단 대상 제외.
                   let bListFiltered = bList.filter((b: any) => !blockeds.includes(b.writer))
                   return bListFiltered.sort((b1, b2) => b2.up - b1.up)
             }
@@ -132,7 +132,7 @@ export class StatementBoard {
                   `select *, (select count(id) from \`comment\` where boardId = a.id) as comNum ${selectAndQuery}
                                     from ( select id ${fromQuery} ${whereQuery} ${orderQuery}
                                     ) b join \`board\` a on b.id = a.id;`,
-            ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put(err).out())  // 차단 대상 제외.
+            ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put("getUserBoards").put(err).out())  // 차단 대상 제외.
             console.log("bList", bList)
             return bList.sort((b1, b2) => b2.up - b1.up)
       }
@@ -145,9 +145,9 @@ export class StatementBoard {
             const boards = await DB.Manager.query(
                   `select *, (select count(id) from \`comment\` where boardId = ${boardId}) as comNum ${selectAndQuery}
                               ${fromQuery} ${whereQuery};`,
-            ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put(err).out())  // 차단 대상 제외.
+            ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put("getBoard_0").put(err).out())  // 차단 대상 제외.
             const boardTags = await DB.Manager.findOne(Board, { select: ["tags"], relations: ["tags"], where: { id: boardId } })
-                  .catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put(err).out())
+                  .catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put("getBoard_1").put(err).out())
             const board = boards[0]
             if (boardTags) {
                   const tags = boardTags.tags.map((t) => t.name)
@@ -157,7 +157,7 @@ export class StatementBoard {
       }
       public static async categorizedBoardList(startId: number, categ: number, userKey: number, url?: string, tag?: string, search?: string, searchUser?: number) {
             const user = await DB.Manager.findOne(User, { relations: ["blockeds"], where: { key: userKey } }).catch((err) => {
-                  Logger.errorApp(ErrorCode.user_find_failed).put(err).out()
+                  Logger.errorApp(ErrorCode.user_find_failed).put("categorizedBoardList_0").put(err).out()
             })
             if (user) {
                   switch (categ) {
@@ -181,7 +181,10 @@ export class StatementBoard {
                               else return null
                         default: return null
                   }
-            } else return null
+            } else {
+                  Logger.errorApp(ErrorCode.user_find_failed).put("categorizedBoardList_1").out()
+                  return
+            }
       }
       /**
       * 게시글 목록 조회.
@@ -192,7 +195,7 @@ export class StatementBoard {
       */
       public static async boardList(startId: number, categ: number, userKey: number, url?: string, tag?: string, search?: string, searchUser?: number) {
             return new Promise(async (resolve, _) => {
-                  console.log("1")
+                  console.log("1", startId, categ, userKey, url, tag, search, searchUser)
                   const bList = await this.categorizedBoardList(startId, categ, userKey, url, tag, search, searchUser)
                   console.log("bl", bList)
                   if (bList) {
@@ -234,9 +237,9 @@ export class StatementBoard {
                               }
                               Logger.passApp("boardList").out()
                               resolve({ boardList, endId, end: endOfList })
-                        }).catch((err) => Logger.errorApp(ErrorCode.user_find_failed).put(err).out())
+                        }).catch((err) => Logger.errorApp(ErrorCode.user_find_failed).put("boardList").put(err).out())
                   } else {
-                        Logger.errorApp(ErrorCode.board_find_failed).out()
+                        Logger.errorApp(ErrorCode.board_find_failed).put("boardList").out()
                   }
             })
       }
@@ -338,11 +341,11 @@ export class StatementBoard {
                                                       end: endOfList,
                                                       tags: board.tags
                                                 })
-                                          }).catch((err) => Logger.errorApp(ErrorCode.user_find_failed).put(err).out())
-                                    }).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put(err).out())
-                              }).catch((err) => Logger.errorApp(ErrorCode.user_find_failed).put(err).out())
-                        } else Logger.errorApp(ErrorCode.board_find_failed).out()
-                  }).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put(err).out())
+                                          }).catch((err) => Logger.errorApp(ErrorCode.user_find_failed).put("boardSelect_0").put(err).out())
+                                    }).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put("boardSelect_0").put(err).out())
+                              }).catch((err) => Logger.errorApp(ErrorCode.user_find_failed).put("boardSelect_1").put(err).out())
+                        } else Logger.errorApp(ErrorCode.board_find_failed).put("boardSelect_1").out()
+                  }).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put("boardSelect_2").put(err).out())
             })
       }
       /**
@@ -402,8 +405,8 @@ export class StatementBoard {
                                     endId,
                                     end: endOfList
                               })
-                        }).catch((err) => Logger.errorApp(ErrorCode.user_find_failed).put(err).out())
-                  }).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put(err).out())
+                        }).catch((err) => Logger.errorApp(ErrorCode.user_find_failed).put("commentList").put(err).out())
+                  }).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put("commentList").put(err).out())
             })
       }
       /**
@@ -443,7 +446,7 @@ export class StatementBoard {
                                           hashTagEntities.push(tagO)
                                           const promisesInside: Promise<any>[] = []
                                           const pi = new Promise((res, _) => DB.Manager.increment(Tag, { name: tagObj.tag }, "count", 1).then(() => res(true)))
-                                          const pi0 = new Promise((res, _) => DB.Manager.increment(UrlTagCount, { url: { id: urlO_?.id }, tag: { id: tagO.id } }, "count", 1).then(() => res(true)).catch((err) => Logger.errorApp(ErrorCode.urltagcount_update_failed).put(err).out()))
+                                          const pi0 = new Promise((res, _) => DB.Manager.increment(UrlTagCount, { url: { id: urlO_?.id }, tag: { id: tagO.id } }, "count", 1).then(() => res(true)).catch((err) => Logger.errorApp(ErrorCode.urltagcount_update_failed).put("boardInsert_0").put(err).out()))
                                           promisesInside.push(pi, pi0)
                                           await Promise.all(promisesInside)
                                           res(true)
@@ -451,9 +454,9 @@ export class StatementBoard {
                                           console.log("no tag")
                                           const tagO_ = await DB.Manager.save(Tag, { name: tagObj.tag, isUrl: tagObj.isUrl, count: 1 })
                                           hashTagEntities.push(tagO_)
-                                          DB.Manager.save(UrlTagCount, { url: { id: urlO_?.id }, tag: { id: tagO_.id }, count: 1 }).then(() => res(true)).catch((err) => Logger.errorApp(ErrorCode.urltagcount_save_failed).put(err).out())
+                                          DB.Manager.save(UrlTagCount, { url: { id: urlO_?.id }, tag: { id: tagO_.id }, count: 1 }).then(() => res(true)).catch((err) => Logger.errorApp(ErrorCode.urltagcount_save_failed).put("boardInsert_1").put(err).out())
                                     }
-                              }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put(err).out())
+                              }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put("boardInsert").put(err).out())
                               promisesTags.push(pt)
                         }
                   } else {
@@ -465,12 +468,12 @@ export class StatementBoard {
                                     if (tagO) {
                                           hashTagEntities.push(tagO)
                                           DB.Manager.increment(Tag, { name: tagObj.tag }, "count", 1).then(() => res(true))
-                                                .catch((err) => Logger.errorApp(ErrorCode.tag_update_failed).put(err).out())
+                                                .catch((err) => Logger.errorApp(ErrorCode.tag_update_failed).put("boardInsert").put(err).out())
                                     } else {
                                           DB.Manager.save(Tag, { name: tagObj.tag, isUrl: tagObj.isUrl, count: 1 }).then((tagO) => {
                                                 hashTagEntities.push(tagO)
                                                 res(true)
-                                          }).catch((err) => Logger.errorApp(ErrorCode.tag_save_failed).put(err).out())
+                                          }).catch((err) => Logger.errorApp(ErrorCode.tag_save_failed).put("boardInsert").put(err).out())
                                     }
                               })
                               promisesTags.push(pt)
@@ -513,12 +516,12 @@ export class StatementBoard {
                         updated: true
                   }).then((r) => {
                         if (!r.affected) {
-                              Logger.errorApp(ErrorCode.board_update_failed).out()
+                              Logger.errorApp(ErrorCode.board_update_failed).put("boardUpdate_0").out()
                         } else {
                               Logger.passApp("boardUpdate").out()
                               resolve(true)
                         }
-                  }).catch((err) => Logger.errorApp(ErrorCode.board_update_failed).put(err).out())
+                  }).catch((err) => Logger.errorApp(ErrorCode.board_update_failed).put("boardUpdate_1").put(err).out())
             })
       }
 
@@ -531,7 +534,7 @@ export class StatementBoard {
                   DB.Manager.delete(Board, boardId).then(() => {
                         Logger.passApp("boardDelete").out()
                         resolve(true)
-                  }).catch((err) => Logger.errorApp(ErrorCode.block_delete_failed).put(err).out())
+                  }).catch((err) => Logger.errorApp(ErrorCode.block_delete_failed).put("boardDelete").put(err).out())
             })
       }
 
@@ -593,7 +596,7 @@ export class StatementBoard {
                   }).then(() => {
                         Logger.passApp("commentInsert").out()
                         resolve(true)
-                  }).catch((err) => Logger.errorApp(ErrorCode.comment_insert_failed).put(err).out())
+                  }).catch((err) => Logger.errorApp(ErrorCode.comment_insert_failed).put("commentInsert").put(err).out())
             })
       }
 
@@ -610,12 +613,12 @@ export class StatementBoard {
                         updated: true
                   }).then((r) => {
                         if (!r.affected) {
-                              Logger.errorApp(ErrorCode.comment_update_bad_request).out()
+                              Logger.errorApp(ErrorCode.comment_update_bad_request).put("commentUpdate_0").out()
                         } else {
                               Logger.passApp("commentUpdate").out()
                               resolve(true)
                         }
-                  }).catch((err) => Logger.errorApp(ErrorCode.comment_update_failed).put(err).out())
+                  }).catch((err) => Logger.errorApp(ErrorCode.comment_update_failed).put("commentUpdate_1").put(err).out())
             })
       }
 
@@ -628,7 +631,7 @@ export class StatementBoard {
                   DB.Manager.delete(Comment, commentId).then(() => {
                         Logger.passApp("commentDelete").out()
                         resolve(true)
-                  }).catch((err) => Logger.errorApp(ErrorCode.comment_delete_failed).put(err).out())
+                  }).catch((err) => Logger.errorApp(ErrorCode.comment_delete_failed).put("commentDelete").put(err).out())
             })
       }
 
@@ -690,14 +693,14 @@ export class StatementBoard {
                                                 resolve(r)
                                                 return
                                           } else {
-                                                Logger.errorApp(ErrorCode.tag_find_failed).out()
+                                                Logger.errorApp(ErrorCode.tag_find_failed).put("getUrlTag_0").out()
                                           }
-                                    }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put(err).out())
+                                    }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put("getUrlTag_1").put(err).out())
                         } else {
                               console.log("2")
                               resolve([])
                         }
-                  }).catch((err) => Logger.errorApp(ErrorCode.url_find_failed).put(err).out())
+                  }).catch((err) => Logger.errorApp(ErrorCode.url_find_failed).put("getUrlTag").put(err).out())
             })
       }
 
@@ -713,15 +716,15 @@ export class StatementBoard {
                               const left_tag_cnt = hotKeyLen - (userHotKeyLen - r.length)
                               const exclude_tag = r.map((t) => "\"" + t.name + "\"").join(" ,")
                               console.log("exclude", exclude_tag)
-                              DB.Manager.query(`select name, isUrl from \`tag\` where name not in (${exclude_tag}) order by count desc limit ${left_tag_cnt}`)
+                              DB.Manager.query(`select name, isUrl from \`tag\` ${r.length ? `where name not in (${exclude_tag})` : ""} order by count desc limit ${left_tag_cnt}`)
                                     .then((r2) => {
                                           console.log("tag2", r2)
                                           r.push(...r2)
                                           Logger.passApp("get tag").out()
                                           resolve(r)
                                           return
-                                    }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put(err).out())
-                        }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put(err).out())
+                                    }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put("getHotTag_0").put(err).out())
+                        }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put("getHotTag_1").put(err).out())
             })
       }
 }

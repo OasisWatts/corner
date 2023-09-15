@@ -7,7 +7,7 @@ import { Tags } from "./tags"
 import { Write } from "../ssr/write"
 import { CLIENT_SETTINGS, FRONT, PROPS, fullStyle } from "front/@lib/util"
 import Bind from "front/reactRoot"
-import { boardPage } from "../ssr"
+import { Page } from "../ssr"
 import Search from "./search"
 
 type State = {
@@ -15,7 +15,7 @@ type State = {
       searchToggle: boolean
 }
 type Props = {
-      page: boardPage
+      page: Page
 }
 
 export default class Header extends Action<Props, State> {
@@ -46,7 +46,7 @@ export default class Header extends Action<Props, State> {
             } this.previousWidth = window.innerWidth
       }
       private handlePressIcon = () => {
-            Action.trigger("page", boardPage.boardList)
+            Action.trigger("page", Page.boardList)
       }
       private handlePressSearchButton = () => {
             this.setState({ searchToggle: true })
