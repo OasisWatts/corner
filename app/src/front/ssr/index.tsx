@@ -111,7 +111,11 @@ export default class Index extends Action<Props, State> {
                   this.forceUpdate()
             },
             landingOff: () => {
-                  this.setState({ landing: false }, () => Action.trigger("boardList"))
+                  this.setState({ landing: false }, () => {
+                        if (!PROPS.data.boardAccess) {
+                              Action.trigger("boardList")
+                        }
+                  })
             }
       }
       componentDidMount() {

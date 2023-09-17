@@ -24,6 +24,8 @@ declare namespace Page {
                   hostname: string | null
                   ext: boolean
                   ss: boolean
+                  name?: string
+                  image?: string
                   boardAccess?: boolean
                   board?: BoardType
             }
@@ -56,7 +58,8 @@ declare type ActionReceiverTable = Partial<{
       "tagReload": Action,
       "followListUser": Action<[string]>,
       "landingOff": Action,
-      "pageReload": Action
+      "pageReload": Action,
+      "writeReload": Action
 }>
 
 declare type Props = {}

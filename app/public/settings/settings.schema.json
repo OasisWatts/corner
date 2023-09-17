@@ -23,10 +23,13 @@
                         "contentsLen": {
                               "type": "number"
                         },
-                        "tagCnt": {
+                        "tagDisplayCnt": {
                               "type": "number"
                         },
-                        "tagLen": {
+                        "tagLenLim": {
+                              "type": "number"
+                        },
+                        "tagCountLim": {
                               "type": "number"
                         }
                   }

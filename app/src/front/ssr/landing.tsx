@@ -25,7 +25,11 @@ export default class Landing extends Action<Props, State> {
                         body: JSON.stringify({ i: user.uid, n: user.displayName?.replace(/\n|\s/g, ""), e: user.email })
                   }).then((r) => r.json()).then((o) => {
                         console.log("o", o)
-                        if (o.signed) Action.trigger("landingOff")
+                        if (o.signed) {
+                              PROPS.data.name = o.name
+                              PROPS.data.image = o.image
+                              Action.trigger("landingOff")
+                        }
                   })
             })
             // .catch(() => {

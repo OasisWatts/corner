@@ -3,7 +3,7 @@ import Action from "front/reactCom"
 import React from "react"
 import { View, Text, Image, Pressable, FlatList, TextInput } from "reactNative"
 import { CommentItem } from "./commentItem"
-import { blockSt, composeStyle, contentsSt, upButtonSt, mainButtonTextStyle, rightButtonSt, profileSt, setStyle, pageSt, buttonSetSt, tWhite, tDeepGray, importantButtonTextStyle, slimPageSt, widePageSt, slimThreshold, dateSt, writerSt, numSt, numSt1, commentButtonSt, hoveredUp, hoveredComment, importantImageSt, profileImgSt, followImgSt, followButtonSt, tWriteColor, tUpColor, tLightGray, lightGray, writeColor, upColor, updatedSt, rightButtonSetSt, inputSt, whiteSt, almostWhiteSt, submitButtonTextSt, mainFontSizeSt, contentFontSize, contentFontSizeSt } from "front/@lib/style"
+import { blockSt, composeStyle, contentsSt, upButtonSt, mainButtonTextStyle, rightButtonSt, profileSt, setStyle, pageSt, buttonSetSt, tWhite, tDeepGray, importantButtonTextStyle, slimPageSt, widePageSt, slimThreshold, dateSt, writerSt, numSt, numSt1, commentButtonSt, hoveredUp, hoveredComment, importantImageSt, profileImgSt, followImgSt, followButtonSt, tWriteColor, tUpColor, tLightGray, lightGray, writeColor, upColor, updatedSt, rightButtonSetSt, inputSt, whiteSt, almostWhiteSt, submitButtonTextSt, mainFontSizeSt, contentFontSize, contentFontSizeSt, fontBlackSt, inlineBlockSt } from "front/@lib/style"
 import { BoardItem } from "./boardItem"
 import { Page } from "."
 import { CLIENT_SETTINGS, PROPS, extension, fullStyle, userKey } from "front/@lib/util"
@@ -155,8 +155,8 @@ export class Board extends Action<Props, State> {
             Action.trigger("pageBoardUpdate", id)
       }
       private handlePressUp = () => {
-            const { id, up } = this.state
-            fetch("/boardUp?id=" + id).then((r) => r.json()).then((o) => {
+            const { id, up, writer } = this.state
+            if (writer !== PROPS.data.writer) fetch("/boardUp?id=" + id).then((r) => r.json()).then((o) => {
                   this.setState({ up: o.uped ? up + 1 : up - 1, uped: o.uped })
             })
       }
@@ -207,14 +207,14 @@ export class Board extends Action<Props, State> {
             })
       }
       private handlePressFollow = () => {
-            const { writerId } = this.state
-            fetch("/follow?id=" + writerId).then((r) => r.json()).then((o) => {
+            const { writerId, writer } = this.state
+            if (writer !== PROPS.data.name) fetch("/follow?id=" + writerId).then((r) => r.json()).then((o) => {
                   this.setState({ writerFollowed: o.followed }, () => Action.trigger("followReload", writerId, o.followed))
             })
       }
       private handleHoverInUp = () => {
-            const { writerId } = this.state
-            if (writerId !== PROPS.data.userKey) this.setState({ hoverUp: true })
+            const { writer } = this.state
+            if (writer !== PROPS.data.name) this.setState({ hoverUp: true })
       }
       private handleHoverOutUp = () => {
             this.setState({ hoverUp: false })
@@ -223,7 +223,8 @@ export class Board extends Action<Props, State> {
             this.setState({ commentText: "" })
       }
       private handleHoverInFollow = () => {
-            this.setState({ hoverFollow: true })
+            const { writer } = this.state
+            if (writer !== PROPS.data.name) this.setState({ hoverFollow: true })
       }
       private handleHoverOutFollow = () => {
             this.setState({ hoverFollow: false })
@@ -234,15 +235,15 @@ export class Board extends Action<Props, State> {
       private handleBlurTextArea = () => {
             this.setState({ focusedArea: false })
       }
-      render(): React.ReactNode {
+      private renderHeader = () => {
             const { commentText, focusedArea, writerImage, up, uped, updated, writer, writerId, writerFollowed, date, numComment, contents, comments, tags, hoverUp, hoverComment, hoverFollow } = this.state
-            const slim = window.innerWidth < slimThreshold
+
             return (
-                  <View style={[pageSt, slim ? slimPageSt : widePageSt]}>
+                  <View>
                         <View style={[boardWrapSt, whiteSt]}>
                               <View style={profileSt}>
                                     <Image style={profileImgSt} source={{ uri: CLIENT_SETTINGS.host + "/profiles/" + writerImage }} />
-                                    {writerId === userKey ? null : <Pressable style={[followButtonSt, hoverFollow ? hoveredUp : null]} onPress={this.handlePressFollow} onHoverIn={this.handleHoverInFollow} onHoverOut={this.handleHoverOutFollow} >
+                                    {writer === PROPS.data.name ? null : <Pressable style={[followButtonSt, hoverFollow ? hoveredUp : null]} onPress={this.handlePressFollow} onHoverIn={this.handleHoverInFollow} onHoverOut={this.handleHoverOutFollow} >
                                           <Image style={followImgSt} source={{ uri: CLIENT_SETTINGS.host + "/images/" + (hoverFollow || writerFollowed ? "heartPink.svg" : "heartGray.svg") }} />
                                     </Pressable>}
                               </View>
@@ -251,6 +252,16 @@ export class Board extends Action<Props, State> {
                                           <Text style={writerSt}>{writer}</Text>
                                           <Text style={dateSt}>{getHumanTimeDistance(Date.parse(date), Date.now())}</Text>
                                           {updated ? <Text style={updatedSt}>updated</Text> : null}
+                                          {writer === PROPS.data.name ?
+                                                <Pressable style={[updatedSt, inlineBlockSt]} onPress={this.handlePressDelete} >
+                                                      <Text style={mainButtonTextStyle}>delete</Text>
+                                                </Pressable>
+                                                : null}
+                                          {writer === PROPS.data.name ?
+                                                <Pressable style={[updatedSt, inlineBlockSt]} onPress={this.handlePressUpdate}  >
+                                                      <Text style={mainButtonTextStyle}>edit</Text>
+                                                </Pressable>
+                                                : null}
                                     </View>
                                     <Text style={contentFontSizeSt}>{contents}</Text>
                                     <Text style={[tagSt, contentFontSizeSt]}>{"#" + tags.join(" #")}</Text>
@@ -263,15 +274,6 @@ export class Board extends Action<Props, State> {
                                                 <Image style={importantImageSt} source={{ uri: CLIENT_SETTINGS.host + "/images/commentGray.svg" }} />
                                           </View>
                                           <Text style={numSt1}>{getHumanNumber(numComment)}</Text>
-                                          {writerId === userKey ? <View style={rightButtonSetSt}>
-                                                <Pressable style={rightButtonSt} onPress={this.handlePressDelete} >
-                                                      <Text style={mainButtonTextStyle}>delete</Text>
-                                                </Pressable>
-                                                <Pressable style={rightButtonSt} onPress={this.handlePressUpdate}  >
-                                                      <Text style={mainButtonTextStyle}>update</Text>
-                                                </Pressable>
-                                          </View>
-                                                : null}
                                     </View>
                               </View>
                         </View>
@@ -279,25 +281,33 @@ export class Board extends Action<Props, State> {
                               <TextInput style={inputForWriteBoxSt} multiline numberOfLines={3} maxLength={MAX_CONTENTS_LEN} onChangeText={this.onChangeComment} value={commentText} />
                               <View style={buttonsForWriteBoxSt}>
                                     <Pressable style={rightButtonSt} onPress={this.handlePressCommentCancel} >
-                                          <Text style={mainButtonTextStyle}> clear</Text>
+                                          <Text style={[mainButtonTextStyle, fontBlackSt]}> clear</Text>
                                     </Pressable>
                                     <Pressable style={rightButtonSt} onPress={this.handlePressCommentWrite} >
                                           <Text style={[mainButtonTextStyle, submitButtonTextSt, marginRightButtonSt]}>comment</Text>
                                     </Pressable>
                               </View>
                         </Pressable>
-                        <View style={commentListSt}>
-                              <FlatList
-                                    data={comments}
-                                    renderItem={this.renderItem}
-                                    keyExtractor={(item: any) => item.id}
-                                    onEndReached={this.handleLoadMore}
-                                    onEndReachedThreshold={0.5} />
-                        </View>
+                  </View>
+            )
+      }
+      render(): React.ReactNode {
+            const slim = window.innerWidth < slimThreshold
+            const { comments } = this.state
+            return (
+                  <View style={[pageSt, slim ? slimPageSt : widePageSt]}>
+                        <FlatList
+                              ListHeaderComponent={this.renderHeader}
+                              data={comments}
+                              renderItem={this.renderItem}
+                              keyExtractor={(item: any) => item.id}
+                              onEndReached={this.handleLoadMore}
+                              onEndReachedThreshold={0.5} />
                   </View >
             )
       }
 }
+
 export const upColorSt = setStyle({
       color: upColor
 })

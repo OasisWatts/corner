@@ -84,14 +84,14 @@ export default class Follows extends Action<Props, State> {
             const slim = window.innerWidth < slimThreshold
             return (
                   <View style={[sideBarSt, fullStyle ? fullSt : null, slim ? slimSideBarSt : wideSideBarSt]}>
-                        <Image style={[iconSt, slim ? slimSideBarIconSt : wideSideBarIconSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/hot.svg" }} />
+                        {recommends.length ? <Image style={[iconSt, slim ? slimSideBarIconSt : wideSideBarIconSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/hot.svg" }} /> : null}
                         <View>
                               <FlatList
                                     data={recommends}
                                     renderItem={this.renderItem}
                                     keyExtractor={(item: any) => item.key} />
                         </View>
-                        <Image style={[iconSt, slim ? slimSideBarIconSt : wideSideBarIconSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/heartBlack.svg" }} />
+                        {follows.length ? <Image style={[iconSt, slim ? slimSideBarIconSt : wideSideBarIconSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/heartBlack.svg" }} /> : null}
                         <FlatList
                               data={follows}
                               renderItem={this.renderItem}

@@ -25,7 +25,7 @@ export default class Tag {
       /** 게시글과 관계 설정. */
       @ManyToMany(
             () => Board,
-            (boards) => boards.tags,
+            (boards) => boards.tags
       )
       public boards!: Board[]
 

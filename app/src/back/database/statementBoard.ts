@@ -17,7 +17,10 @@ const url = require("url")
 
 const MAX_CONTENTS_LEN = 100 // SETTINGS.board.contentsLen
 const MAX_LIST_LEN = SETTINGS.board.listLen
-const MAX_TAG_CNT = SETTINGS.board.tagCnt
+const TAG_DISPLAY_CNT = SETTINGS.board.tagDisplayCnt
+const MAX_TAG_LEN = SETTINGS.board.tagLenLim
+const MAX_TAG_CNT = SETTINGS.board.tagCountLim
+
 /**
  * 커뮤니티 관련 트랜잭션 함수를 가진 클래스.
  */
@@ -415,10 +418,15 @@ export class StatementBoard {
        * @param contents 게시글 내용.
        */
       public static async boardInsert(writerKey: number, contents: string, hashTag: string, url_?: string, hostname_?: string) {
-            const hashTags = hashTag.split("#").map((t) => ({ tag: t.replace(/\n|\s/g, ""), isUrl: false })).filter((t) => t.tag.length)
+            console.log("00")
+            const hashTags_ = hashTag.split("#").map((t) => ({ tag: t.replace(/\n|\s/g, ""), isUrl: false })).filter((t) => t.tag.length)
+            const hashTags = Array.from(new Set(hashTags_))
             const hashTagEntities: Tag[] = []
             const promisesTags: Promise<any>[] = []
             const promisesFunc: Promise<any>[] = []
+            console.log("1", hashTags, hashTags.map((t) => t.tag))
+            if (hashTags.length > MAX_TAG_CNT) return
+            if (hashTags.some((t) => t.tag.length > MAX_TAG_LEN)) return
             let urlO_: Url
             console.log("uh", url_, hostname_)
             if (url_) hashTags.push({ tag: url_, isUrl: true })
@@ -509,19 +517,157 @@ export class StatementBoard {
         * @param updaterKey 업데이트하려는 사용자 식별자.
         * @param contents 게시글 내용.
         */
-      public static boardUpdate(boardId: number, updaterKey: number, contents: string) {
-            return new Promise((resolve, _) => {
-                  DB.Manager.update(Board, { id: boardId, writer: updaterKey }, {
-                        contents: contents.slice(0, MAX_CONTENTS_LEN),
-                        updated: true
-                  }).then((r) => {
-                        if (!r.affected) {
-                              Logger.errorApp(ErrorCode.board_update_failed).put("boardUpdate_0").out()
-                        } else {
-                              Logger.passApp("boardUpdate").out()
-                              resolve(true)
-                        }
-                  }).catch((err) => Logger.errorApp(ErrorCode.board_update_failed).put("boardUpdate_1").put(err).out())
+      public static boardUpdate(boardId: number, updaterKey: number, contents: string, hashTag: string) {
+            const hashTags_ = hashTag.split("#").map((t) => ({ tag: t.replace(/\n|\s/g, ""), isUrl: false })).filter((t) => t.tag.length)
+            const hashTags = Array.from(new Set(hashTags_))
+            const hashTagEntities: Tag[] = []
+            const promisesTags: Promise<any>[] = []
+            if (hashTags.length > MAX_TAG_CNT) return
+            if (hashTags.some((t) => t.tag.length > MAX_TAG_LEN)) return
+            let urlO_: Url
+            return new Promise(async (resolve, _) => {
+                  DB.Manager.findOne(Board, { where: { id: boardId, writer: updaterKey }, relations: ["url", "tags"] }).then(async (board) => {
+                        if (board) {
+                              console.log("boards", board)
+                              console.log("boards tags", board.tags)
+                              if (board.url) {
+                                    console.log("url", hashTags)
+                                    for (const tagObj of hashTags) {
+                                          const pt = new Promise(async (res, _) => {
+                                                const tagO = await DB.Manager.findOne(Tag, { where: { name: tagObj.tag } })
+                                                const promisesInside: Promise<any>[] = []
+                                                console.log("tagO", tagO)
+                                                if (tagO) {
+                                                      console.log("-", board.tags.some((t) => t.name === tagO.name))
+                                                      hashTagEntities.push(tagO)
+                                                      if (!board.tags.some((t) => t.name === tagO.name)) {  // 태그 추가 (증가)
+                                                            console.log("--")
+                                                            const pi = new Promise((res, _) => DB.Manager.increment(Tag, { name: tagObj.tag }, "count", 1).then(() => res(true))).catch((err) => Logger.errorApp(ErrorCode.tag_update_failed).put("boardInsert").put(err).out())
+                                                            const pi0 = new Promise((res, _) => DB.Manager.increment(UrlTagCount, { url: { id: board.url?.id }, tag: { id: tagO.id } }, "count", 1).then(() => res(true)).catch((err) => Logger.errorApp(ErrorCode.urltagcount_update_failed).put("boardInsert_0").put(err).out()))
+                                                            promisesInside.push(pi, pi0)
+                                                      }
+                                                      await Promise.all(promisesInside)
+                                                      console.log("---", tagObj.tag)
+                                                      res(true)
+                                                } else { // 태그 추가 (생성)
+                                                      console.log("no tag")
+                                                      const tagO_ = await DB.Manager.save(Tag, { name: tagObj.tag, isUrl: tagObj.isUrl, count: 1 })
+                                                      hashTagEntities.push(tagO_)
+                                                      DB.Manager.save(UrlTagCount, { url: { id: board.url?.id }, tag: { id: tagO_.id }, count: 1 }).then(() => { console.log("res no tag", tagObj.tag); res(true) }).catch((err) => Logger.errorApp(ErrorCode.urltagcount_save_failed).put("boardInsert_1").put(err).out())
+                                                }
+                                                console.log("i", tagObj.tag)
+                                          }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put("boardInsert").put(err).out())
+                                          promisesTags.push(pt)
+                                          console.log("ii")
+                                    }
+                                    console.log("iii")
+                                    for (const tagObj of board.tags) {
+                                          const pt = new Promise(async (res, _) => {
+                                                const tagO = await DB.Manager.findOne(Tag, { where: { name: tagObj.name } })
+                                                const promisesInside: Promise<any>[] = []
+                                                console.log("tagO--", tagO, hashTags.some(({ tag, isUrl }) => (tag === tagO?.name)))
+                                                if (tagO && !hashTags.some(({ tag, isUrl }) => (tag === tagO.name))) {
+                                                      if (tagO.count > 1) { // 태그 제거 (감소)
+                                                            const pi = new Promise((res, _) => DB.Manager.decrement(Tag, { name: tagObj.name }, "count", 1).then(() => res(true)))
+                                                            const pi0 = new Promise((res, _) => DB.Manager.decrement(UrlTagCount, { url: { id: board.url?.id }, tag: { id: tagO.id } }, "count", 1).then(() => res(true)).catch((err) => Logger.errorApp(ErrorCode.urltagcount_update_failed).put("boardInsert_0").put(err).out()))
+                                                            promisesInside.push(pi, pi0)
+                                                            console.log("i+-")
+                                                            await Promise.all(promisesInside)
+                                                            console.log("i+")
+                                                            res(true)
+                                                      } else { // 태그 제거 (삭제 , many to many 라 tag는 delete 불가)
+                                                            const pi = new Promise((res, _) => DB.Manager.decrement(Tag, { name: tagObj.name }, "count", 1).then(() => res(true)))
+                                                            const pi0 = new Promise((res, _) => DB.Manager.delete(UrlTagCount, { url: { id: board.url?.id }, tag: { id: tagO.id } }).then(() => res(true)).catch((err) => Logger.errorApp(ErrorCode.urltagcount_update_failed).put("boardInsert_0").put(err).out()))
+                                                            promisesInside.push(pi, pi0)
+                                                            console.log("i+-")
+                                                            await Promise.all(promisesInside)
+                                                            console.log("i+")
+                                                            res(true)
+                                                      }
+                                                } else res(true)
+                                          })
+                                          promisesTags.push(pt)
+                                    }
+                              } else {
+                                    console.log("1")
+                                    for (const tagObj of hashTags) {
+                                          console.log("tObj", tagObj)
+                                          const pt = new Promise(async (res, _) => {
+                                                const tagO = await DB.Manager.findOne(Tag, { where: { name: tagObj.tag } })
+                                                if (tagO) {
+                                                      hashTagEntities.push(tagO)
+                                                      if (!board.tags.includes(tagO)) {  // 태그 추가 (증가)
+                                                            DB.Manager.increment(Tag, { name: tagObj.tag }, "count", 1).then(() => res(true))
+                                                                  .catch((err) => Logger.errorApp(ErrorCode.tag_update_failed).put("boardInsert").put(err).out())
+                                                      }
+                                                } else { // 태그 추가 (생성)
+                                                      DB.Manager.save(Tag, { name: tagObj.tag, isUrl: tagObj.isUrl, count: 1 }).then((tagO) => {
+                                                            hashTagEntities.push(tagO)
+                                                            res(true)
+                                                      }).catch((err) => Logger.errorApp(ErrorCode.tag_save_failed).put("boardInsert").put(err).out())
+                                                }
+                                          })
+                                          promisesTags.push(pt)
+                                    }
+                                    for (const tagObj of board.tags) {
+                                          const pt = new Promise(async (res, _) => {
+                                                console.log("00")
+                                                DB.Manager.findOne(Tag, { where: { id: tagObj.id } }).then((tagO) => {
+                                                      if (tagO && !hashTags.some(({ tag, isUrl }) => (tag === tagO.name))) {
+                                                            DB.Manager.decrement(Tag, { id: tagObj.id }, "count", 1).then(() => res(true))
+                                                                  .catch((err) => Logger.errorApp(ErrorCode.tag_update_failed).put("boardInsert").put(err).out())
+                                                      } else res(true)
+                                                }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put("boardInsert").put(err).out())
+                                          })
+                                          promisesTags.push(pt)
+                                    }
+                              }
+                              console.log("1")
+                              const resultTag = await Promise.all(promisesTags)
+                              console.log("2")
+                              console.log("hashtags", hashTags, hashTagEntities)
+                              const promisesUserTag: Promise<any>[] = []
+                              for (const hE of hashTagEntities) {
+                                    promisesUserTag.push(
+                                          new Promise(async (resolve, _) => {
+                                                const userTagCountExist = await DB.Manager.findOne(UserTagCount, { where: { user: { key: board.writer }, tag: { id: hE.id } } })
+                                                console.log("userTagCount", userTagCountExist)
+                                                if (userTagCountExist) { // 태그 추가 (증가)
+                                                      if (!board.tags.some((t) => t.name === hE.name)) await DB.Manager.increment(UserTagCount, { user: { key: board.writer }, tag: { id: hE.id } }, "count", 1)
+                                                } else await DB.Manager.save(UserTagCount, { user: { key: board.writer }, tag: { id: hE.id }, count: 1 }) // 태그 추가 (생성)
+                                                resolve(true)
+                                          })
+                                    )
+                              }
+                              for (const tagObj of board.tags) {
+                                    promisesUserTag.push(
+                                          new Promise(async (resolve, _) => {
+                                                const userTagCountExist = await DB.Manager.findOne(UserTagCount, { where: { user: { key: board.writer }, tag: { id: tagObj.id } } })
+                                                console.log("userTagCount", userTagCountExist)
+                                                if (userTagCountExist && !hashTagEntities.some((tagEn) => tagEn.id === tagObj.id)) {
+                                                      if (userTagCountExist.count > 1) { // 태그 제거 (감소)
+                                                            await DB.Manager.decrement(UserTagCount, { user: { key: board.writer }, tag: { id: userTagCountExist.id } }, "count", 1)
+                                                      } else { // 태그 제거 (삭제)
+                                                            await DB.Manager.delete(UserTagCount, { user: { key: board.writer }, tag: { id: userTagCountExist.id } })
+                                                      }
+                                                }
+                                                resolve(true)
+                                          })
+                                    )
+                              }
+                              await Promise.all(promisesUserTag)
+                              console.log("promise result", resultTag, urlO_)
+                              DB.Manager.save(Board, {
+                                    id: boardId, writer: updaterKey,
+                                    contents: contents.slice(0, MAX_CONTENTS_LEN),
+                                    updated: true,
+                                    tags: hashTagEntities
+                              }).then((r) => {
+                                    Logger.passApp("boardUpdate").out()
+                                    resolve(true)
+                              }).catch((err) => Logger.errorApp(ErrorCode.board_update_failed).put("boardUpdate_1").put(err).out())
+                        } else Logger.errorApp(ErrorCode.board_find_failed).put("boardUpdate_0").out()
+                  }).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put("boardUpdate_1").put(err).out())
             })
       }
 
@@ -529,12 +675,27 @@ export class StatementBoard {
       * 게시글 삭제.
       * @param boardId 게시글 식별자.
       */
-      public static boardDelete(boardId: number) {
+      public static boardDelete(boardId: number, userKey: number) {
             return new Promise((resolve, _) => {
-                  DB.Manager.delete(Board, boardId).then(() => {
-                        Logger.passApp("boardDelete").out()
-                        resolve(true)
-                  }).catch((err) => Logger.errorApp(ErrorCode.block_delete_failed).put("boardDelete").put(err).out())
+                  DB.Manager.findOne(Board, { where: { id: boardId, writer: userKey }, relations: ["tags", "url"] }).then((board) => {
+                        if (board) {
+                              console.log("board", board)
+                              const promisesTag: Promise<any>[] = []
+                              board.tags.forEach((tag) => {
+                                    const p = new Promise((res) => DB.Manager.decrement(Tag, { name: tag.name }, "count", 1).then(() => res(true)).catch((err) => Logger.errorApp(ErrorCode.tag_update_failed).put("boardDelete").put(err).out()))
+                                    promisesTag.push(p)
+                                    if (board.url) {
+                                          const pi0 = new Promise((res, _) => DB.Manager.decrement(UrlTagCount, { url: { id: board.url?.id }, tag: { id: tag.id } }, "count", 1).then(() => res(true)).catch((err) => Logger.errorApp(ErrorCode.urltagcount_update_failed).put("boardDelete").put(err).out()))
+                                          promisesTag.push(pi0)
+                                    }
+                              })
+                              DB.Manager.remove(Board, board).then(async () => { // cascade deleting tags
+                                    await Promise.all(promisesTag)
+                                    Logger.passApp("boardDelete").out()
+                                    resolve(true)
+                              }).catch((err) => Logger.errorApp(ErrorCode.block_delete_failed).put("boardDelete").put(err).out())
+                        } else Logger.errorApp(ErrorCode.board_find_failed).put("boardDelete_0").out()
+                  }).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put("boardDelete_1").put(err).out())
             })
       }
 
@@ -626,12 +787,16 @@ export class StatementBoard {
        * 댓글 삭제.
        * @param commentId 댓글 식별자.
        */
-      public static commentDelete(commentId: number) {
+      public static commentDelete(commentId: number, userKey: number) {
             return new Promise((resolve, _) => {
-                  DB.Manager.delete(Comment, commentId).then(() => {
-                        Logger.passApp("commentDelete").out()
-                        resolve(true)
-                  }).catch((err) => Logger.errorApp(ErrorCode.comment_delete_failed).put("commentDelete").put(err).out())
+                  DB.Manager.findOne(User, { where: { key: userKey } }).then((user) => {
+                        if (user) {
+                              DB.Manager.delete(Comment, commentId).then(() => {
+                                    Logger.passApp("commentDelete").out()
+                                    resolve(true)
+                              }).catch((err) => Logger.errorApp(ErrorCode.comment_delete_failed).put("commentDelete").put(err).out())
+                        } else Logger.errorApp(ErrorCode.user_find_failed).put("commentDelete_0").out()
+                  }).catch((err) => Logger.errorApp(ErrorCode.user_find_failed).put("commentDelete_1").put(err).out())
             })
       }
 
@@ -685,7 +850,7 @@ export class StatementBoard {
                         if (url_) {
                               console.log("url_", url_)
                               const urlId = url_.id
-                              DB.Manager.query(`select name, isUrl from (select tagId from \`urltagcount\` where urlId = ${urlId}  order by count desc limit ${MAX_TAG_CNT}) b join corner.tag a on a.id = b.tagid;`)
+                              DB.Manager.query(`select name, isUrl from (select tagId from \`urltagcount\` where urlId = ${urlId} and count > 0 order by count desc limit ${TAG_DISPLAY_CNT}) b join corner.tag a on a.id = b.tagid;`)
                                     .then((r) => {
                                           console.log("tag", r)
                                           Logger.passApp("get tag").out()
@@ -706,17 +871,17 @@ export class StatementBoard {
 
       /** 핫한 태그 가져오기. */
       public static async getHotTag(userKey: number) {
-            const hotKeyLen = Math.ceil(MAX_TAG_CNT / 2)
-            const userHotKeyLen = MAX_TAG_CNT - hotKeyLen - 1
+            const hotKeyLen = Math.ceil(TAG_DISPLAY_CNT / 2)
+            const userHotKeyLen = TAG_DISPLAY_CNT - hotKeyLen - 1
             console.log("len", hotKeyLen, userHotKeyLen)
             return new Promise((resolve, _) => {
-                  DB.Manager.query(`select name, isUrl from (select tagId from \`usertagcount\` where userKey = ${userKey} order by count desc limit ${userHotKeyLen}) b join \`tag\` a on a.id = b.tagId;`)
+                  DB.Manager.query(`select name, isUrl from (select tagId from \`usertagcount\` where userKey = ${userKey} and count > 0 order by count desc limit ${userHotKeyLen}) b join \`tag\` a on a.id = b.tagId;`)
                         .then((r) => {
                               console.log("tag", r)
                               const left_tag_cnt = hotKeyLen - (userHotKeyLen - r.length)
                               const exclude_tag = r.map((t) => "\"" + t.name + "\"").join(" ,")
                               console.log("exclude", exclude_tag)
-                              DB.Manager.query(`select name, isUrl from \`tag\` ${r.length ? `where name not in (${exclude_tag})` : ""} order by count desc limit ${left_tag_cnt}`)
+                              DB.Manager.query(`select name, isUrl from \`tag\` ${r.length ? `where count > 0 and name not in (${exclude_tag})` : "where count > 0"} order by count desc limit ${left_tag_cnt}`)
                                     .then((r2) => {
                                           console.log("tag2", r2)
                                           r.push(...r2)
@@ -725,6 +890,28 @@ export class StatementBoard {
                                           return
                                     }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put("getHotTag_0").put(err).out())
                         }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put("getHotTag_1").put(err).out())
+            })
+      }
+      /** url, hostname에 게시글 있는지 확인. */
+      public static async checkBoard(url: string, hostname: string) {
+            return new Promise<any>(async (resolve) => {
+                  let urlExist = false
+                  let tagExist = false
+                  const urlObj = await DB.Manager.findOne(Url, { where: { name: url }, select: ["id"] }).catch((err) => Logger.errorApp(ErrorCode.url_find_failed).put("checkBoard").put(err).out())
+                  if (urlObj) {
+                        console.log("urlobj", urlObj)
+                        const boardExist = await DB.Manager.query(`select id from \`board\` where urlId = ${urlObj.id} limit 1;`)
+                        console.log("uE", boardExist)
+                        if (boardExist.length) urlExist = true
+                  }
+                  const tagObj = await DB.Manager.findOne(Tag, { where: { name: hostname } }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put("checkBoard").put(err).out())
+                  if (tagObj) {
+                        const boardExist = await DB.Manager.query(`select boardId from \`board_tags_tag\` where tagId = ${tagObj.id} limit 1;`)
+                        console.log("tE", boardExist)
+                        if (boardExist.length) tagExist = true
+                  }
+                  console.log("result", urlExist, tagExist)
+                  resolve({ u: urlExist, h: tagExist })
             })
       }
 }

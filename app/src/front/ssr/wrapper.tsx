@@ -38,6 +38,7 @@ export default class Wrapper extends Action<Props, State> {
 
       private renderPage = () => {
             const { page, boardId } = this.props
+            console.log("render page", page)
             switch (page) {
                   case Page.write:
                         return <Write update={false} boardId={null} />

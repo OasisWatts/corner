@@ -13,6 +13,20 @@ const MAX_FOLLOW_LEN = SETTINGS.follow.followLen
  * 친구 관련 트랜잭션 함수를 가진 클래스.
  */
 export class StatementUser {
+
+      public static getUser(userKey: number): Promise<{ name: string, image: string }> {
+            return new Promise((resolve, reject) => {
+                  DB.Manager.findOne(User, {
+                        where: { key: userKey },
+                        select: ["image", "name"]
+                  }).then((user) => {
+                        if (user) {
+                              Logger.passApp("getUser").out()
+                              resolve({ image: user.image, name: user.name })
+                        } else Logger.errorApp(ErrorCode.user_find_failed).put("getUser0").out()
+                  }).catch((err) => Logger.errorApp(ErrorCode.user_find_failed).put("getUser1").put(err).out())
+            })
+      }
       /**
        * 팔로우 또는 언팔로우.
        * @param targetKey 대상 사용자 식별자.
@@ -38,12 +52,12 @@ export class StatementUser {
                               }
                               if (user.followings.some((f) => f.key === targetKey)) {
                                     DB.Manager.query(`delete from \`user_followings_user\` where followerKey = ${userKey} and followedKey = ${targetKey}`).then(() => {
-                                          Logger.passApp().out()
+                                          Logger.passApp("follow").out()
                                           resolve({ followed: false })
                                     }).catch((err) => { Logger.errorApp(ErrorCode.unfollow_failed).put("follow").put(err).out() })
                               } else {
                                     DB.Manager.query(`insert into \`user_followings_user\`(followerKey, followedKey) value(${userKey}, ${targetKey})`).then(() => {
-                                          Logger.passApp().out()
+                                          Logger.passApp("follow").out()
                                           resolve({ followed: true })
                                     }).catch((err) => { Logger.errorApp(ErrorCode.follow_failed).put("follow").put(err).out() })
                               }
@@ -73,7 +87,7 @@ export class StatementUser {
                                           resolve({ users, end: true, endId: 0, zero: true })
                                     } else resolve({ users, end: false, endId, zero: true })
                               }
-                              Logger.passApp("getFollow")
+                              Logger.passApp("getFollow").out()
                               return
                         }).catch((err) => Logger.errorApp(ErrorCode.follow_find_failed).put("getFollow_0").put(err).out())
                   } else if (tag) {
@@ -118,7 +132,7 @@ export class StatementUser {
                                                             resolve({ users: [...users, ...users_], end: true, endId: 0, zero: true })
                                                       } else resolve({ users: [...users, ...users_], end: false, endId, zero: true })
                                                 }
-                                                Logger.passApp("getFollow")
+                                                Logger.passApp("getFollow").out()
                                                 return
                                           }).catch((err) => Logger.errorApp(ErrorCode.follow_find_failed).put("getFollow_2").put(err).out())
                                     } else resolve({ users, end: false, endId })
@@ -145,7 +159,7 @@ export class StatementUser {
                                     DB.Manager.query(`select userKey, (select name from corner.user where user.key = userKey) name, (select image from corner.user where user.key = userKey) image from corner.usertagcount where tagId = ${tagId} order by count desc limit ${MAX_FOLLOW_RECOMM};`).then((usersO) => {
                                           const users = usersO.map((us) => ({ key: us.userKey, name: us.name, image: us.image }))
                                           console.log("usrs", usersO, users)
-                                          Logger.passApp("getFollowRecommend")
+                                          Logger.passApp("getFollowRecommend").out()
                                           resolve(users)
                                           return
                                     }).catch((err) => Logger.errorApp(ErrorCode.follow_recommend_find_failed).put("getFollowRecommend_0").put(err).out())
@@ -156,7 +170,7 @@ export class StatementUser {
                         DB.Manager.query(`select userKey, (select name from corner.user where user.key = userKey) name, (select image from corner.user where user.key = userKey) image, count(*) as cnt from corner.usertagcount group by userKey order by cnt desc;`).then((usersO) => {
                               const users = usersO.map((us) => ({ key: us.userKey, name: us.name, image: us.image }))
                               console.log("usrs", usersO, users)
-                              Logger.passApp("getFollowRecommend")
+                              Logger.passApp("getFollowRecommend").out()
                               resolve(users)
                               return
                         }).catch((err) => Logger.errorApp(ErrorCode.follow_recommend_find_failed).put("getFollowRecommend_1").put(err).out())
@@ -185,12 +199,12 @@ export class StatementUser {
                               const targetKey = target.key
                               const userKey = user.key
                               const numBlocks = user.blockeds.length
-                              if (user.blockeds.some((u) => u.key === targetKey)) Logger.errorApp(ErrorCode.block_already).out()
-                              if (targetKey === userKey) Logger.errorApp(ErrorCode.block_self).out()
-                              if (numBlocks > MAX_BLOCKS) Logger.errorApp(ErrorCode.max_blocks).out()
+                              if (user.blockeds.some((u) => u.key === targetKey)) Logger.errorApp(ErrorCode.block_already).put("blockAdd").out()
+                              if (targetKey === userKey) Logger.errorApp(ErrorCode.block_self).put("blockAdd").out()
+                              if (numBlocks > MAX_BLOCKS) Logger.errorApp(ErrorCode.max_blocks).put("blockAdd").out()
                               else DB.Manager.query(`insert into \`user_blockeds_user\`(blockersKey, blockedsKey) value(${userKey}, ${targetKey})`)
                                     .then(() => {
-                                          Logger.passApp().out()
+                                          Logger.passApp("blockAdd").out()
                                           resolve(true)
                                     }).catch((err) => {
                                           Logger.errorApp(ErrorCode.block_add_failed).put("blockAdd_0").put(err).out()
@@ -233,7 +247,7 @@ export class StatementUser {
                   Promise.all([targetKey, userKey]).then((v) => {
                         DB.Manager.query(`delete from \`user_blockeds_user\` where blockersKey = ${v[1]} and blockedsKey = ${v[0]}`)
                               .then((res) => {
-                                    Logger.passApp().out()
+                                    Logger.passApp("blockDelete").out()
                                     resolve(true)
                               }).catch((err) => {
                                     Logger.errorApp(ErrorCode.block_delete_failed).put("blockDelete_0").put(err).out()
@@ -255,15 +269,18 @@ export class StatementUser {
             return new Promise((resolve, reject) => {
                   DB.Manager.findOne(User, { where: { socialId } }).then((user) => {
                         if (user) {
-                              resolve({ signed: true, userKey: user.key })
+                              console.log("su0")
+                              resolve({ signed: true, userKey: user.key, name: user.name, image: user.image })
                         } else {
-                              DB.Manager.save(User, { socialId, name, email }).then((res) => {
+                              console.log("su1")
+                              const imgNo = Math.floor(Math.random() * 5)
+                              DB.Manager.save(User, { socialId, name, email, image: "user" + String(imgNo) + ".svg" }).then((res) => {
                                     Logger.passApp("signUp").put("signIn").out()
                                     resolve({ signed: true, userKey: res.key })
                                     return
-                              }).catch((err) => Logger.errorApp(ErrorCode.user_save_failed).put(err).out())
+                              }).catch((err) => Logger.errorApp(ErrorCode.user_save_failed).put("signIn").put(err).out())
                         }
-                  }).catch((err) => Logger.errorApp(ErrorCode.user_find_failed).put(err).out())
+                  }).catch((err) => Logger.errorApp(ErrorCode.user_find_failed).put("signIn").put(err).out())
             })
       }
 }

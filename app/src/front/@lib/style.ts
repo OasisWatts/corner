@@ -9,7 +9,7 @@ export function setStyle(obj: Object) {
       return styles.style
 }
 export const mainColor = "black"
-export const deepGray = "rgb(120,120,120)"
+export const deepGray = "rgb(70,70,70)"
 export const gray = "rgb(150,150,150)"
 export const softGray = "rgb(180,180,180)"
 export const lightGray = "rgb(220,220,220)"

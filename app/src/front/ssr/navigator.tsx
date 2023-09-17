@@ -28,7 +28,7 @@ export default class Navigator extends Action<Props, State> {
             } this.previousWidth = window.innerWidth
       }
       private handleWrite = () => {
-            Action.trigger("page", Page.write)
+            Action.trigger("page", Page.write, () => Action.trigger("writeReload"))
       }
       private handlePressSearch = () => {
             Action.trigger("searchShow", true)

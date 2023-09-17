@@ -7,8 +7,9 @@
       "board": {
             "listLen": 10,
             "contentsLen": 500,
-            "tagCnt": 7,
-            "tagLen": 10
+            "tagDisplayCnt": 10,
+            "tagLenLim": 20,
+            "tagCountLim": 10
       },
       "follow": {
             "limit": 100,

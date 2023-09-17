@@ -9,7 +9,9 @@ import { wrapForWriteBoxSt } from "./board"
 import { CLIENT_SETTINGS, PROPS, extension, fullStyle } from "front/@lib/util"
 
 const MAX_CONTENTS_LEN = CLIENT_SETTINGS.board.contentsLen
-const MAX_TAG_LEN = CLIENT_SETTINGS.board.tagLen
+const MAX_TAG_LEN = CLIENT_SETTINGS.board.tagLenLim
+const MAX_TAG_CNT = CLIENT_SETTINGS.board.tagCountLim
+
 type Props = {
       update: boolean,
       boardId: number | null
@@ -28,6 +30,12 @@ export class Write extends Action<Props, State> {
                   focusedContentArea: false,
                   focusedTagArea: false,
                   hashTag: "#"
+            }
+      }
+
+      protected ACTION_RECEIVER_TABLE: any = {
+            writeReload: () => {
+                  this.setState({ contentText: "", focusedContentArea: false, focusedTagArea: false, hashTag: "#" })
             }
       }
 
@@ -50,7 +58,7 @@ export class Write extends Action<Props, State> {
       private getBoard = () => {
             const { boardId } = this.props
             console.log("getBoard from update")
-            fetch("/board/" + String(boardId)).then((r) => r.json()).then((res) => {
+            fetch("/boardload?id=" + String(boardId)).then((r) => r.json()).then((res) => {
                   console.log("res board", res)
                   this.setState({
                         contentText: res.contents,
@@ -65,7 +73,10 @@ export class Write extends Action<Props, State> {
             const { hashTag: prevTag } = this.state
             const last = hashTag[hashTag.length - 1]
             const prevLast = prevTag[prevTag.length - 1]
+            const tmpTags = hashTag.split("#")
+            if (tmpTags.length > MAX_TAG_CNT) return
             if (last === " " && prevLast !== "#") hashTag += "#"
+            else if (tmpTags[tmpTags.length - 1].length > MAX_TAG_LEN) return
             if (hashTag.length === 0) hashTag = "#"
             console.log("hashtag", hashTag, "pr", prevTag)
             this.setState({ hashTag })
@@ -126,7 +137,7 @@ export class Write extends Action<Props, State> {
                         <TextInput style={[inputForWritePageSt, fullStyle ? fullStyleInputForWritePageSt : null, fullStyle ? almostWhiteSt : (focusedContentArea ? whiteSt : null)]} multiline numberOfLines={3} maxLength={MAX_CONTENTS_LEN} onChangeText={this.onChangeContentText} value={contentText} onFocus={this.handleFocusContent} onBlur={this.handleBlurContent} />
                         <Pressable style={[hashTagSt, fullStyle ? fullStyleHashTagSt : null, fullStyle ? almostWhiteSt : (focusedTagArea ? whiteSt : null)]} onHoverIn={this.handleFocusTag} onHoverOut={this.handleBlurTag}>
                               <Text style={hashTagTextSt}> hash tag </Text>
-                              <TextInput style={inputHashTagSt} onChangeText={this.onChangeHashTagText} value={hashTag} maxLength={MAX_TAG_LEN} />
+                              <TextInput style={inputHashTagSt} onChangeText={this.onChangeHashTagText} value={hashTag} maxLength={MAX_TAG_LEN * MAX_TAG_CNT} />
                         </Pressable>
                         <View style={[buttonsForWritePageSt, fullStyle ? fullStyleButtonsForWritePageSt : null]}>
                               <Pressable style={rightButtonSt} onPress={this.handlePressCancel} >

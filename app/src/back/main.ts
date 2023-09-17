@@ -13,7 +13,7 @@ import { StatementUser } from "./database/statementUser"
 
 const app = express()
 const MAX_CONTENTS_LEN = SETTINGS.board.contentsLen
-const MAX_TAG_LEN = SETTINGS.board.tagLen
+
 declare module 'express-session' {
       interface SessionData {
             userKey: number | null
@@ -54,6 +54,7 @@ DB.initialize().then(() => {
       app.use("/strings", express.static(path.resolve(__dirname, "./strings"), { maxAge: SETTINGS.cookie.maxAge }), send404)
       app.use("/constants.js", (req, res) => res.sendFile(path.resolve(__dirname, "./constants.js")))
       app.use("/board/constants.js", (req, res) => res.sendFile(path.resolve(__dirname, "./constants.js")))
+      app.use("/favicon.ico", express.static(path.resolve(__dirname, "./images/favicon.ico"), { maxAge: SETTINGS.cookie.maxAge }), send404)
       app.get("/admin/load-languages", (req, res) => loadLanguages())
       // 전체 게시글 목록 조회.
       app.get("/boards", async (req, res, next) => {
@@ -153,12 +154,12 @@ DB.initialize().then(() => {
             let url = req.body.u
             let hostname = req.body.h
             if (contents.length > MAX_CONTENTS_LEN) return
-            if (hashTag.length > MAX_TAG_LEN) return
             if (url === "") url = null
             if (hostname === "" || url === hostname) hostname = null
             console.log("u", url, hostname)
             if (!req.session.isLogined || !userKey) res.redirect("/")
             else {
+                  console.log("0")
                   const result = await DB.Manager.transaction(() => StatementBoard.boardInsert(userKey, contents, hashTag, url, hostname))
                   if (result) res.send(true)
             }
@@ -168,17 +169,22 @@ DB.initialize().then(() => {
             const boardId = Number(req.query.id)
             const userKey = req.session.userKey
             const contents = req.body.c
+            const hashTag = req.body.t
+            if (contents.length > MAX_CONTENTS_LEN) return
             if (!req.session.isLogined || !userKey) res.redirect("/")
             else {
-                  const result = await StatementBoard.boardUpdate(boardId, userKey, contents)
+                  const result = await StatementBoard.boardUpdate(boardId, userKey, contents, hashTag)
                   if (result) res.send(true)
             }
       })
       // 게시글 삭제.
       app.get("/boardDelete", async (req, res) => {
             const boardId = Number(req.query.id)
-            const result = await StatementBoard.boardDelete(boardId)
-            if (result) res.send(true)
+            const userKey = req.session.userKey
+            if (userKey) {
+                  const result = await StatementBoard.boardDelete(boardId, userKey)
+                  if (result) res.send(true)
+            }
       })
       // 댓글 등록.
       app.post("/commentInsert", async (req, res) => {
@@ -205,8 +211,11 @@ DB.initialize().then(() => {
       // 댓글 삭제.
       app.get("/commentDelete", async (req, res) => {
             const commentId = Number(req.query.cid)
-            const result = await StatementBoard.commentDelete(commentId)
-            if (result) res.send(true)
+            const userKey = req.session.userKey
+            if (userKey) {
+                  const result = await StatementBoard.commentDelete(commentId, userKey)
+                  if (result) res.send(true)
+            }
       })
       // 게시글 좋아요.
       app.get("/boardUp", async (req, res) => {
@@ -281,14 +290,16 @@ DB.initialize().then(() => {
             const id = String(req.body.i)
             const name = String(req.body.n)
             const email = String(req.body.e)
+            console.log("s0")
             if (!req.session.isLogined || !req.session.userKey) {
                   try {
+                        console.log("s1")
                         const result: any = await StatementUser.signIn(id, name, email)
+                        console.log("s2")
                         req.session.userKey = result.userKey
                         req.session.isLogined = true
-                        res.send(JSON.stringify({ signed: true }))
-                  }
-                  catch { res.send(JSON.stringify({ signed: false })) }
+                        res.send(JSON.stringify({ signed: true, name: result.name, image: result.image }))
+                  } catch { res.send(JSON.stringify({ signed: false })) }
             } else res.send(JSON.stringify({ signed: true }))
       })
       // 로그아웃
@@ -313,13 +324,23 @@ DB.initialize().then(() => {
             console.log('req', req)
             const boardId = Number(req.params.id)
             const userKey = req.session.userKey
-            const board = await StatementBoard.boardSelect(boardId, userKey)
             res.set("Access-Control-Allow-Origin", "*")
-            if (!req.session.isLogined || !req.session.userKey) {
-                  pageBuilder("ssr", { url: null, hostname: null, ext: false, ss: false, boardAccess: true, board })(req, res, next)
-            } else pageBuilder("ssr", { url: null, hostname: null, ext: false, ss: true, boardAccess: true, board })(req, res, next)
+            if (!req.session.isLogined || !userKey) {
+                  pageBuilder("ssr", { url: null, hostname: null, ext: false, ss: false })(req, res, next)
+            } else {
+                  const board = await StatementBoard.boardSelect(boardId, userKey)
+                  const user = await StatementUser.getUser(userKey)
+                  pageBuilder("ssr", { url: null, hostname: null, ext: false, ss: true, boardAccess: true, board, name: user.name, image: user.image })(req, res, next)
+            }
       })
-      app.get("/*", (req, res, next) => {
+      // board가 존재하는지 확인.
+      app.get("/check", async (req, res, next) => {
+            const url = String(req.query.u)
+            const hostname = String(req.query.h)
+            const result = await StatementBoard.checkBoard(url, hostname)
+            if (result) res.send(result)
+      })
+      app.get("/*", async (req, res, next) => {
             const { u, h } = req.query
             let url: string | null = null
             let hostname: string | null = null
@@ -327,10 +348,15 @@ DB.initialize().then(() => {
             if (h) hostname = String(h)
             const extension: boolean = Boolean(req.query.ext)
             res.set("Access-Control-Allow-Origin", "*")
+            // req.session.isLogined = true // 개발 시 로그인 매번 할 필요 없게
+            // req.session.userKey = 1 // 개발 시 로그인 매번 할 필요 없게
             console.log("il", req.session.isLogined, req.session.userKey)
             if (!req.session.isLogined || !req.session.userKey) {
                   pageBuilder("ssr", { url, hostname, ext: extension, ss: false })(req, res, next)
-            } else pageBuilder("ssr", { url, hostname, ext: extension, ss: true })(req, res, next)
+            } else {
+                  const user = await StatementUser.getUser(req.session.userKey)
+                  pageBuilder("ssr", { url, hostname, ext: extension, ss: true, name: user.name, image: user.image })(req, res, next)
+            }
       })
       app.listen(4416)
 })
