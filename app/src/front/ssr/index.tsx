@@ -15,6 +15,7 @@ import Wrapper from "./wrapper"
 import Landing from "./landing"
 import { initializeApp } from "firebase/app"
 import { getAuth } from "firebase/auth"
+import Navigator from "./navigator"
 
 window.onpopstate = (ev: any) => { // 브라우저 뒤로가기, 앞으로가기 반영
       let id = Page.boardList
@@ -164,10 +165,11 @@ export default class Index extends Action<Props, State> {
             const { page, boardId, landing } = this.state
             return (
                   <View>
-                        <Background />
                         <Header page={page} />
                         <Wrapper page={page} boardId={boardId} />
                         {landing ? <Landing /> : null}
+                        <Navigator />
+                        <Follows />
                   </View>
             )
       }

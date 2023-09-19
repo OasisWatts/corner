@@ -1,10 +1,10 @@
 
-import { almostWhiteSt, contentFontSize, lightGray, lightGraySt, setStyle, slimThreshold, tWhite } from "front/@lib/style"
+import { almostWhiteSt, contentFontSize, lightGray, lightGraySt, setStyle, slimThreshold, slimerThreshold, softGray, tWhite } from "front/@lib/style"
 import { CLIENT_SETTINGS, fullStyle } from "front/@lib/util"
 import Action from "front/reactCom"
 import React from "react"
 import { Image, Pressable, TextInput, View } from "reactNative"
-import { slimTagsWrapperSt, tagsWrapperSt } from "./tags"
+import { slimTagsWrapperSt, slimerTagsWrapperSt, tagsWrapperSt } from "./tags"
 import { Page } from "front/ssr"
 
 type State = {
@@ -52,10 +52,11 @@ export default class Search extends Action<Props, State> {
       render(): React.ReactNode {
             const { text } = this.state
             const slim = window.innerWidth < slimThreshold
+            const slimer = window.innerWidth < slimerThreshold
             return (
-                  <View style={[tagsWrapperSt, slim ? slimTagsWrapperSt : null]}>
+                  <View style={[tagsWrapperSt, slimer ? slimerTagsWrapperSt : slim ? slimTagsWrapperSt : null]}>
                         <Image style={searchImageSt} source={{ uri: CLIENT_SETTINGS.host + "/images/search.svg" }} />
-                        <TextInput style={[searchInputSt, fullStyle ? almostWhiteSt : null]} onChangeText={this.handleChangeText} value={text} onKeyPress={this.handleKeyPress} />
+                        <TextInput style={[searchInputSt, almostWhiteSt]} onChangeText={this.handleChangeText} value={text} onKeyPress={this.handleKeyPress} />
                         <Pressable onPress={this.handlePressCancel} style={cancelButtonSt} >
                               <Image style={imgSt} source={{ uri: CLIENT_SETTINGS.host + "/images/off.svg" }} />
                         </Pressable>
@@ -75,7 +76,7 @@ const searchInputSt = setStyle({
       height: "30px",
       borderWidth: "1px",
       borderStyle: "solid",
-      borderColor: lightGray,
+      borderColor: softGray,
       borderRadius: "15px",
       paddingLeft: "10px",
       fontSize: contentFontSize,

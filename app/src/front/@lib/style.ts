@@ -13,7 +13,7 @@ export const deepGray = "rgb(70,70,70)"
 export const gray = "rgb(150,150,150)"
 export const softGray = "rgb(180,180,180)"
 export const lightGray = "rgb(220,220,220)"
-export const almostWhite = "rgb(240, 240, 240)"
+export const almostWhite = "rgb(243, 243, 243)"
 export const tWhite = "rgba(255,255,255,0.8)"
 export const tLightGray = "rgba(220, 220, 220, 0.5)"
 export const tDeepGray = "rgba(120,120,120,0.5)"
@@ -23,7 +23,10 @@ export const tUpColor = "rgba(228,98,98,0.5)"
 export const upColor = "rgb(228,98,98)"
 export const contentFontSize = "14px"
 export const smallFontSize = "13px"
-export const slimThreshold = 1500
+export const slimThreshold = 1200
+export const slimerThreshold = 450
+export const slimThresholdSize = "1200px"
+export const slimThresholdExceptSize = "calc(50% - 600px)"
 export const contentFontSizeSt = setStyle({
       fontSize: contentFontSize
 })
@@ -52,9 +55,13 @@ export const pageSt = setStyle({
       borderTopLeftRadius: "20px",
       borderTopRightRadius: "20px"
 })
+export const slimerPageSt = setStyle({
+      left: "0",
+      width: "100%"
+})
 export const slimPageSt = setStyle({
       left: "65px",
-      width: "calc(100% - 130px)"
+      width: "calc(100% - 115px)"
 })
 export const widePageSt = setStyle({
       left: "200px",
@@ -74,7 +81,8 @@ export const itemSt = setStyle({
 /** writer의 이미지 및 좋아요 등 wrapper */
 export const profileSt = setStyle({
       width: "60px",
-      display: "inline-block"
+      display: "inline-block",
+      verticalAlign: "top"
 })
 /** date, content, numComment 등 wrapper (게시글, 댓글) */
 export const contentsSt = setStyle({

@@ -1,9 +1,9 @@
 // import { setStyle } from "front/common/style"
 import Action from "front/reactCom"
 import React from "react"
-import { View, Text, Image, Pressable, FlatList, TextInput } from "reactNative"
+import { View, Text, Image, Pressable, FlatList, TextInput, Linking } from "reactNative"
 import { CommentItem } from "./commentItem"
-import { blockSt, composeStyle, contentsSt, upButtonSt, mainButtonTextStyle, rightButtonSt, profileSt, setStyle, pageSt, buttonSetSt, tWhite, tDeepGray, importantButtonTextStyle, slimPageSt, widePageSt, slimThreshold, dateSt, writerSt, numSt, numSt1, commentButtonSt, hoveredUp, hoveredComment, importantImageSt, profileImgSt, followImgSt, followButtonSt, tWriteColor, tUpColor, tLightGray, lightGray, writeColor, upColor, updatedSt, rightButtonSetSt, inputSt, whiteSt, almostWhiteSt, submitButtonTextSt, mainFontSizeSt, contentFontSize, contentFontSizeSt, fontBlackSt, inlineBlockSt } from "front/@lib/style"
+import { blockSt, composeStyle, contentsSt, upButtonSt, mainButtonTextStyle, rightButtonSt, profileSt, setStyle, pageSt, buttonSetSt, tWhite, tDeepGray, importantButtonTextStyle, slimPageSt, widePageSt, slimThreshold, dateSt, writerSt, numSt, numSt1, commentButtonSt, hoveredUp, hoveredComment, importantImageSt, profileImgSt, followImgSt, followButtonSt, tWriteColor, tUpColor, tLightGray, lightGray, writeColor, upColor, updatedSt, rightButtonSetSt, inputSt, whiteSt, almostWhiteSt, submitButtonTextSt, mainFontSizeSt, contentFontSize, contentFontSizeSt, fontBlackSt, inlineBlockSt, slimerThreshold, slimerPageSt } from "front/@lib/style"
 import { BoardItem } from "./boardItem"
 import { Page } from "."
 import { CLIENT_SETTINGS, PROPS, extension, fullStyle, userKey } from "front/@lib/util"
@@ -33,6 +33,7 @@ type State = {
       uped: boolean
       contents: string
       tags: string[]
+      url: string | null
       hoverUp: boolean
       hoverComment: boolean
       hoverFollow: boolean
@@ -45,7 +46,7 @@ export class Board extends Action<Props, State> {
             super(props)
             if (PROPS.data.boardAccess) {
                   console.log("board", PROPS.data.board)
-                  const { id, writer, writerId, writerImage, writerFollowed, contents, date, up, numComment, uped, updated, comments, tags } = PROPS.data.board
+                  const { id, writer, writerId, writerImage, writerFollowed, contents, date, up, numComment, uped, updated, comments, tags, url } = PROPS.data.board
                   this.state = {
                         commentStartId: comments.length ? comments[comments.length - 1]?.id : -1,
                         comments,
@@ -64,6 +65,7 @@ export class Board extends Action<Props, State> {
                         uped,
                         contents,
                         tags,
+                        url,
                         hoverUp: false,
                         hoverComment: false,
                         hoverFollow: false
@@ -88,6 +90,7 @@ export class Board extends Action<Props, State> {
                         uped: false,
                         contents: "",
                         tags: [],
+                        url: null,
                         hoverUp: false,
                         hoverComment: false,
                         hoverFollow: false
@@ -202,6 +205,7 @@ export class Board extends Action<Props, State> {
                         commentStartId: res.endId,
                         endOfList: res.end ? true : false,
                         tags: res.tags,
+                        url: res.url,
                         commentText: ""
                   })
             })
@@ -235,6 +239,11 @@ export class Board extends Action<Props, State> {
       private handleBlurTextArea = () => {
             this.setState({ focusedArea: false })
       }
+      private pressURL = () => {
+            const { url } = this.state
+            console.log("url", url)
+            if (url) Linking.openURL(url)
+      }
       private renderHeader = () => {
             const { commentText, focusedArea, writerImage, up, uped, updated, writer, writerId, writerFollowed, date, numComment, contents, comments, tags, hoverUp, hoverComment, hoverFollow } = this.state
 
@@ -265,6 +274,7 @@ export class Board extends Action<Props, State> {
                                     </View>
                                     <Text style={contentFontSizeSt}>{contents}</Text>
                                     <Text style={[tagSt, contentFontSizeSt]}>{"#" + tags.join(" #")}</Text>
+                                    <Text style={[tagSt, contentFontSizeSt, urlSt]} onPress={this.pressURL}>written place</Text>
                                     <View style={[buttonSetSt, boardButtonSetSt]}>
                                           <Pressable style={[upButtonSt, hoverUp ? hoveredUp : null]} onPress={this.handlePressUp} onHoverIn={this.handleHoverInUp} onHoverOut={this.handleHoverOutUp}>
                                                 <Image style={importantImageSt} source={{ uri: CLIENT_SETTINGS.host + "/images/" + (hoverUp || uped ? "upPink.svg" : "upGray.svg") }} />
@@ -277,7 +287,7 @@ export class Board extends Action<Props, State> {
                                     </View>
                               </View>
                         </View>
-                        <Pressable style={[wrapForWriteBoxSt, fullStyle ? almostWhiteSt : null, (focusedArea && !fullStyle) ? whiteSt : null]} onHoverIn={this.handleFocusTextArea} onHoverOut={this.handleBlurTextArea} >
+                        <Pressable style={[wrapForWriteBoxSt, almostWhiteSt]}  >
                               <TextInput style={inputForWriteBoxSt} multiline numberOfLines={3} maxLength={MAX_CONTENTS_LEN} onChangeText={this.onChangeComment} value={commentText} />
                               <View style={buttonsForWriteBoxSt}>
                                     <Pressable style={rightButtonSt} onPress={this.handlePressCommentCancel} >
@@ -293,9 +303,10 @@ export class Board extends Action<Props, State> {
       }
       render(): React.ReactNode {
             const slim = window.innerWidth < slimThreshold
+            const slimer = window.innerWidth < slimerThreshold
             const { comments } = this.state
             return (
-                  <View style={[pageSt, slim ? slimPageSt : widePageSt]}>
+                  <View style={[pageSt, slimer ? slimerPageSt : slim ? slimPageSt : widePageSt]}>
                         <FlatList
                               ListHeaderComponent={this.renderHeader}
                               data={comments}
@@ -320,8 +331,7 @@ export const wrapForWriteBoxSt = setStyle({
       height: "110px",
       borderBottomColor: lightGray,
       borderBottomWidth: "1px",
-      borderBottomStyle: "solid",
-      backgroundColor: tWhite
+      borderBottomStyle: "solid"
 })
 export const inputForWriteBoxSt = composeStyle(
       inputSt,
@@ -337,7 +347,6 @@ export const buttonsForWriteBoxSt = setStyle({
       display: "block"
 })
 const boardWrapSt = setStyle({
-      background: tWhite,
       display: "block",
       paddingTop: "10px",
       paddingBottom: "10px",
@@ -354,6 +363,6 @@ const tagSt = setStyle({
 export const marginRightButtonSt = setStyle({
       marginRight: "10px"
 })
-const commentListSt = setStyle({
-      height: "100vh"
+const urlSt = setStyle({
+      textDecorationLine: "underline"
 })

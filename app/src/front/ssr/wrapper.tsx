@@ -8,7 +8,7 @@ import { BoardList } from "./boardList"
 import { Board } from "./board"
 import Follows from "./followList"
 import Navigator from "./navigator"
-import { setStyle, slimThreshold } from "front/@lib/style"
+import { setStyle, slimThreshold, slimThresholdExceptSize, slimThresholdSize } from "front/@lib/style"
 import Landing from "./landing"
 import Setting from "./setting"
 
@@ -56,17 +56,15 @@ export default class Wrapper extends Action<Props, State> {
             const slim = window.innerWidth < slimThreshold
             return (
                   <View style={slim ? slimWrapperSt : wideWrapperSt}>
-                        <Follows />
                         {this.renderPage()}
-                        <Navigator />
                   </View>
             )
       }
 }
 const wideWrapperSt = setStyle({
       position: "relative",
-      width: "1500px",
-      left: "calc(50% - 750px)"
+      width: slimThresholdSize,
+      left: slimThresholdExceptSize
 })
 const slimWrapperSt = setStyle({
       position: "relative",

@@ -1,4 +1,4 @@
-import { contentFontSize, contentFontSizeSt, pageSt, setStyle, slimPageSt, slimThreshold, tLightGray, tWhite, widePageSt } from "front/@lib/style"
+import { contentFontSize, contentFontSizeSt, pageSt, setStyle, slimPageSt, slimThreshold, slimerPageSt, slimerThreshold, tLightGray, tWhite, widePageSt } from "front/@lib/style"
 import Action from "front/reactCom"
 import React from "react"
 import { FlatList, Text, View } from "reactNative"
@@ -90,7 +90,7 @@ export class BoardList extends Action<Props, State> {
                         req = "/tagboards?sid=" + startId + "&t=" + tag
                         break
                   case BOARD_CATEGORY.urlBoards:
-                        req = "/urlboards?sid=" + startId + "&u=" + url
+                        req = "/urlboards?sid=" + startId + "&u=" + url.replaceAll("&", "!oa@sis$").replaceAll("#", "!cor@ner$")
                         break
                   case BOARD_CATEGORY.myBoards:
                         req = "/myboards?sid=" + startId
@@ -129,9 +129,11 @@ export class BoardList extends Action<Props, State> {
       render(): React.ReactNode {
             const { boards, categ } = this.state
             const slim = window.innerWidth < slimThreshold
+            const slimer = window.innerWidth < slimerThreshold
+
             if (boards.length > 0) {
                   return (
-                        <View style={[pageSt, transparentWhiteSt, slim ? slimPageSt : widePageSt]}>
+                        <View style={[pageSt, slimer ? slimerPageSt : slim ? slimPageSt : widePageSt]}>
                               <FlatList
                                     style={flatListSt}
                                     data={boards}
@@ -144,8 +146,8 @@ export class BoardList extends Action<Props, State> {
                   )
             } else {
                   return (
-                        <View style={[pageSt, transparentWhiteSt, slim ? slimPageSt : widePageSt]}>
-                              <Text style={vacancyTextSt}>{categ === BOARD_CATEGORY.userBoards ? "게시글이 없습니다." : "첫번째 게시글의 주인이 되어보세요."}</Text>
+                        <View style={[pageSt, slimer ? slimerPageSt : slim ? slimPageSt : widePageSt]}>
+                              <Text style={vacancyTextSt}>{categ === BOARD_CATEGORY.userBoards ? "no board." : "Be the first writer of this place"}</Text>
                         </View>
                   )
             }
@@ -154,9 +156,6 @@ export class BoardList extends Action<Props, State> {
 const flatListSt = setStyle({
       borderTopLeftRadius: "20px",
       borderTopRightRadius: "20px"
-})
-const transparentWhiteSt = setStyle({
-      backgroundColor: tWhite
 })
 const vacancyTextSt = setStyle({
       position: "absolute",

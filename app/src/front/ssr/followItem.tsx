@@ -65,29 +65,20 @@ export default class FollowItem extends Action<Props, State> {
             const { name, image } = this.props
             const slim = window.innerWidth < slimThreshold
             return (
-                  <View style={[followSt, slim ? null : wideFollowSt]}>
-                        <Pressable style={iconWrapSt} onPress={this.handlePressFollowItem} onHoverIn={this.handleHoverIn} onHoverOut={this.handleHoverOut} >
-                              <Image style={[iconSt, hoverItem || activated ? iconBorderSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/profiles/" + image }} />
-                              <Text style={[textSt, slim ? null : wideTextSt]}>{name}</Text>
-                        </Pressable>
-                  </View>
+                  <Pressable style={[followSt, slim ? null : wideFollowSt]} onPress={this.handlePressFollowItem} onHoverIn={this.handleHoverIn} onHoverOut={this.handleHoverOut} >
+                        <Image style={[iconSt, hoverItem || activated ? iconBorderSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/profiles/" + image }} />
+                        <Text style={[textSt, slim ? null : wideTextSt]}>{name}</Text>
+                  </Pressable>
             )
       }
 }
 const followSt = setStyle({
-      height: "50px",
+      height: "53px",
       width: "100%",
       marginTop: "5px"
 })
 const wideFollowSt = setStyle({
       height: "35px"
-})
-const iconWrapSt = setStyle({
-      height: "30px",
-      width: "30px",
-      borderRadius: "20px",
-      position: "relative",
-      marginLeft: "10px"
 })
 const iconBorderSt = setStyle({
       borderWidth: "5px",
@@ -97,18 +88,20 @@ const iconBorderSt = setStyle({
 const iconSt = setStyle({
       height: "30px",
       width: "30px",
-      borderRadius: "20px"
+      borderRadius: "20px",
+      left: "17px"
 })
 const textSt = setStyle({
       fontSize: contentFontSize,
       overflowX: "clip",
       textOverflow: "ellipsis",
       whiteSpace: "nowrap",
-      width: "30px"
+      width: "55px",
+      left: "5px"
 })
 const wideTextSt = setStyle({
       position: "absolute",
-      left: "45px",
+      left: "55px",
       lineHeight: "30px",
       width: "120px"
 })

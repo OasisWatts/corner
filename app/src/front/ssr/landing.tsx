@@ -1,5 +1,5 @@
 
-import { setStyle, slimThreshold, upColor, whiteSt, writeColor } from "front/@lib/style"
+import { setStyle, slimThreshold, softGray, upColor, whiteSt, writeColor } from "front/@lib/style"
 import { CLIENT_SETTINGS, PROPS } from "front/@lib/util"
 import Action from "front/reactCom"
 import React from "react"
@@ -29,6 +29,7 @@ export default class Landing extends Action<Props, State> {
                               PROPS.data.name = o.name
                               PROPS.data.image = o.image
                               Action.trigger("landingOff")
+                              Action.trigger("tagReload")
                         }
                   })
             })
@@ -48,9 +49,11 @@ export default class Landing extends Action<Props, State> {
       render(): React.ReactNode {
             const slim = window.innerWidth < slimThreshold
             if (PROPS.data.ext) {
+                  // if (slim) {
                   return (<View style={[landingSt, landingExtSt]}>
-                        <Pressable style={[buttonSt, buttonExSt]} onPress={this.googleLogin}>
-                              <Text style={[textSt, buttonTextSt]}>Sign In with Google</Text>
+                        <Pressable style={[buttonSt, buttonExSt, slim ? slimButtonSt : null]} onPress={this.googleLogin}>
+                              <Image style={[googleImageSt, slim ? slimGoogleImageSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/google.svg" }} />
+                              <Text style={[textSt, buttonTextSt, slim ? slimButtonTextSt : null]}>Sign In with Google</Text>
                         </Pressable>
                   </View>)
             } else return (
@@ -63,16 +66,17 @@ export default class Landing extends Action<Props, State> {
                         </View>
                         <View style={[sideSt, rightSideSt, slim ? slimSideSt : null]}>
                               <Text style={[textSt, rightMainTextSt]}> Be the first user of the prototype version </Text>
-                              <Text style={[textSt, guide0TextSt]}> You have to download chrome extension (Please install by clicking 'get corner')</Text>
+                              <Text style={[textSt, guide0TextSt]}> You have to install a chrome extension (Please click 'Install Corner')</Text>
                               <View style={buttonSetSt}>
-                                    <Pressable style={[buttonSt]}>
-                                          <Text style={[textSt, buttonTextSt]}>Get Corner</Text>
+                                    <Pressable style={[buttonSt, slim ? slimButtonSt : null]}>
+                                          <Text style={[textSt, buttonTextSt, slim ? slimButtonTextSt : null]}>Download Corner</Text>
                                     </Pressable>
-                                    <Pressable style={[buttonSt]} onPress={this.googleLogin}>
-                                          <Text style={[textSt, buttonTextSt]}>Sign In with Google</Text>
+                                    <Pressable style={[buttonSt, slim ? slimButtonSt : null]} onPress={this.googleLogin}>
+                                          <Image style={[googleImageSt, slim ? slimGoogleImageSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/google.svg" }} />
+                                          <Text style={[textSt, buttonTextSt, slim ? slimButtonTextSt : null]}>Sign In with Google</Text>
                                     </Pressable>
                               </View>
-                              <Text style={[textSt, guide1TextSt]}> You can use corner by clicking the button  located in the bottom right corner after download</Text>
+                              <Text style={[textSt, guide1TextSt]}> example text</Text>
                         </View>
                   </View>
             )
@@ -106,6 +110,18 @@ const imageSt = setStyle({
       left: "calc(50% - 150px)",
       width: "300px",
       height: "100px"
+})
+const googleImageSt = setStyle({
+      width: "30px",
+      height: "30px",
+      display: "inline-block",
+      top: "7px",
+      marginRight: "10px"
+})
+const slimGoogleImageSt = setStyle({
+      width: "20px",
+      height: "20px",
+      top: "5px"
 })
 const mainTextSt = setStyle({
       fontSize: "60px",
@@ -155,18 +171,25 @@ const buttonSt = setStyle({
       marginLeft: "20px",
       marginRight: "20px"
 })
+const slimButtonSt = setStyle({
+      width: "200px",
+      height: "40px"
+})
 const buttonTextSt = setStyle({
       fontSize: "23px",
       textAlign: "center",
       lineHeight: "60px",
-      width: "100%",
       display: "inline-block",
       fontWeight: "400",
       color: "black"
+})
+const slimButtonTextSt = setStyle({
+      fontSize: "15px",
+      lineHeight: "40px"
 })
 const buttonExSt = setStyle({
       marginTop: "150px",
       borderWidth: "1px",
       borderStyle: "solid",
-      borderColor: "black"
+      borderColor: softGray
 })

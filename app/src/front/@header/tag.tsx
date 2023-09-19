@@ -1,10 +1,13 @@
 
 import { almostWhiteSt, composeStyle, lightGraySt, mainButtonTextStyle, setStyle, tagButtonTextSt, whiteSt } from "front/@lib/style"
-import { fullStyle } from "front/@lib/util"
+import { CLIENT_SETTINGS, fullStyle } from "front/@lib/util"
 import Action from "front/reactCom"
 import { Page } from "front/ssr"
 import React from "react"
 import { Pressable, Text, View } from "reactNative"
+
+const MAX_TAG_LEN_LIM = CLIENT_SETTINGS.board.tagLenLim
+const HALF_MAX_TAG_LEN_LIM = Math.floor(MAX_TAG_LEN_LIM / 2)
 
 type Props = {
       name: string
@@ -55,10 +58,13 @@ export default class Tag extends Action<Props, State> {
             const { name, isHere } = this.props
             const { hoveredTag, activated } = this.state
             console.log("name", name, this.props.isUrl)
+            let parsedName = name
+            if (name.length > (MAX_TAG_LEN_LIM + 8)) parsedName = "..." + name.slice(8, 8 + HALF_MAX_TAG_LEN_LIM) + "..." + name.slice(name.length - HALF_MAX_TAG_LEN_LIM)
+
             return (
                   <Pressable style={tagSt} onPress={this.handlePress} onHoverIn={this.handleHoverIn} onHoverOut={this.handleHoverOut}>
-                        <Text style={[mainButtonTextStyle, tagButtonTextSt, fullStyle ? (hoveredTag || activated ? lightGraySt : almostWhiteSt) : (hoveredTag || activated ? whiteSt : null)]} > {isHere ? "here" : name}</Text>
-                  </Pressable>
+                        <Text style={[mainButtonTextStyle, tagButtonTextSt, (hoveredTag || activated ? lightGraySt : almostWhiteSt)]} > {isHere ? "here" : parsedName}</Text>
+                  </Pressable >
             )
       }
 }

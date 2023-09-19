@@ -5,7 +5,7 @@ import React, { createRef, useRef } from "react"
 import { FlatList, Image, Pressable, ScrollView, Text, View } from "reactNative"
 import Tag from "./tag"
 import { CLIENT_SETTINGS, PROPS } from "front/@lib/util"
-import { setStyle, slimThreshold, softGray } from "front/@lib/style"
+import { setStyle, slimThreshold, slimerThreshold, softGray } from "front/@lib/style"
 
 type State = {
       tags: TagType[]
@@ -109,8 +109,9 @@ export class Tags extends Action<Props, State> {
             console.log("state tags", tags)
             const renderOne = tags.length < 1 && PROPS.data.ext
             const slim = window.innerWidth < slimThreshold
+            const slimer = window.innerWidth < slimerThreshold
             return (
-                  <View style={[tagsWrapperSt, slim ? slimTagsWrapperSt : null]}>
+                  <View style={[tagsWrapperSt, slimer ? slimerTagsWrapperSt : slim ? slimTagsWrapperSt : null]}>
                         {renderOne ? <Tag name={PROPS.data.url} isUrl={true} isHere={true} activatedDefault={true} /> :
                               null
                         }
@@ -135,6 +136,10 @@ export const tagsWrapperSt = setStyle({
       top: "10px",
       left: "225px",
       width: "calc(100% - 450px)"
+})
+export const slimerTagsWrapperSt = setStyle({
+      left: "90px",
+      width: "calc(100% - 130px)"
 })
 export const slimTagsWrapperSt = setStyle({
       left: "100px",

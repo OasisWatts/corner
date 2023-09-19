@@ -1,5 +1,5 @@
 
-import { deepGray, fontBlackSt, gray, lightGray, setStyle, slimThreshold, smallFontSize } from "front/@lib/style"
+import { deepGray, fontBlackSt, gray, lightGray, setStyle, slimThreshold, slimThresholdExceptSize, slimerThreshold, smallFontSize, softGray } from "front/@lib/style"
 import { CLIENT_SETTINGS, PROPS, extension, fullStyle } from "front/@lib/util"
 import Action from "front/reactCom"
 import React from "react"
@@ -42,6 +42,7 @@ export default class Follows extends Action<Props, State> {
       }
       private previousWidth: number = window.innerWidth
       private resize = () => {
+            console.log("wih", window.innerWidth)
             if ((this.previousWidth > slimThreshold && window.innerWidth <= slimThreshold) || (this.previousWidth < slimThreshold && window.innerWidth >= slimThreshold)) {
                   this.forceUpdate()
             } this.previousWidth = window.innerWidth
@@ -82,16 +83,17 @@ export default class Follows extends Action<Props, State> {
       render(): React.ReactNode {
             const { recommends, follows } = this.state
             const slim = window.innerWidth < slimThreshold
+            const slimer = window.innerWidth < slimerThreshold
             return (
-                  <View style={[sideBarSt, fullStyle ? fullSt : null, slim ? slimSideBarSt : wideSideBarSt]}>
-                        {recommends.length ? <Image style={[iconSt, slim ? slimSideBarIconSt : wideSideBarIconSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/hot.svg" }} /> : null}
+                  <View style={[sideBarSt, fullSt, slimer && !recommends.length && !follows.length ? displayNonSt : null, slimer ? slimerLeftSideBarSt : slim ? slimLeftSideBarSt : wideLeftSideBarSt, slim ? null : wideSideBarSt]}>
+                        {recommends.length ? <Image style={[iconSt, slimer ? slimerSideBarIconSt : slim ? slimSideBarIconSt : wideSideBarIconSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/hot.svg" }} /> : null}
                         <View>
                               <FlatList
                                     data={recommends}
                                     renderItem={this.renderItem}
                                     keyExtractor={(item: any) => item.key} />
                         </View>
-                        {follows.length ? <Image style={[iconSt, slim ? slimSideBarIconSt : wideSideBarIconSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/heartBlack.svg" }} /> : null}
+                        {follows.length ? <Image style={[iconSt, slimer ? slimerSideBarIconSt : slim ? slimSideBarIconSt : wideSideBarIconSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/heartBlack.svg" }} /> : null}
                         <FlatList
                               data={follows}
                               renderItem={this.renderItem}
@@ -108,19 +110,41 @@ export const sideBarSt = setStyle({
       height: "100%",
       top: "53px"
 })
+const displayNonSt = setStyle({
+      display: "none"
+})
 const fullSt = setStyle({
       borderRightWidth: "1px",
       borderRightStyle: "solid",
       borderRightColor: lightGray
 })
-export const slimSideBarSt = setStyle({
+const wideLeftSideBarSt = setStyle({
+      left: slimThresholdExceptSize
+})
+const slimLeftSideBarSt = setStyle({
       width: "65px"
+})
+const slimerLeftSideBarSt = setStyle({
+      bottom: "50px",
+      top: "auto",
+      flexDirection: "row",
+      height: "65px",
+      width: "100%",
+      backgroundColor: "white",
+      borderTopWidth: "1px",
+      borderTopStyle: "solid",
+      borderTopColor: lightGray,
+      paddingTop: "5px"
 })
 export const wideSideBarSt = setStyle({
       width: "190px"
 })
 const slimSideBarIconSt = setStyle({
-      left: "14px"
+      left: "23px"
+})
+const slimerSideBarIconSt = setStyle({
+      margin: "0",
+      left: "10px"
 })
 const wideSideBarIconSt = setStyle({
       left: "88px"

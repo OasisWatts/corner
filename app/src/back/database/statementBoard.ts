@@ -153,9 +153,11 @@ export class StatementBoard {
                   .catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put("getBoard_1").put(err).out())
             const board = boards[0]
             if (boardTags) {
-                  const tags = boardTags.tags.map((t) => t.name)
+                  const tags = boardTags.tags.filter((t) => !t.isUrl).map((t) => t.name)
+                  const url = boardTags.tags.filter((t) => t.isUrl)
                   console.log("tags", tags)
                   board.tags = tags
+                  if (url.length) board.url = url[0].name
             } return board
       }
       public static async categorizedBoardList(startId: number, categ: number, userKey: number, url?: string, tag?: string, search?: string, searchUser?: number) {
@@ -289,7 +291,8 @@ export class StatementBoard {
                                                       comments: [],
                                                       endId: 0, // comment 관련
                                                       end: true,
-                                                      tags: board?.tags
+                                                      tags: board?.tags,
+                                                      url: board?.url
                                                 })
                                                 return
                                           } console.log("1")
@@ -342,7 +345,8 @@ export class StatementBoard {
                                                       comments,
                                                       endId,
                                                       end: endOfList,
-                                                      tags: board.tags
+                                                      tags: board.tags,
+                                                      url: board.url
                                                 })
                                           }).catch((err) => Logger.errorApp(ErrorCode.user_find_failed).put("boardSelect_0").put(err).out())
                                     }).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put("boardSelect_0").put(err).out())
@@ -895,23 +899,25 @@ export class StatementBoard {
       /** url, hostname에 게시글 있는지 확인. */
       public static async checkBoard(url: string, hostname: string) {
             return new Promise<any>(async (resolve) => {
-                  let urlExist = false
-                  let tagExist = false
+                  let urlBoardNum = 0
+                  let tagBoardNum = 0
                   const urlObj = await DB.Manager.findOne(Url, { where: { name: url }, select: ["id"] }).catch((err) => Logger.errorApp(ErrorCode.url_find_failed).put("checkBoard").put(err).out())
                   if (urlObj) {
                         console.log("urlobj", urlObj)
                         const boardExist = await DB.Manager.query(`select id from \`board\` where urlId = ${urlObj.id} limit 1;`)
                         console.log("uE", boardExist)
-                        if (boardExist.length) urlExist = true
+                        if (boardExist.length) urlBoardNum = boardExist.length
                   }
                   const tagObj = await DB.Manager.findOne(Tag, { where: { name: hostname } }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put("checkBoard").put(err).out())
                   if (tagObj) {
                         const boardExist = await DB.Manager.query(`select boardId from \`board_tags_tag\` where tagId = ${tagObj.id} limit 1;`)
                         console.log("tE", boardExist)
-                        if (boardExist.length) tagExist = true
+                        if (boardExist.length) tagBoardNum = boardExist.length
                   }
-                  console.log("result", urlExist, tagExist)
-                  resolve({ u: urlExist, h: tagExist })
+                  console.log("result", urlBoardNum, tagBoardNum)
+                  if (urlBoardNum > 99) urlBoardNum = 100
+                  if (tagBoardNum > 99) tagBoardNum = 100
+                  resolve({ u: urlBoardNum, h: tagBoardNum })
             })
       }
 }

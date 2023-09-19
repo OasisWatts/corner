@@ -4,7 +4,7 @@ import Action from "front/reactCom"
 import React from "react"
 import { Pressable, Text, View } from "reactNative"
 import { Page } from "."
-import { pageSt, setStyle, slimPageSt, slimThreshold, whiteSt, widePageSt } from "front/@lib/style"
+import { pageSt, setStyle, slimPageSt, slimThreshold, slimerPageSt, whiteSt, widePageSt } from "front/@lib/style"
 import { fullStyle } from "front/@lib/util"
 
 
@@ -37,8 +37,9 @@ export default class Setting extends Action<Props, State> {
 
       render(): React.ReactNode {
             const slim = window.innerWidth < slimThreshold
+            const slimer = window.innerWidth < slimerThreshold
             return (
-                  <View style={[pageSt, fullStyle ? whiteSt : null, slim ? slimPageSt : widePageSt]}>
+                  <View style={[pageSt, whiteSt, slimer ? slimerPageSt : slim ? slimPageSt : widePageSt]}>
                         <Pressable style={buttonSt} onPress={this.signOut}>
                               <Text>Sign out</Text>
                         </Pressable>

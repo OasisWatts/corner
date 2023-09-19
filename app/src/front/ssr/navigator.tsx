@@ -1,5 +1,5 @@
 
-import { tWriteColor, composeStyle, mainButtonStyle, contentFontSize, setStyle, slimThreshold, tWhite, lightGray, almostWhite } from "front/@lib/style"
+import { tWriteColor, composeStyle, mainButtonStyle, contentFontSize, setStyle, slimThreshold, tWhite, lightGray, almostWhite, slimThresholdExceptSize, slimerThreshold } from "front/@lib/style"
 import Action from "front/reactCom"
 import React from "react"
 import { Image, Pressable, Text, View } from "reactNative"
@@ -45,26 +45,27 @@ export default class Navigator extends Action<Props, State> {
 
       render(): React.ReactNode {
             const slim = window.innerWidth < slimThreshold
+            const slimer = window.innerWidth < slimerThreshold
             return (
-                  <View style={[rightSideBar, fullStyle ? (slim ? slimFullSt : fullSt) : null, slim ? slimSideBarSt : wideSideBarSt, slim ? slimRightSideBar : wideRightSideBar]}>
-                        <Pressable style={[slim ? slimWriteSt : wideButtonSt, writeSt]} onPress={this.handleWrite}>
+                  <View style={[rightSideBar, slimer ? slimerFullSt : slim ? slimFullSt : fullSt, slim ? null : wideSideBarSt, slimer ? slimerRightSideBarSt : slim ? slimRightSideBar : wideRightSideBar]}>
+                        <Pressable style={[slim ? slimWriteSt : wideButtonSt, slimer ? slimerWriteSt : writeSt]} onPress={this.handleWrite}>
                               <Image style={[imgSt, slim ? slimWriteImgSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/write.svg" }} />
                               {slim ? null : <Text style={textSt}>write</Text>}
                         </Pressable>
                         <Pressable style={[slim ? slimButtonSt : wideButtonSt]} onPress={this.handlePressSearch} >
-                              <Image style={[imgSt, slim ? slimImgSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/searchBold.svg" }} />
+                              <Image style={[imgSt, slimer ? slimerImgSt : slim ? slimImgSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/searchBold.svg" }} />
                               {slim ? null : <Text style={textSt}>search</Text>}
                         </Pressable>
                         <Pressable style={[slim ? slimButtonSt : wideButtonSt]} onPress={this.handlePressMyBoard} >
-                              <Image style={[imgSt, slim ? slimImgSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/myWrite.svg" }} />
+                              <Image style={[imgSt, slimer ? slimerImgSt : slim ? slimImgSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/myWrite.svg" }} />
                               {slim ? null : <Text style={textSt}>my write</Text>}
                         </Pressable>
                         <Pressable style={[slim ? slimButtonSt : wideButtonSt]} onPress={this.handlePressMyUp} >
-                              <Image style={[imgSt, slim ? slimImgSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/myUp.svg" }} />
+                              <Image style={[imgSt, slimer ? slimerImgSt : slim ? slimImgSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/myUp.svg" }} />
                               {slim ? null : <Text style={textSt}>my up</Text>}
                         </Pressable>
                         <Pressable style={[slim ? slimButtonSt : wideButtonSt]} onPress={this.handlePressSetting} >
-                              <Image style={[imgSt, slim ? slimImgSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/setting.svg" }} />
+                              <Image style={[imgSt, slimer ? slimerImgSt : slim ? slimImgSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/setting.svg" }} />
                               {slim ? null : <Text style={textSt}>setting</Text>}
                         </Pressable>
                   </View>
@@ -91,11 +92,25 @@ const slimFullSt = setStyle({
       backgroundColor: almostWhite,
       marginTop: "30px"
 })
+const slimerFullSt = setStyle({
+      backgroundColor: lightGray
+})
 const wideRightSideBar = setStyle({
-      right: "calc(50% - 750px)"
+      right: slimThresholdExceptSize
 })
 const slimRightSideBar = setStyle({
+      width: "50px",
       right: "0"
+})
+const slimerRightSideBarSt = setStyle({
+      bottom: "0",
+      height: "55px",
+      top: "auto",
+      left: "0",
+      width: "100%",
+      paddingTop: "10px",
+      justifyContent: "space-around",
+      flexDirection: "row",
 })
 const wideButtonSt = setStyle({
       position: "relative",
@@ -114,6 +129,10 @@ const writeSt = setStyle({
       borderRadius: "20px",
       backgroundColor: tWriteColor
 })
+const slimerWriteSt = setStyle({
+      borderRadius: "20px",
+      backgroundColor: tWriteColor
+})
 const slimWriteSt = setStyle({
       position: "relative",
       width: "40px",
@@ -125,6 +144,10 @@ const imgSt = setStyle({
       height: "30px",
       width: "30px",
       position: "absolute",
+      left: "10px",
+      top: "5px"
+})
+const slimerImgSt = setStyle({
       left: "10px",
       top: "5px"
 })

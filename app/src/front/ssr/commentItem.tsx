@@ -126,7 +126,7 @@ export class CommentItem extends Action<Props, State> {
             const { updateToggle, text, focusedArea, hoverUp, hoverFollow, writerFollowed, up, uped } = this.state
             if (updateToggle) {
                   return (
-                        <Pressable style={[wrapForWriteBoxSt, fullStyle ? almostWhiteSt : null, (focusedArea && !fullStyle) ? whiteSt : null]} onFocus={this.handleFocusTextArea} onBlur={this.handleBlurTextArea} >
+                        <Pressable style={[wrapForWriteBoxSt, almostWhiteSt, focusedArea ? whiteSt : null]} onFocus={this.handleFocusTextArea} onBlur={this.handleBlurTextArea} >
                               <TextInput style={inputForWriteBoxSt} multiline numberOfLines={3} maxLength={MAX_CONTENTS_LEN} onChangeText={this.onChangeComment} value={text} />
                               <View style={buttonsForWriteBoxSt}>
                                     <Pressable style={rightButtonSt} onPress={this.handlePressCancel} >

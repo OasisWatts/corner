@@ -21,6 +21,9 @@ declare module 'express-session' {
       }
 }
 
+function parseUrl(url) {
+      return url.replaceAll("!oa@sis$", "&").replaceAll("!cor@ner$", "#")
+}
 export const send404 = (req, res) => {
       res.sendStatus(404)
 }
@@ -101,7 +104,7 @@ DB.initialize().then(() => {
       }) // 같은 url의 게시글 목록 조회.
       app.get("/urlboards", async (req, res, next) => {
             const startId = Number(req.query.sid)
-            const url = String(req.query.u)
+            const url = parseUrl(String(req.query.u))
             const userKey = req.session.userKey
             if (!req.session.isLogined || !userKey) res.redirect("/")
             else {
@@ -151,7 +154,7 @@ DB.initialize().then(() => {
             console.log("body", req.body)
             const contents = req.body.c
             const hashTag = req.body.t
-            let url = req.body.u
+            let url = parseUrl(req.body.u)
             let hostname = req.body.h
             if (contents.length > MAX_CONTENTS_LEN) return
             if (url === "") url = null
@@ -249,7 +252,7 @@ DB.initialize().then(() => {
       })
       // url 최빈 태그 조회.
       app.get("/tag", async (req, res, next) => {
-            const url = String(req.query.u)
+            const url = parseUrl(String(req.query.u))
             const hot = Boolean(req.query.h)
             const userKey = req.session.userKey
             console.log("tag", url, hot)
@@ -334,8 +337,8 @@ DB.initialize().then(() => {
             }
       })
       // board가 존재하는지 확인.
-      app.get("/check", async (req, res, next) => {
-            const url = String(req.query.u)
+      app.post("/check", async (req, res, next) => {
+            const url = parseUrl(String(req.query.u))
             const hostname = String(req.query.h)
             const result = await StatementBoard.checkBoard(url, hostname)
             if (result) res.send(result)
@@ -344,9 +347,10 @@ DB.initialize().then(() => {
             const { u, h } = req.query
             let url: string | null = null
             let hostname: string | null = null
-            if (u) url = String(u)
+            if (u) url = parseUrl(String(u))
             if (h) hostname = String(h)
             const extension: boolean = Boolean(req.query.ext)
+            console.log("url", url)
             res.set("Access-Control-Allow-Origin", "*")
             // req.session.isLogined = true // 개발 시 로그인 매번 할 필요 없게
             // req.session.userKey = 1 // 개발 시 로그인 매번 할 필요 없게

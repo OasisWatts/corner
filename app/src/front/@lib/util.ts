@@ -8,5 +8,3 @@ export const PROPS: Page.Props<any> = FRONT && eval("window['__PROPS']")// windo
 export const extension: boolean = FRONT && PROPS.data.ext
 /** userKey */
 export const userKey: number = FRONT && PROPS.data.userKey
-/** full 화면 여부. (extension이 아니거나, extension일 때 full로 화면을 킨 경우.) [미완]*/
-export const fullStyle: boolean = FRONT && (!PROPS.data.ext)

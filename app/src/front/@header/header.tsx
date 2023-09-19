@@ -1,4 +1,4 @@
-import { composeStyle, upButtonSt, importantButtonTextStyle, lightGray, mainButtonStyle, mainButtonTextStyle, mainColor, setStyle, tDeepGray, tLightGray, tWhite, slimThreshold } from "front/@lib/style"
+import { composeStyle, upButtonSt, importantButtonTextStyle, lightGray, mainButtonStyle, mainButtonTextStyle, mainColor, setStyle, tDeepGray, tLightGray, tWhite, slimThreshold, slimThresholdSize, slimThresholdExceptSize } from "front/@lib/style"
 import Action from "front/reactCom"
 import React from "react"
 import { Image, Pressable, StyleSheet, Text, View } from "reactNative"
@@ -59,7 +59,7 @@ export default class Header extends Action<Props, State> {
             const { hoverWrite, searchToggle } = this.state
             const slim = window.innerWidth < slimThreshold
             return (
-                  <View style={[headerSt, slim ? slimHeaderSt : null, fullStyle ? fullSt : null]}>
+                  <View style={[headerSt, slim ? slimHeaderSt : null, fullSt]}>
                         <Pressable onPress={this.handlePressIcon} style={[iconSt, slim ? slimIconSt : null]} >
                               <Image style={[iconImgSt, slim ? imgSt : null]} source={{ uri: CLIENT_SETTINGS.host + (slim ? "/images/cornerIcon.png" : "/images/cornerIconLong.png") }} />
                         </Pressable>
@@ -74,9 +74,9 @@ export default class Header extends Action<Props, State> {
 const headerSt = setStyle({
       position: "fixed",
       height: "50px",
-      width: "1500px",
+      width: slimThresholdSize,
       top: "0",
-      left: "calc(50% - 750px)",
+      left: slimThresholdExceptSize,
       zIndex: "100",
       backgroundColor: "transparent"
 })

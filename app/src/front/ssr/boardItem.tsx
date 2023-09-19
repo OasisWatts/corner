@@ -149,7 +149,6 @@ export class BoardItem extends Action<Props, State> {
       }
 }
 const boardItemSt = setStyle({
-      background: tWhite,
       display: "block",
       paddingTop: "10px",
       paddingBottom: "10px",

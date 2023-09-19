@@ -1,6 +1,6 @@
 // import { setStyle } from "front/common/style"
 // import { CLIENT_SETTINGS } from "front/@lib/util"
-import { buttonsForWriteBoxSt, buttonSetSt, composeStyle, inputForWriteBoxSt, inputSt, mainButtonStyle, mainButtonTextStyle, pageSt, rightButtonSt, pressableSt1, setStyle, slimPageSt, slimThreshold, tLightGray, tWhite, widePageSt, contentFontSize, almostWhite, tWriteColor, writeColor, whiteSt, almostWhiteSt, submitButtonTextSt, fontBlackSt } from "front/@lib/style"
+import { buttonsForWriteBoxSt, buttonSetSt, composeStyle, inputForWriteBoxSt, inputSt, mainButtonStyle, mainButtonTextStyle, pageSt, rightButtonSt, pressableSt1, setStyle, slimPageSt, slimThreshold, tLightGray, tWhite, widePageSt, contentFontSize, almostWhite, tWriteColor, writeColor, whiteSt, almostWhiteSt, submitButtonTextSt, fontBlackSt, softGray, slimerPageSt, slimerThreshold } from "front/@lib/style"
 import Action from "front/reactCom"
 import React from "react"
 import { View, TextInput, Pressable, Text } from "reactNative"
@@ -18,8 +18,6 @@ type Props = {
 }
 type State = {
       contentText: string
-      focusedContentArea: boolean
-      focusedTagArea: boolean
       hashTag: string
 }
 export class Write extends Action<Props, State> {
@@ -27,15 +25,13 @@ export class Write extends Action<Props, State> {
             super(props)
             this.state = {
                   contentText: "",
-                  focusedContentArea: false,
-                  focusedTagArea: false,
                   hashTag: "#"
             }
       }
 
       protected ACTION_RECEIVER_TABLE: any = {
             writeReload: () => {
-                  this.setState({ contentText: "", focusedContentArea: false, focusedTagArea: false, hashTag: "#" })
+                  this.setState({ contentText: "", hashTag: "#" })
             }
       }
 
@@ -115,31 +111,21 @@ export class Write extends Action<Props, State> {
             console.log("cancel")
             Action.trigger("page", Page.boardList)
       }
-      private handleFocusContent = () => {
-            this.setState({ focusedContentArea: true })
-      }
-      private handleBlurContent = () => {
-            this.setState({ focusedContentArea: false })
-      }
-      private handleFocusTag = () => {
-            this.setState({ focusedTagArea: true })
-      }
-      private handleBlurTag = () => {
-            this.setState({ focusedTagArea: false })
-      }
 
       render(): React.ReactNode {
-            const { contentText, hashTag, focusedContentArea, focusedTagArea } = this.state
+            const { contentText, hashTag } = this.state
             const { update } = this.props
             const slim = window.innerWidth < slimThreshold
+            const slimer = window.innerWidth < slimerThreshold
+
             return (
-                  <View style={[pageSt, fullStyle ? whiteSt : null, slim ? slimPageSt : widePageSt]}>
-                        <TextInput style={[inputForWritePageSt, fullStyle ? fullStyleInputForWritePageSt : null, fullStyle ? almostWhiteSt : (focusedContentArea ? whiteSt : null)]} multiline numberOfLines={3} maxLength={MAX_CONTENTS_LEN} onChangeText={this.onChangeContentText} value={contentText} onFocus={this.handleFocusContent} onBlur={this.handleBlurContent} />
-                        <Pressable style={[hashTagSt, fullStyle ? fullStyleHashTagSt : null, fullStyle ? almostWhiteSt : (focusedTagArea ? whiteSt : null)]} onHoverIn={this.handleFocusTag} onHoverOut={this.handleBlurTag}>
+                  <View style={[pageSt, whiteSt, slimer ? slimerPageSt : slim ? slimPageSt : widePageSt]}>
+                        <TextInput style={[inputForWritePageSt, focusedSt]} multiline numberOfLines={3} maxLength={MAX_CONTENTS_LEN} onChangeText={this.onChangeContentText} value={contentText} />
+                        <Pressable style={[hashTagSt, focusedSt]}>
                               <Text style={hashTagTextSt}> hash tag </Text>
                               <TextInput style={inputHashTagSt} onChangeText={this.onChangeHashTagText} value={hashTag} maxLength={MAX_TAG_LEN * MAX_TAG_CNT} />
                         </Pressable>
-                        <View style={[buttonsForWritePageSt, fullStyle ? fullStyleButtonsForWritePageSt : null]}>
+                        <View style={[buttonsForWritePageSt, fullStyleButtonsForWritePageSt]}>
                               <Pressable style={rightButtonSt} onPress={this.handlePressCancel} >
                                     <Text style={[mainButtonTextStyle, biggerFontSt, fontBlackSt]}> cancel</Text>
                               </Pressable>
@@ -156,7 +142,6 @@ const inputForWritePageSt = composeStyle(
       {
             height: "250px",
             width: "100%",
-            backgroundColor: tWhite,
             left: "0",
             borderRadius: "20px",
             paddingLeft: "20px",
@@ -175,12 +160,17 @@ const hashTagSt = setStyle({
       top: "260px",
       height: "40px",
       width: "100%",
-      backgroundColor: tWhite,
       borderRadius: "20px",
+})
+const focusedSt = setStyle({
+      borderWidth: "1px",
+      borderStyle: "solid",
+      borderColor: softGray,
+      backgroundColor: "white"
 })
 const fullStyleHashTagSt = setStyle({
       width: "calc(100% - 40px)",
-      top: "300px",
+      top: "285px",
       left: "20px"
 })
 const hashTagTextSt = setStyle({
@@ -207,7 +197,7 @@ const buttonsForWritePageSt = setStyle({
       display: "block"
 })
 const fullStyleButtonsForWritePageSt = setStyle({
-      top: "360px",
+      top: "350px",
       right: "20px"
 })
 const biggerFontSt = setStyle({
