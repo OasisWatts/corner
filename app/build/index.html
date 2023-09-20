@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="/*{JSON.stringify($.locale)}*/">
+
+<head>
+      <meta charset="utf8">
+      <meta name="format-detection" content="telephone=no">
+      <meta name="msapplication-tap-highlight" content="no">
+      <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+      <title>/*{$.title}*/</title>
+      <script type="text/javascript">Object['FRONT'] = true; window.__PROPS = "/*{JSON.stringify($)}*/"</script>
+</head>
+
+<body>
+      <script type="text/javascript" src="constants.js"></script>
+      <script
+            type="text/javascript">Object.assign(window.__CLIENT_SETTINGS, "/*{JSON.stringify(CLIENT_SETTINGS)}*/");</script>
+      <script type="text/javascript" src="/strings//*{$.locale}*/./*{$.page}*/.js"></script>
+      <script type="text/javascript" src="/pages//*{$.page}*/.js"></script>
+</body>
+
+</html>

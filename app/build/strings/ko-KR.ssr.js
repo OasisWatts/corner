@@ -1,0 +1,1 @@
+window.__LANGUAGE={"MINUTES_0":"방금","MINUTES_1":"{#0}분","MINUTES_2":"{#0}시간 {#1}분","MINUTES_3":"{#0}일 {#1}시간","MINUTES_4":"{#0}개월 {#1}일","SECONDS_1":"{#0}분 {#0}초","SECOND":"{#0}초","DAY":"{#0}일","rank":"위","people":"{#0}명","TIME_DISTANCE_PAST":"<{HUMAN_M|{##0}}> 전","TIME_DISTANCE_FUTURE":"<{HUMAN_M|{##0}}> 후","ERROR":"error: {#0}"}
