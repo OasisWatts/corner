@@ -57,7 +57,9 @@ declare type ActionReceiverTable = Partial<{
       "setting": Action,
       "tagReload": Action,
       "followListUser": Action<[string]>,
+      "followListTag": Action<[string]>
       "landingOff": Action,
+      "landingOn": Action,
       "pageReload": Action,
       "writeReload": Action
 }>

@@ -58,6 +58,7 @@ export class Tags extends Action<Props, State> {
                         console.log("tags", tags)
                         this.setState({ tags })
                         // }
+                        Action.trigger("boardListTag", PROPS.data.hostname)
                   })
             } else {
                   fetch("/tag?h=true").then((r) => r.json()).then((tags) => {
@@ -107,17 +108,14 @@ export class Tags extends Action<Props, State> {
       render(): React.ReactNode {
             const { tags, leftEnd, rightEnd } = this.state
             console.log("state tags", tags)
-            const renderOne = tags.length < 1 && PROPS.data.ext
             const slim = window.innerWidth < slimThreshold
             const slimer = window.innerWidth < slimerThreshold
+            const renderOne = tags.length < 1 && PROPS.data.ext
+            let renderOneTags: any[] = []
+            if (renderOne) renderOneTags = [{ name: PROPS.data.url, isUrl: true, isHere: true, activatedDefault: true }, { name: PROPS.data.hostname, isUrl: false, isHere: false, activatedDefault: false }]
             return (
                   <View style={[tagsWrapperSt, slimer ? slimerTagsWrapperSt : slim ? slimTagsWrapperSt : null]}>
-                        {renderOne ? <Tag name={PROPS.data.url} isUrl={true} isHere={true} activatedDefault={true} /> :
-                              null
-                        }
-                        {renderOne ? <Tag name={PROPS.data.hostname} isUrl={false} isHere={false} activatedDefault={true} /> :
-                              <FlatList ref={this.flatListRef} horizontal={true} showsHorizontalScrollIndicator={false} onContentSizeChange={this.handleContentSizeChange} onScroll={this.handleScroll} data={tags} renderItem={this.renderItem} keyExtractor={(item) => item.name} />
-                        }
+                        <FlatList ref={this.flatListRef} horizontal={true} showsHorizontalScrollIndicator={false} onContentSizeChange={this.handleContentSizeChange} onScroll={this.handleScroll} data={renderOne ? renderOneTags : tags} renderItem={this.renderItem} keyExtractor={(item) => item.name} />
                         {leftEnd ? null
                               : <Pressable style={leftButtonSt} onPress={this.handleLeftButton}>
                                     <Image style={leftButtonImgSt} source={{ uri: CLIENT_SETTINGS.host + "/images/rightArrow.svg" }} />
@@ -139,7 +137,8 @@ export const tagsWrapperSt = setStyle({
 })
 export const slimerTagsWrapperSt = setStyle({
       left: "90px",
-      width: "calc(100% - 130px)"
+      width: "calc(100% - 130px)",
+      height: "30px"
 })
 export const slimTagsWrapperSt = setStyle({
       left: "100px",

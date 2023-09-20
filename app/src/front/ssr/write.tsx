@@ -1,6 +1,6 @@
 // import { setStyle } from "front/common/style"
 // import { CLIENT_SETTINGS } from "front/@lib/util"
-import { buttonsForWriteBoxSt, buttonSetSt, composeStyle, inputForWriteBoxSt, inputSt, mainButtonStyle, mainButtonTextStyle, pageSt, rightButtonSt, pressableSt1, setStyle, slimPageSt, slimThreshold, tLightGray, tWhite, widePageSt, contentFontSize, almostWhite, tWriteColor, writeColor, whiteSt, almostWhiteSt, submitButtonTextSt, fontBlackSt, softGray, slimerPageSt, slimerThreshold } from "front/@lib/style"
+import { buttonsForWriteBoxSt, buttonSetSt, composeStyle, inputForWriteBoxSt, inputSt, mainButtonStyle, mainButtonTextStyle, pageSt, rightButtonSt, pressableSt1, setStyle, slimPageSt, slimThreshold, tLightGray, tWhite, widePageSt, contentFontSize, almostWhite, writeColor, whiteSt, almostWhiteSt, submitButtonTextSt, fontBlackSt, softGray, slimerPageSt, slimerThreshold, tWriteColor } from "front/@lib/style"
 import Action from "front/reactCom"
 import React from "react"
 import { View, TextInput, Pressable, Text } from "reactNative"
@@ -141,13 +141,14 @@ const inputForWritePageSt = composeStyle(
       inputSt,
       {
             height: "250px",
-            width: "100%",
-            left: "0",
+            width: "calc(100% - 10px)",
+            left: "5px",
+            top: "5px",
             borderRadius: "20px",
             paddingLeft: "20px",
             paddingRight: "20px",
             paddingTop: "20px",
-            paddingBottom: "20px"
+            paddingBottom: "20px",
       }
 )
 const fullStyleInputForWritePageSt = setStyle({
@@ -159,13 +160,14 @@ const hashTagSt = setStyle({
       position: "absolute",
       top: "260px",
       height: "40px",
-      width: "100%",
-      borderRadius: "20px",
+      width: "calc(100% - 10px)",
+      left: "5px",
+      borderRadius: "20px"
 })
 const focusedSt = setStyle({
       borderWidth: "1px",
       borderStyle: "solid",
-      borderColor: softGray,
+      borderColor: tWriteColor,
       backgroundColor: "white"
 })
 const fullStyleHashTagSt = setStyle({
@@ -179,7 +181,9 @@ const hashTagTextSt = setStyle({
       width: "80px",
       height: "40px",
       lineHeight: "40px",
-      fontSize: contentFontSize
+      fontSize: contentFontSize,
+      color: writeColor,
+      pointer: "default"
 })
 const inputHashTagSt = setStyle({
       position: "absolute",

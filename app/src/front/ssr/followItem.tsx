@@ -97,7 +97,8 @@ const textSt = setStyle({
       textOverflow: "ellipsis",
       whiteSpace: "nowrap",
       width: "55px",
-      left: "5px"
+      left: "5px",
+      textAlign: "center"
 })
 const wideTextSt = setStyle({
       position: "absolute",

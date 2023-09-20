@@ -117,6 +117,9 @@ export default class Index extends Action<Props, State> {
                               Action.trigger("boardList")
                         }
                   })
+            },
+            landingOn: () => {
+                  this.setState({ landing: true })
             }
       }
       componentDidMount() {

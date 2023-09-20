@@ -3,8 +3,8 @@
       "version": "1.0.3",
       "description": "test of Corner",
       "icons": {
-            "48": "mdpi-foreground.png",
-            "128": "xxhdpi-foreground.png"
+            "48": "img/mdpi-corner-icon.png",
+            "128": "img/xxhdpi-corner-icon.png"
       },
       "background": {
             "service_worker": "background.js"
@@ -26,10 +26,8 @@
       "web_accessible_resources": [
             {
                   "resources": [
-                        "img/corner-icon.svg",
-                        "img/off.svg",
-                        "img/enlarge.svg",
-                        "img/reduce.svg"
+                        "img/corner-icon-url.png",
+                        "img/corner-icon-hostname.png"
                   ],
                   "matches": [
                         "<all_urls>"
@@ -40,7 +38,9 @@
       "manifest_version": 3,
       "permissions": [
             "tabs",
-            "scripting"
+            "scripting",
+            "sidePanel",
+            "contextMenus"
       ],
       "host_permissions": [
             "*://*/*"

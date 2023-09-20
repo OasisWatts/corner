@@ -262,8 +262,8 @@ DB.initialize().then(() => {
                         const result = await StatementBoard.getHotTag(userKey)
                         res.send(JSON.stringify(result))
                   } else if (url) {
-                        const result = await StatementBoard.getUrlTag(url)
-                        res.send(JSON.stringify(result))
+                        const tags = await StatementBoard.getUrlTag(url)
+                        res.send(JSON.stringify({ tags }))
                   }
             }
       })
@@ -337,7 +337,8 @@ DB.initialize().then(() => {
             }
       })
       // board가 존재하는지 확인.
-      app.post("/check", async (req, res, next) => {
+      app.get("/check", async (req, res, next) => {
+            console.log("check")
             const url = parseUrl(String(req.query.u))
             const hostname = String(req.query.h)
             const result = await StatementBoard.checkBoard(url, hostname)
@@ -352,8 +353,8 @@ DB.initialize().then(() => {
             const extension: boolean = Boolean(req.query.ext)
             console.log("url", url)
             res.set("Access-Control-Allow-Origin", "*")
-            // req.session.isLogined = true // 개발 시 로그인 매번 할 필요 없게
-            // req.session.userKey = 1 // 개발 시 로그인 매번 할 필요 없게
+            req.session.isLogined = true // 개발 시 로그인 매번 할 필요 없게
+            req.session.userKey = 5 // 개발 시 로그인 매번 할 필요 없게
             console.log("il", req.session.isLogined, req.session.userKey)
             if (!req.session.isLogined || !req.session.userKey) {
                   pageBuilder("ssr", { url, hostname, ext: extension, ss: false })(req, res, next)

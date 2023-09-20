@@ -29,6 +29,9 @@ export default class Follows extends Action<Props, State> {
       protected ACTION_RECEIVER_TABLE: any = {
             followListTag: (tag) => {
                   this.setState({ tag, recommends: [], startId: 0, follows: [], endOfList: false }, () => this.getFollows(true))
+            },
+            followReload: () => {
+                  this.setState({ recommends: [], startId: 0, follows: [], endOfList: false }, () => this.getFollows(true))
             }
       }
       componentDidMount(): void {

@@ -93,11 +93,11 @@ export class StatementBoard {
                   return bListFiltered.sort((b1, b2) => b2.up - b1.up)
             } else return []
       }
-      /** 차단한 상대가 쓴 것이 아닌 게시글 가져오기. */
+      /** 전체 항목에서 보여줄 게시글 가져오기. (게시글을 넉넉히 뽑은뒤, up이 높은 것을 보여줌 - 모든 게시글을 다 보여줄 필요 없음 ) */
       private static async getBoards(startId: number, userKey: number, blockeds: number[]): Promise<any[]> {
             let whereQuery: string = startId ? `where id < ${startId}` : ""
             let fromQuery: string = "from \`board\`"
-            let orderQuery = `order by id desc limit ${MAX_LIST_LEN}`
+            let orderQuery = `order by id desc limit ${MAX_LIST_LEN * 5}`
             let selectAndQuery = `, (select count(*) from \`user_uped_boards_board\` where userKey = ${userKey} and boardId = a.id) as uped`
 
             const bList = await DB.Manager.query(
@@ -106,7 +106,8 @@ export class StatementBoard {
                               ) b join \`board\` a on b.id = a.id;`,
             ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put("getBoards").put(err).out())  // 차단 대상 제외.
             let bListFiltered = bList.filter((b: any) => !blockeds.includes(b.writer))
-            return bListFiltered.sort((b1, b2) => b2.up - b1.up)
+            if (bListFiltered.length > MAX_LIST_LEN) return bListFiltered.sort((b1, b2) => b2.up - b1.up).slice(MAX_LIST_LEN)
+            else return bListFiltered.sort((b1, b2) => b2.up - b1.up)
       }
       private static async getSearchBoards(startId: number, userKey: number, blockeds: number[], search: string): Promise<any[]> {
             if (search[0] === "#") return this.getTagBoards(startId, userKey, blockeds, search)
@@ -873,7 +874,7 @@ export class StatementBoard {
             })
       }
 
-      /** 핫한 태그 가져오기. */
+      /** 핫한 태그 가져오기. (유저가 작성한 태그 절반, 전체에서 가장 많이 쓴 태그 절반) */
       public static async getHotTag(userKey: number) {
             const hotKeyLen = Math.ceil(TAG_DISPLAY_CNT / 2)
             const userHotKeyLen = TAG_DISPLAY_CNT - hotKeyLen - 1
@@ -904,20 +905,33 @@ export class StatementBoard {
                   const urlObj = await DB.Manager.findOne(Url, { where: { name: url }, select: ["id"] }).catch((err) => Logger.errorApp(ErrorCode.url_find_failed).put("checkBoard").put(err).out())
                   if (urlObj) {
                         console.log("urlobj", urlObj)
-                        const boardExist = await DB.Manager.query(`select id from \`board\` where urlId = ${urlObj.id} limit 1;`)
-                        console.log("uE", boardExist)
-                        if (boardExist.length) urlBoardNum = boardExist.length
+                        const boardNum = await DB.Manager.query(`select count(id) as cnt from \`board\` where urlId = ${urlObj.id} limit 99;`)
+                        console.log("bn", boardNum)
+                        urlBoardNum = boardNum[0].cnt
                   }
                   const tagObj = await DB.Manager.findOne(Tag, { where: { name: hostname } }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put("checkBoard").put(err).out())
                   if (tagObj) {
-                        const boardExist = await DB.Manager.query(`select boardId from \`board_tags_tag\` where tagId = ${tagObj.id} limit 1;`)
-                        console.log("tE", boardExist)
-                        if (boardExist.length) tagBoardNum = boardExist.length
+                        const boardNum = await DB.Manager.query(`select count(boardId) as cnt from \`board_tags_tag\` where tagId = ${tagObj.id} limit 99;`)
+                        tagBoardNum = boardNum[0].cnt
                   }
                   console.log("result", urlBoardNum, tagBoardNum)
                   if (urlBoardNum > 99) urlBoardNum = 100
                   if (tagBoardNum > 99) tagBoardNum = 100
                   resolve({ u: urlBoardNum, h: tagBoardNum })
+            })
+      }
+      /** url, hostname에 게시글 있는지 확인. */
+      public static async checkUrlBoardExist(url: string) {
+            return new Promise<any>(async (resolve) => {
+                  let urlBoardExist = false
+                  const urlObj = await DB.Manager.findOne(Url, { where: { name: url }, select: ["id"] }).catch((err) => Logger.errorApp(ErrorCode.url_find_failed).put("checkBoard").put(err).out())
+                  if (urlObj) {
+                        console.log("urlobj", urlObj)
+                        const boardExist = await DB.Manager.query(`select id from \`board\` where urlId = ${urlObj.id} limit 1;`)
+                        console.log("uE", boardExist)
+                        if (boardExist) urlBoardExist = true
+                  }
+                  resolve(urlBoardExist)
             })
       }
 }

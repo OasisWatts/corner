@@ -1,5 +1,5 @@
 
-import { almostWhiteSt, composeStyle, lightGraySt, mainButtonTextStyle, setStyle, tagButtonTextSt, whiteSt } from "front/@lib/style"
+import { almostWhiteSt, composeStyle, hoveredComment, lightGraySt, mainButtonTextStyle, setStyle, tagButtonTextSt, whiteSt } from "front/@lib/style"
 import { CLIENT_SETTINGS, fullStyle } from "front/@lib/util"
 import Action from "front/reactCom"
 import { Page } from "front/ssr"
@@ -63,7 +63,7 @@ export default class Tag extends Action<Props, State> {
 
             return (
                   <Pressable style={tagSt} onPress={this.handlePress} onHoverIn={this.handleHoverIn} onHoverOut={this.handleHoverOut}>
-                        <Text style={[mainButtonTextStyle, tagButtonTextSt, (hoveredTag || activated ? lightGraySt : almostWhiteSt)]} > {isHere ? "here" : parsedName}</Text>
+                        <Text style={[mainButtonTextStyle, tagButtonTextSt, (hoveredTag || activated ? hoveredComment : almostWhiteSt)]} > {isHere ? "here" : parsedName}</Text>
                   </Pressable >
             )
       }

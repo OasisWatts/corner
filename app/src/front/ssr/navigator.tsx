@@ -1,5 +1,5 @@
 
-import { tWriteColor, composeStyle, mainButtonStyle, contentFontSize, setStyle, slimThreshold, tWhite, lightGray, almostWhite, slimThresholdExceptSize, slimerThreshold } from "front/@lib/style"
+import { tWriteColor, composeStyle, mainButtonStyle, contentFontSize, setStyle, slimThreshold, tWhite, lightGray, almostWhite, slimThresholdExceptSize, slimerThreshold, writeColor } from "front/@lib/style"
 import Action from "front/reactCom"
 import React from "react"
 import { Image, Pressable, Text, View } from "reactNative"

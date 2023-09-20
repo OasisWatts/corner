@@ -1,5 +1,5 @@
 
-import { setStyle, slimThreshold, softGray, upColor, whiteSt, writeColor } from "front/@lib/style"
+import { setStyle, slimThreshold, softGray, tWriteColor, upColor, whiteSt, writeColor } from "front/@lib/style"
 import { CLIENT_SETTINGS, PROPS } from "front/@lib/util"
 import Action from "front/reactCom"
 import React from "react"
@@ -30,6 +30,7 @@ export default class Landing extends Action<Props, State> {
                               PROPS.data.image = o.image
                               Action.trigger("landingOff")
                               Action.trigger("tagReload")
+                              Action.trigger("followListTag", null)
                         }
                   })
             })
@@ -59,24 +60,31 @@ export default class Landing extends Action<Props, State> {
             } else return (
                   <View style={landingSt}>
                         <View style={[sideSt, leftSideSt, slim ? slimSideSt : null]}>
-                              <Image style={imageSt} source={{ uri: CLIENT_SETTINGS.host + "/images/cornerIconLongWhite.png" }} />
+                              <Image style={imageSt} source={{ uri: CLIENT_SETTINGS.host + "/images/cornerIconLongBlack.png" }} />
                               <Text style={[textSt, mainTextSt]}>Leave Comments Everywhere</Text>
                               <Text style={[textSt, subTextSt]}>Express your opinions on websites, even it doen't have a comment feature</Text>
                               <Text style={[textSt, subTextSt]}>Connect with people who share your interest in the same website</Text>
                         </View>
                         <View style={[sideSt, rightSideSt, slim ? slimSideSt : null]}>
-                              <Text style={[textSt, rightMainTextSt]}> Be the first user of the prototype version </Text>
-                              <Text style={[textSt, guide0TextSt]}> You have to install a chrome extension (Please click 'Install Corner')</Text>
+                              <Text style={[textSt, rightMainTextSt, whiteFontSt]}> Be the first user of the prototype version </Text>
+                              <Text style={[textSt, guide0TextSt, whiteFontSt]}> You have to install a chrome extension (Please click 'Install Corner')</Text>
                               <View style={buttonSetSt}>
                                     <Pressable style={[buttonSt, slim ? slimButtonSt : null]}>
-                                          <Text style={[textSt, buttonTextSt, slim ? slimButtonTextSt : null]}>Download Corner</Text>
+                                          <Text style={[textSt, buttonTextSt, slim ? slimButtonTextSt : null]}>Install Corner</Text>
                                     </Pressable>
                                     <Pressable style={[buttonSt, slim ? slimButtonSt : null]} onPress={this.googleLogin}>
                                           <Image style={[googleImageSt, slim ? slimGoogleImageSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/google.svg" }} />
                                           <Text style={[textSt, buttonTextSt, slim ? slimButtonTextSt : null]}>Sign In with Google</Text>
                                     </Pressable>
                               </View>
-                              <Text style={[textSt, guide1TextSt]}> example text</Text>
+                              <Text style={[textSt, guide1TextSt, whiteFontSt]}> Right click and push the 'comment on corner' on context menu to turn on the side panel</Text>
+                              <Text style={[textSt, guide1TextSt, whiteFontSt]}> Icon on the corner shows the number of comments if any comment exists on the page</Text>
+                              <View style={featureWrapSt}>
+                                    <Image style={featureImgSt} source={{ uri: CLIENT_SETTINGS.host + "/images/featureContextmenu.svg" }} />
+                                    <Image style={featureImgSt} source={{ uri: CLIENT_SETTINGS.host + "/images/featureSidepanel.svg" }} />
+                                    <Image style={featureImgSt} source={{ uri: CLIENT_SETTINGS.host + "/images/featureBoardnum.svg" }} />
+                              </View>
+                              <Text style={[textSt, guide0TextSt, whiteFontSt]}> Try using it on a OTT service like Netflix and Disney+, or an original brand site like Toyota or Samsung</Text>
                         </View>
                   </View>
             )
@@ -98,10 +106,10 @@ const sideSt = setStyle({
       padding: "100px"
 })
 const leftSideSt = setStyle({
-      backgroundColor: "black"
+      backgroundColor: "white"
 })
 const rightSideSt = setStyle({
-      backgroundColor: "rgb(8 148 123)"
+      backgroundColor: writeColor
 })
 const slimSideSt = setStyle({
       padding: "20px"
@@ -127,14 +135,12 @@ const mainTextSt = setStyle({
       fontSize: "60px",
       display: "block",
       fontWeight: "800",
-      marginBottom: "100px",
-      marginTop: "100px",
-      color: "white"
+      marginBottom: "50px",
+      marginTop: "50px"
 })
-const textSt = setStyle({
+export const textSt = setStyle({
       display: "block",
       fontWeight: "300",
-      color: "white",
       textAlign: "center"
 })
 const subTextSt = setStyle({
@@ -143,9 +149,8 @@ const subTextSt = setStyle({
 })
 const rightMainTextSt = setStyle({
       fontSize: "40px",
-      marginBottom: "70px",
+      marginBottom: "30px",
       fontWeight: "600",
-      marginTop: "100px"
 })
 const guide0TextSt = setStyle({
       display: "block",
@@ -153,15 +158,16 @@ const guide0TextSt = setStyle({
 })
 const guide1TextSt = setStyle({
       fontSize: "20px",
-      marginTop: "20px"
+      marginTop: "10px"
 })
 const buttonSetSt = setStyle({
       display: "block",
-      marginTop: "100px",
+      marginTop: "50px",
+      marginBottom: "50px",
       position: "relative",
       textAlign: "center"
 })
-const buttonSt = setStyle({
+export const buttonSt = setStyle({
       width: "350px",
       height: "60px",
       backgroundColor: "white",
@@ -171,11 +177,11 @@ const buttonSt = setStyle({
       marginLeft: "20px",
       marginRight: "20px"
 })
-const slimButtonSt = setStyle({
+export const slimButtonSt = setStyle({
       width: "200px",
       height: "40px"
 })
-const buttonTextSt = setStyle({
+export const buttonTextSt = setStyle({
       fontSize: "23px",
       textAlign: "center",
       lineHeight: "60px",
@@ -183,13 +189,28 @@ const buttonTextSt = setStyle({
       fontWeight: "400",
       color: "black"
 })
-const slimButtonTextSt = setStyle({
+export const slimButtonTextSt = setStyle({
       fontSize: "15px",
       lineHeight: "40px"
 })
-const buttonExSt = setStyle({
+export const buttonExSt = setStyle({
       marginTop: "150px",
       borderWidth: "1px",
       borderStyle: "solid",
       borderColor: softGray
+})
+const featureWrapSt = setStyle({
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "center",
+      marginTop: "50px",
+      marginBottom: "50px"
+})
+const featureImgSt = setStyle({
+      width: "220px",
+      height: "160px",
+      marginRight: "50px"
+})
+const whiteFontSt = setStyle({
+      color: "white"
 })
