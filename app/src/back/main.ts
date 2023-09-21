@@ -11,6 +11,8 @@ import { getLocale, loadLanguages } from "./util/language"
 import CookieParser from "cookie-parser"
 import { StatementUser } from "./database/statementUser"
 
+import https from "https"
+import fs from "fs"
 const app = express()
 const MAX_CONTENTS_LEN = SETTINGS.board.contentsLen
 
@@ -20,7 +22,6 @@ declare module 'express-session' {
             isLogined: boolean
       }
 }
-
 function parseUrl(url) {
       return url.replaceAll("!oa@sis$", "&").replaceAll("!cor@ner$", "#")
 }
@@ -353,8 +354,8 @@ DB.initialize().then(() => {
             const extension: boolean = Boolean(req.query.ext)
             console.log("url", url)
             res.set("Access-Control-Allow-Origin", "*")
-            req.session.isLogined = true // 개발 시 로그인 매번 할 필요 없게
-            req.session.userKey = 5 // 개발 시 로그인 매번 할 필요 없게
+            // req.session.isLogined = true // 개발 시 로그인 매번 할 필요 없게
+            // req.session.userKey = 5 // 개발 시 로그인 매번 할 필요 없게
             console.log("il", req.session.isLogined, req.session.userKey)
             if (!req.session.isLogined || !req.session.userKey) {
                   pageBuilder("ssr", { url, hostname, ext: extension, ss: false })(req, res, next)
@@ -363,5 +364,14 @@ DB.initialize().then(() => {
                   pageBuilder("ssr", { url, hostname, ext: extension, ss: true, name: user.name, image: user.image })(req, res, next)
             }
       })
-      app.listen(4416)
+      if (process.argv.includes("-remote") && SETTINGS.https) {
+            const ssl_options = SETTINGS.https && ({
+                  cert: fs.readFileSync(SETTINGS.https.cert),
+                  key: fs.readFileSync(SETTINGS.https.key),
+                  ca: fs.readFileSync(SETTINGS.https.ca),
+            })
+            https.createServer(ssl_options, app).listen(SETTINGS.port)
+      } else {
+            app.listen(SETTINGS.port)
+      }
 })

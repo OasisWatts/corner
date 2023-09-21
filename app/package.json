@@ -11,7 +11,8 @@
     "build-back": "webpack --config ./webpack.back.config.js --mode development",
     "build-front": "node --trace-deprecation ./tools/front.js",
     "build": "npm run build-back && npm run build-front",
-    "server": "node build/main.js",
+    "server": "node build/process.js",
+    "server-dev": "node build/main.js",
     "test": "jest"
   },
   "dependencies": {
@@ -28,6 +29,7 @@
     "fs-extra": "^11.1.1",
     "global": "^4.4.0",
     "graceful-fs": "^4.2.11",
+    "https": "^1.0.0",
     "mysql": "^2.18.1",
     "path": "^0.12.7",
     "react": "18.2.0",

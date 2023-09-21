@@ -34,6 +34,12 @@ declare type Settings = {
             interval: number
             directory: string
       }
+      https: {
+            key: string
+            ca: string
+            cert: string
+      }
+      port: number
 }
 
 declare type boardType = {

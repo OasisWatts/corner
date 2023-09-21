@@ -58,6 +58,15 @@ const configMain = {
       },
       ...config,
 }
+const configProcess = {
+      name: "web",
+      entry: path.resolve(__dirname, "src/back/process.ts"),
+      output: {
+            path: path.join(__dirname, "build"),
+            filename: "process.js",
+      },
+      ...config,
+}
 module.exports = [
-      configMain
+      configMain, configProcess
 ]
