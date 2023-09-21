@@ -5,7 +5,6 @@ async function getTab() {
 chrome.runtime.sendMessage("panelOpened")
 chrome.runtime.onMessage.addListener(async function (msg, sender, sendResponse) {
       if (msg === "panelUpdate" || msg === "tabChanged") {
-            console.log("get in sidepanel")
             const { id, url } = await getTab()
             const parsedUrl = new URL(url)
             prevUrl = url
@@ -30,5 +29,5 @@ chrome.runtime.onMessage.addListener(async function (msg, sender, sendResponse) 
             corner_frame.className = "alerted_corner_frame"
             // corner_frame.insertBefore(url_change_alert)
             if (!document.body.querySelector("#url_change_alert")) document.body.append(url_change_alert)
-      } else console.log("undefined msg")
+      }
 })

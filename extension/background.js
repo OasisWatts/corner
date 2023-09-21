@@ -3,7 +3,6 @@ async function getTab() {
       return tab
 }
 async function create(url, hostname) {
-      console.log("create", url, hostname)
       const iconBlueImg = chrome.runtime.getURL("img/corner-icon-url.png")
       const iconYellowImg = chrome.runtime.getURL("img/corner-icon-hostname.png")
       const corner_img = document.createElement("img")
@@ -14,7 +13,6 @@ async function create(url, hostname) {
       corner_icon.id = "corner_icon"
       corner_icon.appendChild(corner_img)
       corner_icon.appendChild(board_num)
-      console.log("before check fetch")
       fetch("https://corner.dance/check?u=" + url.replaceAll("&", "!oa@sis$").replaceAll("#", "!cor@ner$") + "&h=" + hostname).then((r) => r.json()).then((r) => {
             if (r.u) {
                   corner_img.src = iconBlueImg
@@ -33,7 +31,6 @@ chrome.runtime.onMessage.addListener(async function (msg, sender, sendResponse) 
       if (msg === "connect") {
             const { id, url } = await getTab()
             const parsedUrl = new URL(url)
-            console.log("connected getUrl", url)
             chrome.scripting.executeScript({
                   target: { tabId: id },
                   func: create,
@@ -47,7 +44,7 @@ chrome.runtime.onMessage.addListener(async function (msg, sender, sendResponse) 
             // chrome.sidePanel.setOptions({ enabled: true, path: "sidepanel.html" })
       } else if (msg === "panelOpened") { // side panel이 열린 것을 확인하면, side panel을 원하는대로 업데이트
             chrome.runtime.sendMessage("panelUpdate")
-      } else console.log("undefined msg", msg)
+      }
 })
 // toolbar icon 클릭 시 sidepanel 열림
 chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true })
@@ -67,7 +64,6 @@ const urlChangeExceptions = [
 chrome.tabs.onUpdated.addListener(async () => {
       const { url } = await getTab()
       if (prevUrl != url && !urlChangeExceptions.some((mt) => url.match(mt) || (prevUrl && prevUrl.match(mt)))) {
-            console.log("url changed", prevUrl, url)
             chrome.runtime.sendMessage("urlChanged")
             prevUrl = url
       }
