@@ -364,7 +364,7 @@ DB.initialize().then(() => {
                   pageBuilder("ssr", { url, hostname, ext: extension, ss: true, name: user.name, image: user.image })(req, res, next)
             }
       })
-      if (CLOTHES.development && SETTINGS.https) {
+      if (!CLOTHES.development && SETTINGS.https) {
             const ssl_options = SETTINGS.https && ({
                   cert: fs.readFileSync(SETTINGS.https.cert),
                   key: fs.readFileSync(SETTINGS.https.key),
