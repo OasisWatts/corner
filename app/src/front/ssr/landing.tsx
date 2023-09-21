@@ -3,7 +3,7 @@ import { setStyle, slimThreshold, softGray, tWriteColor, upColor, whiteSt, write
 import { CLIENT_SETTINGS, PROPS } from "front/@lib/util"
 import Action from "front/reactCom"
 import React from "react"
-import { Image, Pressable, Text, TextInput, View } from "reactNative"
+import { Image, Linking, Pressable, Text, TextInput, View } from "reactNative"
 import { signInWithPopup, GoogleAuthProvider, AuthErrorCodes, getAuth } from "firebase/auth"
 import { initializeApp } from "firebase/app"
 import { Page, auth } from "."
@@ -12,6 +12,9 @@ import { Page, auth } from "."
 export default class Landing extends Action<Props, State> {
       constructor(props: Props) {
             super(props)
+      }
+      private installCorner = () => {
+            Linking.openURL(url)
       }
       private googleLogin = () => {
             this.socialLogin(new GoogleAuthProvider(), ["openid", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"]).then((result) => {
@@ -67,7 +70,7 @@ export default class Landing extends Action<Props, State> {
                               <Text style={[textSt, rightMainTextSt, whiteFontSt]}> Be the first user of the prototype version </Text>
                               <Text style={[textSt, guide0TextSt, whiteFontSt]}> You have to install a chrome extension (Please click 'Install Corner')</Text>
                               <View style={buttonSetSt}>
-                                    <Pressable style={[buttonSt, slim ? slimButtonSt : null]}>
+                                    <Pressable style={[buttonSt, slim ? slimButtonSt : null]} onPress={this.installCorner}>
                                           <Text style={[textSt, buttonTextSt, slim ? slimButtonTextSt : null]}>Install Corner</Text>
                                     </Pressable>
                                     <Pressable style={[buttonSt, slim ? slimButtonSt : null]} onPress={this.googleLogin}>
