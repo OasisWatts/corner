@@ -6,8 +6,9 @@
       border: 1px solid rgb(150, 150, 150);
       border-radius: 13px;
       background-color: white;
-      padding: 1.5px;
+      padding: 0.5px;
       padding-right: 7px;
+      padding-left: 2px;
       z-index: 2147483647;
 }
 

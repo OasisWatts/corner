@@ -78,8 +78,8 @@ export default class Landing extends Action<Props, State> {
                                           <Text style={[textSt, buttonTextSt, slim ? slimButtonTextSt : null]}>Sign In with Google</Text>
                                     </Pressable>
                               </View>
-                              <Text style={[textSt, guide1TextSt, whiteFontSt]}> Right click and push the 'comment on corner' on context menu to turn on the side panel</Text>
-                              <Text style={[textSt, guide1TextSt, whiteFontSt]}> Icon on the corner shows the number of comments if any comment exists on the page</Text>
+                              <Text style={[textSt, guide1TextSt, whiteFontSt]}> Right click and select 'comment on corner' from the context menu to activate the side panel</Text>
+                              <Text style={[textSt, guide1TextSt, whiteFontSt]}> Icon on the corner displays the number of comments if any comment exists on the page</Text>
                               <View style={featureWrapSt}>
                                     <Image style={[slim ? slimFeatureImgSt : featureImgSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/featureContextmenu.svg" }} />
                                     <Image style={[slim ? slimFeatureImgSt : featureImgSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/featureSidepanel.svg" }} />
