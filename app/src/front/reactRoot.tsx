@@ -15,7 +15,6 @@ type Props = Page.Props<any> & Readonly<{
 }>
 
 export default function Bind(targetClass: any, bonusClass?: any): void {
-      console.log("b", FRONT)
       // if (typeof window !== "undefined") {
       if (FRONT) {
             // AppRegistry.registerComponent("app", () => targetClass)
@@ -46,7 +45,6 @@ export default function Bind(targetClass: any, bonusClass?: any): void {
       // }
 }
 function renderReactDom(targetClass: any, bonusClass?: any) {
-      console.log("hi")
       const $root = document.createElement("main")
       ReactDOM.render(<Root {...PROPS}>
             {React.createElement(targetClass, PROPS)}

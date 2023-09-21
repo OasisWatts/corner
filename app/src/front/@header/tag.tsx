@@ -1,10 +1,10 @@
 
-import { almostWhiteSt, composeStyle, hoveredComment, lightGraySt, mainButtonTextStyle, setStyle, tagButtonTextSt, whiteSt } from "front/@lib/style"
-import { CLIENT_SETTINGS, fullStyle } from "front/@lib/util"
+import { almostWhiteSt, hoveredComment, mainButtonTextStyle, setStyle, tagButtonTextSt } from "front/@lib/style"
+import { CLIENT_SETTINGS } from "front/@lib/util"
 import Action from "front/reactCom"
 import { Page } from "front/ssr"
 import React from "react"
-import { Pressable, Text, View } from "reactNative"
+import { Pressable, Text } from "reactNative"
 
 const MAX_TAG_LEN_LIM = CLIENT_SETTINGS.board.tagLenLim
 const HALF_MAX_TAG_LEN_LIM = Math.floor(MAX_TAG_LEN_LIM / 2)
@@ -57,7 +57,6 @@ export default class Tag extends Action<Props, State> {
       render(): React.ReactNode {
             const { name, isHere } = this.props
             const { hoveredTag, activated } = this.state
-            console.log("name", name, this.props.isUrl)
             let parsedName = name
             if (name.length > (MAX_TAG_LEN_LIM + 8)) parsedName = "..." + name.slice(8, 8 + HALF_MAX_TAG_LEN_LIM) + "..." + name.slice(name.length - HALF_MAX_TAG_LEN_LIM)
 

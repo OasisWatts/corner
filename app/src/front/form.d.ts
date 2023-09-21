@@ -47,6 +47,7 @@ declare type ActionReceiverTable = Partial<{
       "deleteCommentItem": Action<[number]>,
       "boardReload": Action<>,
       "followReload": Action<[number, boolean]>,
+      "followUserList": Action<[number]>,
       "boardListTag": Action<[string, boolean?, boolean?]>,
       "boardListSearch": Action<string>,
       "searchShow": Action<[boolean]>,

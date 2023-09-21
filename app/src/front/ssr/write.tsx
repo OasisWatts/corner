@@ -1,12 +1,11 @@
 // import { setStyle } from "front/common/style"
 // import { CLIENT_SETTINGS } from "front/@lib/util"
-import { buttonsForWriteBoxSt, buttonSetSt, composeStyle, inputForWriteBoxSt, inputSt, mainButtonStyle, mainButtonTextStyle, pageSt, rightButtonSt, pressableSt1, setStyle, slimPageSt, slimThreshold, tLightGray, tWhite, widePageSt, contentFontSize, almostWhite, writeColor, whiteSt, almostWhiteSt, submitButtonTextSt, fontBlackSt, softGray, slimerPageSt, slimerThreshold, tWriteColor } from "front/@lib/style"
+import { composeStyle, inputSt, mainButtonTextStyle, pageSt, rightButtonSt, setStyle, slimPageSt, slimThreshold, widePageSt, contentFontSize, writeColor, whiteSt, submitButtonTextSt, fontBlackSt, slimerPageSt, slimerThreshold, tWriteColor } from "front/@lib/style"
 import Action from "front/reactCom"
 import React from "react"
 import { View, TextInput, Pressable, Text } from "reactNative"
 import { Page } from "."
-import { wrapForWriteBoxSt } from "./board"
-import { CLIENT_SETTINGS, PROPS, extension, fullStyle } from "front/@lib/util"
+import { CLIENT_SETTINGS, PROPS } from "front/@lib/util"
 
 const MAX_CONTENTS_LEN = CLIENT_SETTINGS.board.contentsLen
 const MAX_TAG_LEN = CLIENT_SETTINGS.board.tagLenLim
@@ -53,9 +52,7 @@ export class Write extends Action<Props, State> {
       }
       private getBoard = () => {
             const { boardId } = this.props
-            console.log("getBoard from update")
             fetch("/boardload?id=" + String(boardId)).then((r) => r.json()).then((res) => {
-                  console.log("res board", res)
                   this.setState({
                         contentText: res.contents,
                         hashTag: "#" + res.tags.join(" #")
@@ -74,12 +71,10 @@ export class Write extends Action<Props, State> {
             if (last === " " && prevLast !== "#") hashTag += "#"
             else if (tmpTags[tmpTags.length - 1].length > MAX_TAG_LEN) return
             if (hashTag.length === 0) hashTag = "#"
-            console.log("hashtag", hashTag, "pr", prevTag)
             this.setState({ hashTag })
       }
       private handlePressWrite = () => {
             const { contentText, hashTag } = this.state
-            console.log("wr", JSON.stringify({ c: contentText }))
             fetch("/boardInsert", {
                   method: "POST",
                   headers: {
@@ -108,7 +103,6 @@ export class Write extends Action<Props, State> {
             }
       }
       private handlePressCancel = () => {
-            console.log("cancel")
             Action.trigger("page", Page.boardList)
       }
 

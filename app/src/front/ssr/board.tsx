@@ -1,19 +1,14 @@
-// import { setStyle } from "front/common/style"
 import Action from "front/reactCom"
 import React from "react"
 import { View, Text, Image, Pressable, FlatList, TextInput, Linking } from "reactNative"
 import { CommentItem } from "./commentItem"
-import { blockSt, composeStyle, contentsSt, upButtonSt, mainButtonTextStyle, rightButtonSt, profileSt, setStyle, pageSt, buttonSetSt, tWhite, tDeepGray, importantButtonTextStyle, slimPageSt, widePageSt, slimThreshold, dateSt, writerSt, numSt, numSt1, commentButtonSt, hoveredUp, hoveredComment, importantImageSt, profileImgSt, followImgSt, followButtonSt, tWriteColor, tUpColor, tLightGray, lightGray, writeColor, upColor, updatedSt, rightButtonSetSt, inputSt, whiteSt, almostWhiteSt, submitButtonTextSt, mainFontSizeSt, contentFontSize, contentFontSizeSt, fontBlackSt, inlineBlockSt, slimerThreshold, slimerPageSt } from "front/@lib/style"
-import { BoardItem } from "./boardItem"
+import { blockSt, composeStyle, contentsSt, upButtonSt, mainButtonTextStyle, rightButtonSt, profileSt, setStyle, pageSt, buttonSetSt, slimPageSt, widePageSt, slimThreshold, dateSt, writerSt, numSt, numSt1, commentButtonSt, hoveredUp, importantImageSt, profileImgSt, followImgSt, followButtonSt, lightGray, upColor, updatedSt, inputSt, whiteSt, almostWhiteSt, submitButtonTextSt, contentFontSizeSt, fontBlackSt, inlineBlockSt, slimerThreshold, slimerPageSt } from "front/@lib/style"
 import { Page } from "."
-import { CLIENT_SETTINGS, PROPS, extension, fullStyle, userKey } from "front/@lib/util"
-import Bind from "front/reactRoot"
+import { CLIENT_SETTINGS, PROPS } from "front/@lib/util"
 import { getHumanNumber, getHumanTimeDistance } from "front/@lib/Language"
 import { } from "./write"
-// import { CLIENT_SETTINGS } from "front/@lib/util"
 
-const MAX_CONTENTS_LEN = 100// CLIENT_SETTINGS.board.contentsLen
-const HOST = ""// CLIENT_SETTINGS.host
+const MAX_CONTENTS_LEN = CLIENT_SETTINGS.board.contentsLen
 
 type State = {
       commentStartId: number
@@ -45,7 +40,6 @@ export class Board extends Action<Props, State> {
       constructor(props: Props) {
             super(props)
             if (PROPS.data.boardAccess) {
-                  console.log("board", PROPS.data.board)
                   const { id, writer, writerId, writerImage, writerFollowed, contents, date, up, numComment, uped, updated, comments, tags, url } = PROPS.data.board
                   this.state = {
                         commentStartId: comments.length ? comments[comments.length - 1]?.id : -1,
@@ -169,7 +163,6 @@ export class Board extends Action<Props, State> {
             fetch("/comments?id=" + id + "&startId=" + commentStartId)
                   .then(r => r.json())
                   .then((o) => {
-                        console.log("comment o", o)
                         this.setState({
                               comments: comments.concat(o.comments),
                               commentStartId: o.endId,
@@ -186,9 +179,7 @@ export class Board extends Action<Props, State> {
       }
       private getBoard = () => {
             const { id } = this.state
-            console.log("board", id, this.props.boardId)
             fetch("/boardload?id=" + String(id)).then((r) => r.json()).then((res) => {
-                  console.log("res board", res)
                   this.setState({
                         id: res.id,
                         writer: res.writer,
@@ -233,19 +224,12 @@ export class Board extends Action<Props, State> {
       private handleHoverOutFollow = () => {
             this.setState({ hoverFollow: false })
       }
-      private handleFocusTextArea = () => {
-            this.setState({ focusedArea: true })
-      }
-      private handleBlurTextArea = () => {
-            this.setState({ focusedArea: false })
-      }
       private pressURL = () => {
             const { url } = this.state
-            console.log("url", url)
             if (url) Linking.openURL(url)
       }
       private renderHeader = () => {
-            const { commentText, focusedArea, writerImage, up, uped, updated, writer, writerId, writerFollowed, date, numComment, contents, comments, tags, hoverUp, hoverComment, hoverFollow } = this.state
+            const { commentText, writerImage, up, uped, updated, writer, writerFollowed, date, numComment, contents, tags, hoverUp, hoverFollow } = this.state
 
             return (
                   <View>

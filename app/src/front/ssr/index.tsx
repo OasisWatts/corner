@@ -1,15 +1,9 @@
-import { composeStyle, mainButtonStyle, mainButtonTextStyle, mainColor, setStyle, tLightGray } from "front/@lib/style"
 import Action from "front/reactCom"
 import React from "react"
-import { Pressable, StyleSheet, Text, View } from "reactNative"
-import { BoardList } from "./boardList"
-import { Tags } from "../@header/tags"
-import { Write } from "./write"
-import { FRONT, PROPS } from "front/@lib/util"
+import { View } from "reactNative"
+import { PROPS } from "front/@lib/util"
 import Bind from "front/reactRoot"
 import Header from "../@header/header"
-import { Board } from "./board"
-import Background from "./background"
 import Follows from "./followList"
 import Wrapper from "./wrapper"
 import Landing from "./landing"
@@ -22,7 +16,7 @@ window.onpopstate = (ev: any) => { // 브라우저 뒤로가기, 앞으로가기
       let urlPage: string = "home"
       if (ev.state.page_id != null) {
             urlPage = ev.state.page_id
-      } console.log("urlPage", urlPage)
+      }
       const arr = urlPage.split("/")
       if (arr.length > 1 && arr[0] === "board") Action.trigger("pageBoard", Number(arr[1]))
       else {
@@ -40,7 +34,6 @@ window.onpopstate = (ev: any) => { // 브라우저 뒤로가기, 앞으로가기
                         id = Page.board
                         break
             }
-            console.log("id", id)
             Action.trigger("page", id)
       }
 }
@@ -87,13 +80,10 @@ export default class Index extends Action<Props, State> {
                   boardId: -1,
                   landing: false
             }
-            console.log("front", FRONT)
-            console.log("props", PROPS)
       }
 
       protected ACTION_RECEIVER_TABLE: any = {
             "page": (page: Page, callback?) => {
-                  console.log("page", Page[page])
                   this.pushHistory(page)
                   this.setState({ page }, () => {
                         if (callback) callback()
@@ -104,7 +94,6 @@ export default class Index extends Action<Props, State> {
                   this.setState({ page: Page.update, boardId })
             },
             "pageBoard": (boardId) => {
-                  console.log("pb", boardId)
                   this.pushHistory(Page.board, boardId)
                   this.setState({ page: Page.board, boardId })
             },
@@ -126,13 +115,11 @@ export default class Index extends Action<Props, State> {
             super.componentDidMount()
             const urlPage = location.href.split("/")[3] // localhost url 기준
             if (PROPS.data.boardAccess) {
-                  console.log("index cm")
                   const boardUrl = "/board/" + String(PROPS.data.board.id)
                   window.history.pushState({ page_id: boardUrl }, "", boardUrl)
                   PROPS.data.boardAccess = false // board로 바로 redering 용 (한 번 보여줬으면, 해당 board가 아닌 다른 반응을 해야하므로, false로 돌림, component did mount 마지막 호출이라 여기서 처리)
-            } else window.history.pushState({ page_id: urlPage }, "", `/${urlPage}`); console.log("index cm1")
+            } else window.history.pushState({ page_id: urlPage }, "", `/${urlPage}`)
 
-            console.log("ss", PROPS.data.ss)
             if (PROPS.data.ss) this.setState({ landing: false })
             else this.setState({ landing: true })
             // const auth_ = getAuth()

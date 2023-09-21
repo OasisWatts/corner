@@ -1,9 +1,9 @@
 
-import { deepGray, fontBlackSt, gray, lightGray, setStyle, slimThreshold, slimThresholdExceptSize, slimerThreshold, smallFontSize, softGray } from "front/@lib/style"
-import { CLIENT_SETTINGS, PROPS, extension, fullStyle } from "front/@lib/util"
+import { lightGray, setStyle, slimThreshold, slimThresholdExceptSize, slimerThreshold } from "front/@lib/style"
+import { CLIENT_SETTINGS, PROPS } from "front/@lib/util"
 import Action from "front/reactCom"
 import React from "react"
-import { FlatList, Image, Pressable, Text, View } from "reactNative"
+import { FlatList, Image, View } from "reactNative"
 import FollowItem from "./followItem"
 
 type State = {
@@ -45,7 +45,6 @@ export default class Follows extends Action<Props, State> {
       }
       private previousWidth: number = window.innerWidth
       private resize = () => {
-            console.log("wih", window.innerWidth)
             if ((this.previousWidth > slimThreshold && window.innerWidth <= slimThreshold) || (this.previousWidth < slimThreshold && window.innerWidth >= slimThreshold)) {
                   this.forceUpdate()
             } this.previousWidth = window.innerWidth
@@ -53,11 +52,8 @@ export default class Follows extends Action<Props, State> {
       private getFollows = (hot?: boolean) => {
             const { tag, startId, follows, endOfList, zero } = this.state
             if (endOfList) return
-            console.log("getFollows", tag, startId, follows, hot)
             if (hot) {
-                  console.log("fe", "/getfollow?h=1" + (tag ? ("&t=" + tag) : ""))
                   fetch("/getfollow?h=1" + (tag ? ("&t=" + tag) : "")).then((r) => r.json()).then((o) => {
-                        console.log("hotFollowO", o)
                         this.setState({
                               recommends: o.recomm,
                               follows: o.follow.users,
@@ -68,7 +64,6 @@ export default class Follows extends Action<Props, State> {
                   })
             } else {
                   fetch("/getfollow?sid=" + startId + (tag ? ("&t=" + tag) : "") + (zero ? "&z=1" : "")).then((r) => r.json()).then((o) => {
-                        console.log("followO", o)
                         this.setState({
                               follows: follows.concat(o.follow.users),
                               startId: o.follow.endId,

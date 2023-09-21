@@ -1,9 +1,9 @@
 
-import { composeStyle, contentFontSize, setStyle, slimThreshold, tUpColor, tWriteColor } from "front/@lib/style"
+import { contentFontSize, setStyle, slimThreshold, tWriteColor } from "front/@lib/style"
 import { CLIENT_SETTINGS } from "front/@lib/util"
 import Action from "front/reactCom"
 import React from "react"
-import { Image, Pressable, Text, View } from "reactNative"
+import { Image, Pressable, Text } from "reactNative"
 import { Page } from "."
 
 type State = {
@@ -47,7 +47,6 @@ export default class FollowItem extends Action<Props, State> {
 
       private handlePressFollowItem = () => {
             const { userKey } = this.props
-            console.log("press follwitem", userKey)
             Action.trigger("page", Page.boardList, () => {
                   Action.trigger("boardListUser", userKey)
                   Action.trigger("followUserList", userKey)

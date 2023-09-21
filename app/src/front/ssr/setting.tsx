@@ -3,9 +3,7 @@ import { getAuth, signOut } from "firebase/auth"
 import Action from "front/reactCom"
 import React from "react"
 import { Pressable, Text, View } from "reactNative"
-import { Page } from "."
 import { pageSt, setStyle, slimPageSt, slimThreshold, slimerPageSt, slimerThreshold, whiteSt, widePageSt } from "front/@lib/style"
-import { fullStyle } from "front/@lib/util"
 import { buttonExSt, buttonSt, buttonTextSt, slimButtonSt, slimButtonTextSt, textSt } from "./landing"
 
 
@@ -31,7 +29,6 @@ export default class Setting extends Action<Props, State> {
       private signOut = () => {
             const auth = getAuth()
             signOut(auth).then(() => fetch("/signout").then((r) => r.json()).then((o) => {
-                  console.log("s o a", o)
                   if (o.signedOut) Action.trigger("landingOn")
             })).catch((err) => console.log("sign out error", err))
       }

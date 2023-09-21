@@ -113,7 +113,6 @@ export class StatementUser {
                   } else {
                         DB.Manager.query(`select userKey, (select name from corner.user where user.key = userKey) name, (select image from corner.user where user.key = userKey) image, count(*) as cnt from (select followedKey from corner.user_followings_user where followerKey = ${userKey}) followed left join corner.usertagcount usertagcount on usertagcount.userKey = followed.followedKey where userKey > 0 group by userKey order by cnt desc limit ${MAX_FOLLOW_LEN};
                         `).then((usersO) => {
-                              console.log("usersO", usersO)
                               const users = usersO.map((us) => ({ key: us.userKey, name: us.name, image: us.image }))
                               if (users.length === 0) {
                                     resolve({ users, end: true, endId: 0, zero: true })
@@ -122,7 +121,6 @@ export class StatementUser {
                                     if (users.length < MAX_FOLLOW_LEN) {
                                           DB.Manager.query(`select followedKey, (select name from corner.user where user.key = followedKey) name, (select image from corner.user where user.key = followedKey) image from corner.user_followings_user where followerKey = ${userKey} and followedKey > ${startId} and followedKey not in (select usertagcount.userKey from corner.usertagcount where usertagcount.userKey = followedKey) order by followedKey desc limit ${MAX_FOLLOW_LEN};
                                                       `).then((usersO_) => {
-                                                console.log("usersO", usersO_)
                                                 const users_ = usersO_.map((us) => ({ key: us.userKey, name: us.name, image: us.image }))
                                                 if (users_.length === 0) {
                                                       resolve({ users: [...users, ...users_], end: true, endId: 0, zero: true })
@@ -149,16 +147,13 @@ export class StatementUser {
        * @returns 
        */
       public static getFollowRecommend(userKey: number, tag: string | null) {
-            console.log("gfr", userKey, tag)
             return new Promise((resolve, reject) => {
                   if (tag) {
                         DB.Manager.findOne(Tag, { where: { name: tag }, select: ["id"] }).then((tagO) => {
                               if (tagO) {
-                                    console.log("tagO", tagO)
                                     const tagId = tagO.id
                                     DB.Manager.query(`select userKey, (select name from corner.user where user.key = userKey) name, (select image from corner.user where user.key = userKey) image from corner.usertagcount where tagId = ${tagId} order by count desc limit ${MAX_FOLLOW_RECOMM};`).then((usersO) => {
                                           const users = usersO.map((us) => ({ key: us.userKey, name: us.name, image: us.image }))
-                                          console.log("usrs", usersO, users)
                                           Logger.passApp("getFollowRecommend").out()
                                           resolve(users)
                                           return
@@ -166,10 +161,8 @@ export class StatementUser {
                               } else Logger.errorApp(ErrorCode.tag_find_failed).put("getFollowRecommend_0").out()
                         }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put("getFollowRecommend_1").put(err).out())
                   } else {
-                        console.log("notag")
                         DB.Manager.query(`select userKey, (select name from corner.user where user.key = userKey) name, (select image from corner.user where user.key = userKey) image, count(*) as cnt from corner.usertagcount group by userKey order by cnt desc;`).then((usersO) => {
                               const users = usersO.map((us) => ({ key: us.userKey, name: us.name, image: us.image }))
-                              console.log("usrs", usersO, users)
                               Logger.passApp("getFollowRecommend").out()
                               resolve(users)
                               return
@@ -269,10 +262,8 @@ export class StatementUser {
             return new Promise((resolve, reject) => {
                   DB.Manager.findOne(User, { where: { socialId } }).then((user) => {
                         if (user) {
-                              console.log("su0")
                               resolve({ signed: true, userKey: user.key, name: user.name, image: user.image })
                         } else {
-                              console.log("su1")
                               const imgNo = Math.floor(Math.random() * 5)
                               DB.Manager.save(User, { socialId, name, email, image: "user" + String(imgNo) + ".svg" }).then((res) => {
                                     Logger.passApp("signUp").put("signIn").out()

@@ -25,7 +25,6 @@ export function L(key: string, ...args: any[]): string {
  * @param page 페이지 식별자.
  */
 export function getLanguageTable(locale: string, page: string): Table<string> {
-      console.log("lt", locale, page)
       return JSON.parse(LANGUAGES[`${locale}/${page}`])
 }
 /**
@@ -57,7 +56,6 @@ export function loadLanguages(): void {
             for (const page in prototable) {
                   if (page[0] === "$" || page[0] === "@") continue
                   const key = `${locale}/${page}`
-                  console.log("key", key)
                   const pageTable = prototable[page] || {}
                   const table = {
                         ...(prototable.$global || {}),
@@ -76,7 +74,7 @@ export function loadLanguages(): void {
                         ...pageTable,
                   })
             }
-      } console.log("R", R)
+      }
       LANGUAGES = R
       Logger.passSignificant("Languages has been updated.").out()
 }

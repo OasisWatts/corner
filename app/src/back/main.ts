@@ -10,6 +10,7 @@ import { BOARD_CATEGORY } from "common/applicationCode"
 import { getLocale, loadLanguages } from "./util/language"
 import CookieParser from "cookie-parser"
 import { StatementUser } from "./database/statementUser"
+import expressStaticGzip from "express-static-gzip"
 
 import https from "https"
 import fs from "fs"
@@ -54,7 +55,7 @@ DB.initialize().then(() => {
       }))
       app.use("/profiles", express.static(path.resolve(__dirname, "./profiles"), { maxAge: SETTINGS.cookie.maxAge }), send404)
       app.use("/images", express.static(path.resolve(__dirname, "./images"), { maxAge: SETTINGS.cookie.maxAge }), send404)
-      app.use("/pages", express.static(path.resolve(__dirname, "./pages"), { maxAge: SETTINGS.cookie.maxAge }), send404)
+      app.use("/pages", expressStaticGzip(path.resolve(__dirname, "./pages"), { serveStatic: { maxAge: SETTINGS.cookie.maxAge }, enableBrotli: true }), send404)
       app.use("/strings", express.static(path.resolve(__dirname, "./strings"), { maxAge: SETTINGS.cookie.maxAge }), send404)
       app.use("/constants.js", (req, res) => res.sendFile(path.resolve(__dirname, "./constants.js")))
       app.use("/board/constants.js", (req, res) => res.sendFile(path.resolve(__dirname, "./constants.js")))
@@ -64,11 +65,9 @@ DB.initialize().then(() => {
       app.get("/boards", async (req, res, next) => {
             const startId = Number(req.query.sid)
             const userKey = req.session.userKey
-            console.log("boards", userKey, req.session.isLogined)
             if (!req.session.isLogined || !userKey) res.redirect("/") // redirection함..
             else {
                   const result = await StatementBoard.boardList(startId, BOARD_CATEGORY.boards, userKey)
-                  console.log("result", JSON.stringify(result))
                   res.send(JSON.stringify(result))
             }
       }) // 본인이 작성한 게시글 목록 조회.
@@ -78,7 +77,6 @@ DB.initialize().then(() => {
             if (!req.session.isLogined || !userKey) res.redirect("/")
             else {
                   const result = await StatementBoard.boardList(startId, BOARD_CATEGORY.myBoards, userKey)
-                  console.log("result", JSON.stringify(result))
                   res.send(JSON.stringify(result))
             }
       }) // 본인이 up한 게시글 목록 조회.
@@ -88,7 +86,6 @@ DB.initialize().then(() => {
             if (!req.session.isLogined || !userKey) res.redirect("/")
             else {
                   const result = await StatementBoard.boardList(startId, BOARD_CATEGORY.myUpBoards, userKey)
-                  console.log("result", JSON.stringify(result))
                   res.send(JSON.stringify(result))
             }
       }) // 같은 태그의 게시글 목록 조회.
@@ -99,7 +96,6 @@ DB.initialize().then(() => {
             if (!req.session.isLogined || !userKey) res.redirect("/")
             else {
                   const result = await StatementBoard.boardList(startId, BOARD_CATEGORY.tagBoards, userKey, undefined, tag)
-                  console.log("result", JSON.stringify(result))
                   res.send(JSON.stringify(result))
             }
       }) // 같은 url의 게시글 목록 조회.
@@ -110,19 +106,16 @@ DB.initialize().then(() => {
             if (!req.session.isLogined || !userKey) res.redirect("/")
             else {
                   const result = await StatementBoard.boardList(startId, BOARD_CATEGORY.urlBoards, userKey, url)
-                  console.log("result", JSON.stringify(result))
                   res.send(JSON.stringify(result))
             }
       }) // 검색어의 게시글 목록 조회.
       app.get("/searchboards", async (req, res, next) => {
             const startId = Number(req.query.sid)
             const search = String(req.query.s)
-            console.log("sb", startId, search)
             const userKey = req.session.userKey
             if (!req.session.isLogined || !userKey) res.redirect("/")
             else {
                   const result = await StatementBoard.boardList(startId, BOARD_CATEGORY.searchBoards, userKey, undefined, undefined, search)
-                  console.log("result", JSON.stringify(result))
                   res.send(JSON.stringify(result))
             }
       })
@@ -130,7 +123,6 @@ DB.initialize().then(() => {
       app.get("/userboards", async (req, res, next) => {
             const startId = Number(req.query.sid)
             const searchUser = Number(req.query.u)
-            console.log("ub", startId, searchUser)
             const userKey = req.session.userKey
             if (!req.session.isLogined || !userKey) res.redirect("/")
             else {
@@ -152,7 +144,6 @@ DB.initialize().then(() => {
       // 게시글 등록.
       app.post("/boardInsert", async (req, res) => {
             const userKey = req.session.userKey
-            console.log("body", req.body)
             const contents = req.body.c
             const hashTag = req.body.t
             let url = parseUrl(req.body.u)
@@ -160,10 +151,8 @@ DB.initialize().then(() => {
             if (contents.length > MAX_CONTENTS_LEN) return
             if (url === "") url = null
             if (hostname === "" || url === hostname) hostname = null
-            console.log("u", url, hostname)
             if (!req.session.isLogined || !userKey) res.redirect("/")
             else {
-                  console.log("0")
                   const result = await DB.Manager.transaction(() => StatementBoard.boardInsert(userKey, contents, hashTag, url, hostname))
                   if (result) res.send(true)
             }
@@ -256,7 +245,6 @@ DB.initialize().then(() => {
             const url = parseUrl(String(req.query.u))
             const hot = Boolean(req.query.h)
             const userKey = req.session.userKey
-            console.log("tag", url, hot)
             if (!req.session.isLogined || !userKey) res.redirect("/")
             else {
                   if (hot) {
@@ -273,7 +261,6 @@ DB.initialize().then(() => {
             const tag = req.query.t ? String(req.query.t) : null
             const startId = Number(req.query.sid)
             const zero = Boolean(req.query.z)
-            console.log("getfollow", hot, tag, startId, zero)
             const userKey = req.session.userKey
             if (!req.session.isLogined || !userKey) res.redirect("/")
             else {
@@ -294,12 +281,9 @@ DB.initialize().then(() => {
             const id = String(req.body.i)
             const name = String(req.body.n)
             const email = String(req.body.e)
-            console.log("s0")
             if (!req.session.isLogined || !req.session.userKey) {
                   try {
-                        console.log("s1")
                         const result: any = await StatementUser.signIn(id, name, email)
-                        console.log("s2")
                         req.session.userKey = result.userKey
                         req.session.isLogined = true
                         res.send(JSON.stringify({ signed: true, name: result.name, image: result.image }))
@@ -314,7 +298,6 @@ DB.initialize().then(() => {
       })
       // 게시글 조회.(랜더링된 화면에서)
       app.get("/boardload", async (req, res, next) => {
-            console.log('req', req)
             const boardId = Number(req.query.id)
             const userKey = req.session.userKey
             if (!req.session.isLogined || !userKey) res.redirect("/")
@@ -325,7 +308,6 @@ DB.initialize().then(() => {
       })
       // 게시글 조회. (새로 랜더링. (유저가 url로 바로 게시글 페이지로 접근할 수 있게 하기 위함) 이렇게 접근하는 경우는, 웹에서 접근할 때이므로, url과 hostname이 null)
       app.get("/board/:id", async (req, res, next) => {
-            console.log('req', req)
             const boardId = Number(req.params.id)
             const userKey = req.session.userKey
             res.set("Access-Control-Allow-Origin", "*")
@@ -339,7 +321,6 @@ DB.initialize().then(() => {
       })
       // board가 존재하는지 확인.
       app.get("/check", async (req, res, next) => {
-            console.log("check")
             const url = parseUrl(String(req.query.u))
             const hostname = String(req.query.h)
             const result = await StatementBoard.checkBoard(url, hostname)
@@ -352,11 +333,9 @@ DB.initialize().then(() => {
             if (u) url = parseUrl(String(u))
             if (h) hostname = String(h)
             const extension: boolean = Boolean(req.query.ext)
-            console.log("url", url)
             res.set("Access-Control-Allow-Origin", "*")
             // req.session.isLogined = true // 개발 시 로그인 매번 할 필요 없게
             // req.session.userKey = 5 // 개발 시 로그인 매번 할 필요 없게
-            console.log("il", req.session.isLogined, req.session.userKey)
             if (!req.session.isLogined || !req.session.userKey) {
                   pageBuilder("ssr", { url, hostname, ext: extension, ss: false })(req, res, next)
             } else {

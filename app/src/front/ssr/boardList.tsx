@@ -1,13 +1,10 @@
-import { contentFontSize, contentFontSizeSt, pageSt, setStyle, slimPageSt, slimThreshold, slimerPageSt, slimerThreshold, tLightGray, tWhite, widePageSt } from "front/@lib/style"
+import { contentFontSize, pageSt, setStyle, slimPageSt, slimThreshold, slimerPageSt, slimerThreshold, widePageSt } from "front/@lib/style"
 import Action from "front/reactCom"
 import React from "react"
 import { FlatList, Text, View } from "reactNative"
 import { BoardItem } from "./boardItem"
-import { PROPS, extension } from "front/@lib/util"
+import { PROPS } from "front/@lib/util"
 import { BOARD_CATEGORY } from "common/applicationCode"
-// import { CLIENT_SETTINGS } from "front/@lib/util"
-
-const HOST = ""// CLIENT_SETTINGS.host
 
 type State = {
       startId: number,
@@ -35,20 +32,17 @@ export class BoardList extends Action<Props, State> {
       }
       protected ACTION_RECEIVER_TABLE: any = {
             "deleteBoardItem": (boardId) => {
-                  console.log("deleteboarditem", boardId)
                   const { boards } = this.state
-                  const newBoards = [...boards.filter((board) => { console.log("boardid", board.id); return (board.id !== boardId) })]
+                  const newBoards = [...boards.filter((board) => { return (board.id !== boardId) })]
                   this.setState({ boards: newBoards })
                   this.forceUpdate()
             },
             "boardListTag": (tag, isUrl, total) => {
-                  console.log("blt", tag, isUrl, total)
                   if (total) this.setState({ startId: 0, boards: [], endOfList: false, categ: BOARD_CATEGORY.boards }, () => this.getBoards())
                   else if (isUrl) this.setState({ startId: 0, boards: [], endOfList: false, categ: BOARD_CATEGORY.urlBoards, url: tag }, () => this.getBoards())
                   else this.setState({ startId: 0, boards: [], endOfList: false, categ: BOARD_CATEGORY.tagBoards, tag }, () => this.getBoards())
             },
             "boardListSearch": (search) => {
-                  console.log("bls", search)
                   this.setState({ startId: 0, boards: [], endOfList: false, categ: BOARD_CATEGORY.searchBoards, search }, () => this.getBoards())
             },
             "boardListMyBoard": () => {
@@ -58,7 +52,6 @@ export class BoardList extends Action<Props, State> {
                   this.setState({ startId: 0, boards: [], endOfList: false, categ: BOARD_CATEGORY.myUpBoards }, () => this.getBoards())
             },
             "boardListUser": (searchUser) => {
-                  console.log("blu")
                   this.setState({ startId: 0, boards: [], endOfList: false, categ: BOARD_CATEGORY.userBoards, searchUser }, () => this.getBoards())
             },
             "boardList": () => {
@@ -83,7 +76,6 @@ export class BoardList extends Action<Props, State> {
       private getBoards = () => {
             const { startId, boards, endOfList, categ, url, tag, search, searchUser } = this.state
             if (endOfList) return
-            console.log("getBoards", startId, boards, endOfList, categ, url, tag, search, searchUser)
             let req
             switch (categ) {
                   case BOARD_CATEGORY.tagBoards:
@@ -109,9 +101,7 @@ export class BoardList extends Action<Props, State> {
                   default:
             }
             if (req) {
-                  console.log("boards req", req)
                   fetch(req).then((r) => r.json()).then((o) => {
-                        console.log("boards o", o)
                         this.setState({
                               boards: boards.concat(o.boardList),
                               startId: o.endId,
@@ -121,7 +111,6 @@ export class BoardList extends Action<Props, State> {
             }
       }
       private handleLoadMore = () => {
-            console.log("loadmore")
             this.getBoards()
       }
       private renderItem = ({ item }) => <BoardItem item={item} />

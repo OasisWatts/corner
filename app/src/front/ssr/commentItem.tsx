@@ -1,18 +1,13 @@
-// import { setStyle } from "front/common/style"
-// import { CLIENT_SETTINGS } from "front/@lib/util"
 import Action from "front/reactCom"
 import React from "react"
 import { View, Text, Pressable, TextInput, Image } from "reactNative"
-import { blockSt, buttonSetSt, composeStyle, contentsSt, itemSt, mainButtonTextStyle, rightButtonSt, pressableSt1, profileSt, setStyle, numSt, upButtonSt, dateSt, writerSt, hoveredUp, importantImageSt, followImgSt, followButtonSt, profileImgSt, rightButtonSetSt, whiteSt, almostWhiteSt, submitButtonTextSt, contentFontSizeSt, fontBlackSt, inlineBlockSt, updatedSt } from "front/@lib/style"
-import { BoardItem } from "./boardItem"
+import { blockSt, buttonSetSt, composeStyle, contentsSt, itemSt, mainButtonTextStyle, rightButtonSt, profileSt, numSt, upButtonSt, dateSt, writerSt, hoveredUp, importantImageSt, followImgSt, followButtonSt, profileImgSt, whiteSt, almostWhiteSt, submitButtonTextSt, contentFontSizeSt, fontBlackSt, inlineBlockSt, updatedSt } from "front/@lib/style"
 import { buttonsForWriteBoxSt, inputForWriteBoxSt, marginRightButtonSt, upColorSt, wrapForWriteBoxSt } from "./board"
-import { Page } from "."
 import { getHumanNumber, getHumanTimeDistance } from "front/@lib/Language"
-import { CLIENT_SETTINGS, PROPS, fullStyle, userKey } from "front/@lib/util"
+import { CLIENT_SETTINGS, PROPS } from "front/@lib/util"
 import { } from "./write"
 
-const MAX_CONTENTS_LEN = 100 // CLIENT_SETTINGS.board.contentsLen
-const HOST = ""// CLIENT_SETTINGS.host
+const MAX_CONTENTS_LEN = CLIENT_SETTINGS.board.contentsLen
 
 type State = {
       updateToggle: boolean
@@ -60,7 +55,6 @@ export class CommentItem extends Action<Props, State> {
       private handlePressCommentUpdate = () => {
             const { item, boardId } = this.props
             const { text } = this.state
-            console.log("update")
             fetch("/commentUpdate?cid=" + item.id + "&bid=" + boardId, {
                   method: "POST",
                   headers: {
@@ -68,7 +62,6 @@ export class CommentItem extends Action<Props, State> {
                   },
                   body: JSON.stringify({ c: text })
             }).then(() => {
-                  console.log("updated")
                   Action.trigger("boardReload")
                   this.setState({ updateToggle: false })
             })
@@ -90,7 +83,6 @@ export class CommentItem extends Action<Props, State> {
             const { item } = this.props
             const { up } = this.state
             if (item.writer !== PROPS.data.name) fetch("/commentUp?id=" + item.id).then((r) => r.json()).then((o) => {
-                  console.log("o", o)
                   this.setState({ up: o.uped ? up + 1 : up - 1, uped: o.uped })
             })
       }

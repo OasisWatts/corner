@@ -14,7 +14,6 @@ export default class Landing extends Action<Props, State> {
             super(props)
       }
       private googleLogin = () => {
-            console.log("google login")
             this.socialLogin(new GoogleAuthProvider(), ["openid", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"]).then((result) => {
                   const user = result.user
                   fetch("/signIn", {
@@ -24,7 +23,6 @@ export default class Landing extends Action<Props, State> {
                         },
                         body: JSON.stringify({ i: user.uid, n: user.displayName?.replace(/\n|\s/g, ""), e: user.email })
                   }).then((r) => r.json()).then((o) => {
-                        console.log("o", o)
                         if (o.signed) {
                               PROPS.data.name = o.name
                               PROPS.data.image = o.image

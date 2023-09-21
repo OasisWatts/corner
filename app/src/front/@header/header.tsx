@@ -1,12 +1,9 @@
-import { composeStyle, upButtonSt, importantButtonTextStyle, lightGray, mainButtonStyle, mainButtonTextStyle, mainColor, setStyle, tDeepGray, tLightGray, tWhite, slimThreshold, slimThresholdSize, slimThresholdExceptSize } from "front/@lib/style"
+import { lightGray, setStyle, slimThreshold, slimThresholdSize, slimThresholdExceptSize } from "front/@lib/style"
 import Action from "front/reactCom"
 import React from "react"
-import { Image, Pressable, StyleSheet, Text, View } from "reactNative"
-import { BoardList } from "../ssr/boardList"
+import { Image, Pressable, View } from "reactNative"
 import { Tags } from "./tags"
-import { Write } from "../ssr/write"
-import { CLIENT_SETTINGS, FRONT, PROPS, fullStyle } from "front/@lib/util"
-import Bind from "front/reactRoot"
+import { CLIENT_SETTINGS } from "front/@lib/util"
 import { Page } from "../ssr"
 import Search from "./search"
 
@@ -48,15 +45,8 @@ export default class Header extends Action<Props, State> {
       private handlePressIcon = () => {
             Action.trigger("page", Page.boardList)
       }
-      private handlePressSearchButton = () => {
-            this.setState({ searchToggle: true })
-      }
-      private handlePressCancelButton = () => {
-            this.setState({ searchToggle: false })
-      }
       render(): React.ReactNode {
-            const { page } = this.props
-            const { hoverWrite, searchToggle } = this.state
+            const { searchToggle } = this.state
             const slim = window.innerWidth < slimThreshold
             return (
                   <View style={[headerSt, slim ? slimHeaderSt : null, fullSt]}>

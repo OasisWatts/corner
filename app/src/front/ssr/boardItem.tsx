@@ -1,15 +1,11 @@
 // import { setStyle } from "front/common/style"
 import Action from "front/reactCom"
 import React from "react"
-import { View, Text, Image, Pressable, TextInput } from "reactNative"
-import { blockSt, buttonSetSt, composeStyle, contentsSt, dateSt, followButtonSt, followImgSt, hoveredComment, hoveredUp, upButtonSt, commentButtonSt, importantImageSt, inlineBlockSt, itemSt, mainButtonStyle, mainButtonTextStyle, numSt, numSt1, rightButtonSt, pressableSt1, profileImgSt, profileSt, rightButtonSetSt, setStyle, tDeepGray, tLightGray, updatedSt, writerSt, whiteSt, contentFontSizeSt, tWhite, lightGray } from "front/@lib/style"
-import { boardWrapSt, upColorSt } from "./board"
+import { View, Text, Image, Pressable } from "reactNative"
+import { blockSt, buttonSetSt, contentsSt, dateSt, followButtonSt, followImgSt, hoveredUp, upButtonSt, commentButtonSt, importantImageSt, inlineBlockSt, mainButtonTextStyle, numSt, numSt1, profileImgSt, profileSt, setStyle, updatedSt, writerSt, whiteSt, contentFontSizeSt, lightGray } from "front/@lib/style"
+import { upColorSt } from "./board"
 import { getHumanNumber, getHumanTimeDistance } from "front/@lib/Language"
 import { CLIENT_SETTINGS, PROPS } from "front/@lib/util"
-// import { CLIENT_SETTINGS } from "front/@lib/util"
-
-const MAX_CONTENTS_LEN = 100// CLIENT_SETTINGS.board.contentsLen
-const HOST = ""// CLIENT_SETTINGS.host
 
 type State = {
       contents: string
@@ -57,7 +53,6 @@ export class BoardItem extends Action<Props, State> {
       private handlePressDelete = () => {
             const { item } = this.props
             fetch("/boardDelete?id=" + item.id).then(() => {
-                  console.log("board deleted")
                   Action.trigger("deleteBoardItem", item.id)
             })
       }
@@ -87,7 +82,6 @@ export class BoardItem extends Action<Props, State> {
       }
       private handleHoverInUp = () => {
             const { item } = this.props
-            console.log("props data name", PROPS.data.name)
             if (item.writer !== PROPS.data.name) this.setState({ hoverUp: true })
       }
       private handleHoverOutUp = () => {

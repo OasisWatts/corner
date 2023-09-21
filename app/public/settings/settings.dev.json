@@ -20,10 +20,10 @@
             "limit": 300
       },
       "session": {
-            "maxAge": 10800000
+            "maxAge": 36000000
       },
       "cookie": {
-            "maxAge": 86400,
+            "maxAge": 604800000,
             "secret": "corner"
       },
       "database": {
