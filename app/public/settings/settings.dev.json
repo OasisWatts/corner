@@ -1,6 +1,6 @@
 {
       "$schema": "./settings.schema.json",
-      "host": "https://corner.dance",
+      "host": "http://localhost:4416",
       "language-support": {
             "ko-KR": "한국어"
       },
@@ -36,11 +36,6 @@
       "log": {
             "interval": 8640000000,
             "directory": "logs"
-      },
-      "https": {
-            "key": "/etc/letsencrypt/live/corner.dance/privkey.pem",
-            "cert": "/etc/letsencrypt/live/corner.dance/cert.pem",
-            "ca": "/etc/letsencrypt/live/corner.dance/fullchain.pem"
       },
       "port": 4416
 }

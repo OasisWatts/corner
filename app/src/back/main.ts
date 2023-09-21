@@ -5,7 +5,7 @@ import session from "express-session"
 import { engine, pageBuilder } from "./reactNest"
 import DB from "./database/connection"
 import { StatementBoard } from "./database/StatementBoard"
-import { SETTINGS, writeClientConstants } from "./util/setting"
+import { CLOTHES, SETTINGS, writeClientConstants } from "./util/setting"
 import { BOARD_CATEGORY } from "common/applicationCode"
 import { getLocale, loadLanguages } from "./util/language"
 import CookieParser from "cookie-parser"
@@ -364,7 +364,7 @@ DB.initialize().then(() => {
                   pageBuilder("ssr", { url, hostname, ext: extension, ss: true, name: user.name, image: user.image })(req, res, next)
             }
       })
-      if (process.argv.includes("-remote") && SETTINGS.https) {
+      if (CLOTHES.development && SETTINGS.https) {
             const ssl_options = SETTINGS.https && ({
                   cert: fs.readFileSync(SETTINGS.https.cert),
                   key: fs.readFileSync(SETTINGS.https.key),

@@ -16,7 +16,7 @@ export const CLOTHES: {
       "development"?: boolean
 }
       = {
-      development: getBoolean("--dev")
+      development: !getBoolean("-remote")
 }
 
 /**
