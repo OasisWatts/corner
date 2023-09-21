@@ -61,9 +61,9 @@ export default class Landing extends Action<Props, State> {
                   <View style={landingSt}>
                         <View style={[sideSt, leftSideSt, slim ? slimSideSt : null]}>
                               <Image style={imageSt} source={{ uri: CLIENT_SETTINGS.host + "/images/cornerIconLongBlack.png" }} />
-                              <Text style={[textSt, mainTextSt]}>Leave Comments Everywhere</Text>
-                              <Text style={[textSt, subTextSt]}>Express your opinions on websites, even it doen't have a comment feature</Text>
-                              <Text style={[textSt, subTextSt]}>Connect with people who share your interest in the same website</Text>
+                              <Text style={[textSt, mainTextSt, slim ? slimMainTextSt : null]}>Leave Comments Everywhere</Text>
+                              <Text style={[textSt, subTextSt, slim ? slimSubTextSt : null]}>Express your opinions on websites, even it doen't have a comment feature</Text>
+                              <Text style={[textSt, subTextSt, slim ? slimSubTextSt : null]}>Connect with people who share your interest in the same website</Text>
                         </View>
                         <View style={[sideSt, rightSideSt, slim ? slimSideSt : null]}>
                               <Text style={[textSt, rightMainTextSt, whiteFontSt]}> Be the first user of the prototype version </Text>
@@ -80,9 +80,9 @@ export default class Landing extends Action<Props, State> {
                               <Text style={[textSt, guide1TextSt, whiteFontSt]}> Right click and push the 'comment on corner' on context menu to turn on the side panel</Text>
                               <Text style={[textSt, guide1TextSt, whiteFontSt]}> Icon on the corner shows the number of comments if any comment exists on the page</Text>
                               <View style={featureWrapSt}>
-                                    <Image style={featureImgSt} source={{ uri: CLIENT_SETTINGS.host + "/images/featureContextmenu.svg" }} />
-                                    <Image style={featureImgSt} source={{ uri: CLIENT_SETTINGS.host + "/images/featureSidepanel.svg" }} />
-                                    <Image style={featureImgSt} source={{ uri: CLIENT_SETTINGS.host + "/images/featureBoardnum.svg" }} />
+                                    <Image style={[slim ? slimFeatureImgSt : featureImgSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/featureContextmenu.svg" }} />
+                                    <Image style={[slim ? slimFeatureImgSt : featureImgSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/featureSidepanel.svg" }} />
+                                    <Image style={[slim ? slimFeatureImgSt : featureImgSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/featureBoardnum.svg" }} />
                               </View>
                               <Text style={[textSt, guide0TextSt, whiteFontSt]}> Try using it on a OTT service like Netflix and Disney+, or an original brand site like Toyota or Samsung</Text>
                         </View>
@@ -112,7 +112,8 @@ const rightSideSt = setStyle({
       backgroundColor: writeColor
 })
 const slimSideSt = setStyle({
-      padding: "20px"
+      padding: "15px",
+      paddingBottom: "50px"
 })
 const imageSt = setStyle({
       left: "calc(50% - 150px)",
@@ -138,6 +139,9 @@ const mainTextSt = setStyle({
       marginBottom: "50px",
       marginTop: "50px"
 })
+const slimMainTextSt = setStyle({
+      fontSize: "45px"
+})
 export const textSt = setStyle({
       display: "block",
       fontWeight: "300",
@@ -146,6 +150,9 @@ export const textSt = setStyle({
 const subTextSt = setStyle({
       fontSize: "30px",
       marginBottom: "10px"
+})
+const slimSubTextSt = setStyle({
+      fontSize: "25px"
 })
 const rightMainTextSt = setStyle({
       fontSize: "40px",
@@ -204,12 +211,20 @@ const featureWrapSt = setStyle({
       flexDirection: "row",
       justifyContent: "center",
       marginTop: "50px",
-      marginBottom: "50px"
+      marginBottom: "50px",
+      width: "100%",
+      flexWrap: "wrap"
 })
 const featureImgSt = setStyle({
       width: "220px",
       height: "160px",
       marginRight: "50px"
+})
+const slimFeatureImgSt = setStyle({
+      width: "165px",
+      height: "120px",
+      marginRight: "15px",
+      marginTop: "15px"
 })
 const whiteFontSt = setStyle({
       color: "white"

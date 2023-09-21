@@ -15,7 +15,7 @@ async function create(url, hostname) {
       corner_icon.appendChild(corner_img)
       corner_icon.appendChild(board_num)
       console.log("before check fetch")
-      fetch("http://localhost:4416/check?u=" + url.replaceAll("&", "!oa@sis$").replaceAll("#", "!cor@ner$") + "&h=" + hostname).then((r) => r.json()).then((r) => {
+      fetch("https://corner.dance/check?u=" + url.replaceAll("&", "!oa@sis$").replaceAll("#", "!cor@ner$") + "&h=" + hostname).then((r) => r.json()).then((r) => {
             if (r.u) {
                   corner_img.src = iconBlueImg
                   if (r.u > 99) board_num.innerText = "99+"

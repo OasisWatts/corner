@@ -1,4 +1,6 @@
 const path = require('path')
+const CompressionPlugin = require("compression-webpack-plugin");
+const BrotliPlugin = require('brotli-webpack-plugin');
 
 const config = {
       resolve: {
@@ -24,6 +26,10 @@ const config = {
                   },
             ],
       },
+      plugins: [
+            new CompressionPlugin(),
+            new BrotliPlugin()
+      ],
       // plugins: [HTMLWebpackPluginConfig],
       devServer: {
             open: true,
