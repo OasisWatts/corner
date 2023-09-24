@@ -149,7 +149,7 @@ const mainTextSt = setStyle({
 const slimMainTextSt = setStyle({
       fontSize: "35px",
       marginBottom: "20px",
-      marginTop: "20px"
+      marginTop: "30px"
 })
 export const textSt = setStyle({
       display: "block",
