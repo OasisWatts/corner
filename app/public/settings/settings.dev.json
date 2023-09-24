@@ -23,7 +23,7 @@
             "maxAge": 36000000
       },
       "cookie": {
-            "maxAge": 604800000,
+            "maxAge": 86400000,
             "secret": "corner"
       },
       "database": {
