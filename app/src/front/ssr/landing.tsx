@@ -60,16 +60,16 @@ export default class Landing extends Action<Props, State> {
                   </View>)
             } else return (
                   <View style={landingSt}>
-                        <View style={[sideSt, leftSideSt, slim ? slimSideSt : null]}>
+                        <View style={[sideSt, leftSideSt, slim ? slimLeftSideSt : null]}>
                               <Image style={imageSt} source={{ uri: CLIENT_SETTINGS.host + "/images/cornerIconLongBlack.png" }} />
                               <Text style={[textSt, mainTextSt, slim ? slimMainTextSt : null]}>Leave Comments Everywhere</Text>
                               <Text style={[textSt, subTextSt, slim ? slimSubTextSt : null]}>Express your opinions on websites, even it doen't have a comment feature</Text>
                               <Text style={[textSt, subTextSt, slim ? slimSubTextSt : null]}>Connect with people who share your interest in the same website</Text>
                         </View>
-                        <View style={[sideSt, rightSideSt, slim ? slimSideSt : null]}>
-                              <Text style={[textSt, rightMainTextSt, whiteFontSt]}> Be the first user of the prototype version </Text>
-                              <Text style={[textSt, guide0TextSt, whiteFontSt]}> You have to install a chrome extension (Please click 'Install Corner')</Text>
-                              <View style={buttonSetSt}>
+                        <View style={[sideSt, rightSideSt, slim ? slimRightSideSt : null]}>
+                              <Text style={[textSt, rightMainTextSt, slim ? slimRightMainTextSt : null, whiteFontSt]}> Be the first user of the prototype version </Text>
+                              <Text style={[textSt, guideTextSt, slim ? slimGuideTextSt : null, whiteFontSt]}> You have to install a chrome extension (Please click 'Install Corner')</Text>
+                              <View style={[buttonSetSt, slim ? slimButtonSetSt : null]}>
                                     <Pressable style={[buttonSt, slim ? slimButtonSt : null]} onPress={this.installCorner}>
                                           <Text style={[textSt, buttonTextSt, slim ? slimButtonTextSt : null]}>Install Corner</Text>
                                     </Pressable>
@@ -78,16 +78,17 @@ export default class Landing extends Action<Props, State> {
                                           <Text style={[textSt, buttonTextSt, slim ? slimButtonTextSt : null]}>Sign In with Google</Text>
                                     </Pressable>
                               </View>
-                              <Text style={[textSt, guide1TextSt, whiteFontSt]}> Right click and select 'comment on corner' from the context menu to activate the side panel</Text>
-                              <Text style={[textSt, guide1TextSt, whiteFontSt]}> Icon on the corner displays the number of comments if any comment exists on the page</Text>
-                              <View style={featureWrapSt}>
-                                    <Image style={[slim ? slimFeatureImgSt : featureImgSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/featureContextmenu.svg" }} />
-                                    <Image style={[slim ? slimFeatureImgSt : featureImgSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/featureSidepanel.svg" }} />
-                                    <Image style={[slim ? slimFeatureImgSt : featureImgSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/featureBoardnum.svg" }} />
+                              <Text style={[textSt, rightMainTextSt, slim ? slimRightMainTextSt : null, whiteFontSt]}>Guide</Text>
+                              <Text style={[textSt, guideTextSt, slim ? slimGuideTextSt : null, whiteFontSt]}> Right click and select 'comment on corner' from the context menu to activate the side panel</Text>
+                              <Text style={[textSt, guideTextSt, slim ? slimGuideTextSt : null, whiteFontSt]}> Icon on the corner displays the number of comments if any comment exists on the page</Text>
+                              <View style={[featureWrapSt, slim ? slimFeatureWrapSt : null]}>
+                                    <Image style={[slim ? slimFeatureImgSt : featureImgSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/featureContextMenu.svg" }} />
+                                    <Image style={[slim ? slimFeatureImgSt : featureImgSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/featureSidePanel.svg" }} />
+                                    <Image style={[slim ? slimFeatureImgSt : featureImgSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/featureBoardNum.svg" }} />
                               </View>
-                              <Text style={[textSt, guide0TextSt, whiteFontSt]}> Try using it on a OTT service like Netflix and Disney+, or an original brand site like Toyota or Samsung</Text>
+                              <Text style={[textSt, guideTextSt, slim ? slimGuideTextSt : null, whiteFontSt]}> Try using it on a OTT service like Netflix and Disney+, or an brand online store like Nike and Samsung</Text>
                         </View>
-                  </View>
+                  </View >
             )
       }
 }
@@ -112,9 +113,14 @@ const leftSideSt = setStyle({
 const rightSideSt = setStyle({
       backgroundColor: writeColor
 })
-const slimSideSt = setStyle({
+const slimLeftSideSt = setStyle({
       padding: "15px",
-      paddingBottom: "50px"
+      paddingBottom: "30px"
+})
+const slimRightSideSt = setStyle({
+      padding: "15px",
+      paddingTop: "30px",
+      paddingBottom: "30px"
 })
 const imageSt = setStyle({
       left: "calc(50% - 150px)",
@@ -141,7 +147,9 @@ const mainTextSt = setStyle({
       marginTop: "50px"
 })
 const slimMainTextSt = setStyle({
-      fontSize: "45px"
+      fontSize: "35px",
+      marginBottom: "20px",
+      marginTop: "20px"
 })
 export const textSt = setStyle({
       display: "block",
@@ -153,27 +161,35 @@ const subTextSt = setStyle({
       marginBottom: "10px"
 })
 const slimSubTextSt = setStyle({
-      fontSize: "25px"
+      fontSize: "20px"
 })
 const rightMainTextSt = setStyle({
       fontSize: "40px",
       marginBottom: "30px",
       fontWeight: "600",
 })
-const guide0TextSt = setStyle({
-      display: "block",
-      fontSize: "25px"
+const slimRightMainTextSt = setStyle({
+      fontSize: "35px",
+      marginBottom: "20px"
 })
-const guide1TextSt = setStyle({
-      fontSize: "20px",
+const guideTextSt = setStyle({
+      display: "block",
+      fontSize: "25px",
       marginTop: "10px"
+})
+const slimGuideTextSt = setStyle({
+      fontSize: "20px"
 })
 const buttonSetSt = setStyle({
       display: "block",
       marginTop: "50px",
-      marginBottom: "50px",
+      marginBottom: "100px",
       position: "relative",
       textAlign: "center"
+})
+const slimButtonSetSt = setStyle({
+      marginTop: "20px",
+      marginBottom: "50px"
 })
 export const buttonSt = setStyle({
       width: "350px",
@@ -215,6 +231,10 @@ const featureWrapSt = setStyle({
       marginBottom: "50px",
       width: "100%",
       flexWrap: "wrap"
+})
+const slimFeatureWrapSt = setStyle({
+      marginTop: "20px",
+      marginBottom: "20px"
 })
 const featureImgSt = setStyle({
       width: "220px",

@@ -2,11 +2,12 @@ import Action from "front/reactCom"
 import React from "react"
 import { View, Text, Image, Pressable, FlatList, TextInput, Linking } from "reactNative"
 import { CommentItem } from "./commentItem"
-import { blockSt, composeStyle, contentsSt, upButtonSt, mainButtonTextStyle, rightButtonSt, profileSt, setStyle, pageSt, buttonSetSt, slimPageSt, widePageSt, slimThreshold, dateSt, writerSt, numSt, numSt1, commentButtonSt, hoveredUp, importantImageSt, profileImgSt, followImgSt, followButtonSt, lightGray, upColor, updatedSt, inputSt, whiteSt, almostWhiteSt, submitButtonTextSt, contentFontSizeSt, fontBlackSt, inlineBlockSt, slimerThreshold, slimerPageSt } from "front/@lib/style"
+import { blockSt, composeStyle, contentsSt, upButtonSt, mainButtonTextStyle, rightButtonSt, profileSt, setStyle, pageSt, buttonSetSt, slimPageSt, widePageSt, slimThreshold, dateSt, writerSt, numSt, numSt1, commentButtonSt, hoveredUp, importantImageSt, profileImgSt, followImgSt, followButtonSt, lightGray, upColor, updatedSt, inputSt, whiteSt, almostWhiteSt, submitButtonTextSt, contentFontSizeSt, fontBlackSt, inlineBlockSt, slimerThreshold, slimerPageSt, mainButtonStyle } from "front/@lib/style"
 import { Page } from "."
 import { CLIENT_SETTINGS, PROPS } from "front/@lib/util"
 import { getHumanNumber, getHumanTimeDistance } from "front/@lib/Language"
 import { } from "./write"
+import { BOARD_CATEGORY } from "common/applicationCode"
 
 const MAX_CONTENTS_LEN = CLIENT_SETTINGS.board.contentsLen
 
@@ -157,6 +158,9 @@ export class Board extends Action<Props, State> {
                   this.setState({ up: o.uped ? up + 1 : up - 1, uped: o.uped })
             })
       }
+      private handlePressBackButton = () => {
+            Action.trigger("page", Page.boardList)
+      }
       private getComments = () => {
             const { commentStartId, comments, endOfList, id } = this.state
             if (endOfList) return
@@ -229,7 +233,7 @@ export class Board extends Action<Props, State> {
             if (url) Linking.openURL(url)
       }
       private renderHeader = () => {
-            const { commentText, writerImage, up, uped, updated, writer, writerFollowed, date, numComment, contents, tags, hoverUp, hoverFollow } = this.state
+            const { commentText, writerImage, up, uped, updated, writer, writerFollowed, date, numComment, contents, tags, hoverUp, hoverFollow, url } = this.state
 
             return (
                   <View>
@@ -258,7 +262,7 @@ export class Board extends Action<Props, State> {
                                     </View>
                                     <Text style={contentFontSizeSt}>{contents}</Text>
                                     <Text style={[tagSt, contentFontSizeSt]}>{"#" + tags.join(" #")}</Text>
-                                    <Text style={[tagSt, contentFontSizeSt, urlSt]} onPress={this.pressURL}>written place</Text>
+                                    {url ? <Text style={[tagSt, contentFontSizeSt, urlSt]} onPress={this.pressURL}>written place</Text> : null}
                                     <View style={[buttonSetSt, boardButtonSetSt]}>
                                           <Pressable style={[upButtonSt, hoverUp ? hoveredUp : null]} onPress={this.handlePressUp} onHoverIn={this.handleHoverInUp} onHoverOut={this.handleHoverOutUp}>
                                                 <Image style={importantImageSt} source={{ uri: CLIENT_SETTINGS.host + "/images/" + (hoverUp || uped ? "upPink.svg" : "upGray.svg") }} />
@@ -268,6 +272,9 @@ export class Board extends Action<Props, State> {
                                                 <Image style={importantImageSt} source={{ uri: CLIENT_SETTINGS.host + "/images/commentGray.svg" }} />
                                           </View>
                                           <Text style={numSt1}>{getHumanNumber(numComment)}</Text>
+                                          <Pressable style={backButtonSt} onPress={this.handlePressBackButton}>
+                                                <Text> go back </Text>
+                                          </Pressable>
                                     </View>
                               </View>
                         </View>
@@ -350,3 +357,10 @@ export const marginRightButtonSt = setStyle({
 const urlSt = setStyle({
       textDecorationLine: "underline"
 })
+const backButtonSt = composeStyle(
+      mainButtonStyle,
+      {
+            top: "-2.5px",
+            left: "150px"
+      }
+)

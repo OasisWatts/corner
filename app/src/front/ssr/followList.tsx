@@ -87,12 +87,16 @@ export default class Follows extends Action<Props, State> {
                         {recommends.length ? <Image style={[iconSt, slimer ? slimerSideBarIconSt : slim ? slimSideBarIconSt : wideSideBarIconSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/hot.svg" }} /> : null}
                         <View>
                               <FlatList
+                                    style={slimer ? slimerFlatListSt : null}
+                                    horizontal={slimer ? true : false}
                                     data={recommends}
                                     renderItem={this.renderItem}
                                     keyExtractor={(item: any) => item.key} />
                         </View>
                         {follows.length ? <Image style={[iconSt, slimer ? slimerSideBarIconSt : slim ? slimSideBarIconSt : wideSideBarIconSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/heartBlack.svg" }} /> : null}
                         <FlatList
+                              style={slimer ? slimerFlatListSt : null}
+                              horizontal={slimer ? true : false}
                               data={follows}
                               renderItem={this.renderItem}
                               keyExtractor={(item: any) => item.key}
@@ -142,7 +146,9 @@ const slimSideBarIconSt = setStyle({
 })
 const slimerSideBarIconSt = setStyle({
       margin: "0",
-      left: "10px"
+      left: "10px",
+      width: "15px",
+      height: "15px"
 })
 const wideSideBarIconSt = setStyle({
       left: "88px"
@@ -152,4 +158,7 @@ const iconSt = setStyle({
       width: "20px",
       marginTop: "10px",
       marginBottom: "5px"
+})
+const slimerFlatListSt = setStyle({
+      width: "170px"
 })

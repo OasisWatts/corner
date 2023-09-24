@@ -2,49 +2,42 @@
 <svg id="_레이어_2" data-name="레이어 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 157.12 114.87">
   <defs>
     <style>
-      .cls-1, .cls-2 {
-        fill: #fff;
-      }
-
-      .cls-3 {
+      .cls-1 {
         fill: none;
         stroke: #231815;
       }
 
-      .cls-3, .cls-2 {
+      .cls-1, .cls-2, .cls-3 {
         stroke-miterlimit: 10;
       }
 
-      .cls-4 {
+      .cls-4, .cls-2 {
         fill: #f7f8f8;
       }
 
       .cls-5 {
-        fill: #c9caca;
-      }
-
-      .cls-6 {
         fill: #dcdddd;
       }
 
+      .cls-2, .cls-3 {
+        stroke: #898989;
+        stroke-width: 3px;
+      }
+
+      .cls-6 {
+        fill: #898989;
+      }
+
+      .cls-3 {
+        fill: #fff;
+      }
+
       .cls-7 {
-        fill: #b01e23;
-      }
-
-      .cls-8 {
-        fill: #15293e;
-      }
-
-      .cls-2 {
-        stroke: #dcdddd;
-      }
-
-      .cls-9 {
         font-family: TTYeonnalligiB, '210 Yeonnalligi';
         font-size: 9px;
       }
 
-      .cls-9, .cls-10 {
+      .cls-7, .cls-8 {
         fill: #231815;
       }
     </style>
@@ -52,20 +45,27 @@
   <g id="_레이어_1-2" data-name="레이어 1">
     <g>
       <g>
-        <rect class="cls-5" width="157.12" height="114.87"/>
-        <rect class="cls-8" width="157.12" height="15.48"/>
-        <rect class="cls-7" x="141.64" width="15.48" height="15.48"/>
+        <g>
+          <rect class="cls-4" width="157.12" height="114.87"/>
+          <rect class="cls-5" width="157.12" height="15.48"/>
+        </g>
+        <g>
+          <rect class="cls-6" x="143.75" y="7.41" width="9.25" height=".66" rx=".33" ry=".33" transform="translate(247.82 118.13) rotate(-135)"/>
+          <rect class="cls-6" x="143.75" y="7.41" width="9.25" height=".66" rx=".33" ry=".33" transform="translate(37.99 107.19) rotate(-45)"/>
+        </g>
+        <g>
+          <path class="cls-6" d="m139.34,3.74h-7.14c-.29,0-.53.24-.53.54v6.59c0,.3.24.54.53.54h7.14c.29,0,.53-.24.53-.54v-6.59c0-.3-.24-.54-.53-.54Zm-.17,6.47c0,.3-.24.54-.53.54h-5.73c-.29,0-.53-.24-.53-.54v-5.28c0-.3.24-.54.53-.54h5.73c.29,0,.53.24.53.54v5.28Z"/>
+          <path class="cls-6" d="m139.34,3.74h-3.91c-.29,0-.53.24-.53.54v3.58c0,.3.24.54.53.54h3.91c.29,0,.53-.24.53-.54v-3.58c0-.3-.24-.54-.53-.54Zm-.1,3.46c0,.3-.24.54-.53.54h-2.51c-.29,0-.53-.24-.53-.54v-2.26c0-.3.24-.54.53-.54h2.51c.29,0,.53.24.53.54v2.26Z"/>
+        </g>
       </g>
-      <rect class="cls-6" x="45.03" y="13.61" width="56.62" height="73.94"/>
-      <rect class="cls-4" x="39.51" y="8.71" width="56.62" height="73.94"/>
-      <polygon class="cls-6" points="56.14 100.26 42.45 90.57 42.64 107.35 46.8 105.17 49.78 110.85 54.97 108.13 51.98 102.45 56.14 100.26"/>
-      <polygon class="cls-1" points="53.35 95.47 39.51 85.51 39.85 102.55 44.01 100.37 47.05 106.17 52.23 103.45 49.19 97.65 53.35 95.47"/>
-      <rect class="cls-2" x="28.18" y="50.58" width="109.98" height="13.71"/>
+      <rect class="cls-2" x="39.51" y="8.71" width="56.62" height="73.94"/>
+      <polygon class="cls-2" points="52.35 98.47 38.51 88.51 38.85 105.55 43.01 103.37 46.05 109.17 51.23 106.45 48.19 100.65 52.35 98.47"/>
+      <rect class="cls-3" x="28.18" y="45.96" width="113.46" height="18.33"/>
       <g>
-        <circle class="cls-3" cx="34.93" cy="57.43" r="4.79"/>
-        <path class="cls-10" d="m36.83,59.34c-.06-.09-.15-.14-.26-.14-1.56-.05-2.85-1.14-2.91-2.52-.02-.49.11-.95.36-1.35.07-.11.07-.24,0-.34v-.02c-.12-.14-.3-.18-.45-.09-1.36.82-2.16,2.68-1.65,3.82.76,1.7,2.76,1.94,4.66,1.22.05-.02.12-.05.16-.09.13-.12.16-.21.12-.4l-.04-.1Z"/>
+        <circle class="cls-1" cx="36.41" cy="55.98" r="4.79"/>
+        <path class="cls-8" d="m37.87,58.24c-.04-.1-.12-.17-.22-.19-1.52-.38-2.55-1.71-2.32-3.07.08-.48.31-.9.64-1.25.09-.09.12-.22.07-.33v-.02c-.09-.16-.25-.24-.42-.18-1.5.52-2.67,2.17-2.41,3.4.39,1.82,2.3,2.47,4.31,2.16.05,0,.13-.03.18-.05.15-.09.2-.17.2-.37l-.02-.1Z"/>
       </g>
-      <text class="cls-9" transform="translate(42.45 59.03)"><tspan x="0" y="0">comment on corner</tspan></text>
+      <text class="cls-7" transform="translate(45.78 56.72)"><tspan x="0" y="0">comment on corner</tspan></text>
     </g>
   </g>
 </svg>
