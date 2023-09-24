@@ -100,7 +100,8 @@ const landingSt = setStyle({
       width: "100vw",
       zIndex: "200",
       display: "inline-block",
-      backgroundColor: "white"
+      backgroundColor: "white",
+      minHeight: "100vh"
 })
 const sideSt = setStyle({
       width: "100%",
