@@ -82,9 +82,9 @@ export default class Landing extends Action<Props, State> {
                               <Text style={[textSt, guideTextSt, slim ? slimGuideTextSt : null, whiteFontSt]}> Right click and select 'comment on corner' from the context menu to activate the side panel</Text>
                               <Text style={[textSt, guideTextSt, slim ? slimGuideTextSt : null, whiteFontSt]}> Icon on the corner displays the number of comments if any comment exists on the page</Text>
                               <View style={[featureWrapSt, slim ? slimFeatureWrapSt : null]}>
-                                    <Image style={[slim ? slimFeatureImgSt : featureImgSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/featureContextMenu.svg" }} />
-                                    <Image style={[slim ? slimFeatureImgSt : featureImgSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/featureSidePanel.svg" }} />
-                                    <Image style={[slim ? slimFeatureImgSt : featureImgSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/featureBoardNum.svg" }} />
+                                    <Image style={[slim ? slimFeatureImgSt : featureImgSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/featureContextmenu.svg" }} />
+                                    <Image style={[slim ? slimFeatureImgSt : featureImgSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/featureSidepanel.svg" }} />
+                                    <Image style={[slim ? slimFeatureImgSt : featureImgSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/featureBoardnum.svg" }} />
                               </View>
                               <Text style={[textSt, guideTextSt, slim ? slimGuideTextSt : null, whiteFontSt]}> Try using it on a OTT service like Netflix and Disney+, or an brand online store like Nike and Samsung</Text>
                         </View>
