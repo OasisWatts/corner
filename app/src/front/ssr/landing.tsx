@@ -78,7 +78,8 @@ export default class Landing extends Action<Props, State> {
                                           <Text style={[textSt, buttonTextSt, slim ? slimButtonTextSt : null]}>Sign In with Google</Text>
                                     </Pressable>
                               </View>
-                              <Text style={[textSt, rightMainTextSt, slim ? slimRightMainTextSt : null, whiteFontSt]}>Guide</Text>
+                              <Text style={[textSt, guideTextSt, slim ? slimGuideTextSt : null, whiteFontSt]}> To visit corner as a website, sign in with google</Text>
+                              <Text style={[textSt, rightMainTextSt, slim ? slimRightMainTextSt : null, slim ? slimBigGuideTextSt : bigGuideTextSt, whiteFontSt]}>Corner Extension Guide</Text>
                               <Text style={[textSt, guideTextSt, slim ? slimGuideTextSt : null, whiteFontSt]}> Right click and select 'comment on corner' from the context menu to activate the side panel</Text>
                               <Text style={[textSt, guideTextSt, slim ? slimGuideTextSt : null, whiteFontSt]}> Icon on the corner displays the number of comments if any comment exists on the page</Text>
                               <View style={[featureWrapSt, slim ? slimFeatureWrapSt : null]}>
@@ -173,6 +174,12 @@ const slimRightMainTextSt = setStyle({
       fontSize: "35px",
       marginBottom: "20px"
 })
+const bigGuideTextSt = setStyle({
+      marginTop: "100px"
+})
+const slimBigGuideTextSt = setStyle({
+      marginTop: "50px"
+})
 const guideTextSt = setStyle({
       display: "block",
       fontSize: "25px",
@@ -184,13 +191,13 @@ const slimGuideTextSt = setStyle({
 const buttonSetSt = setStyle({
       display: "block",
       marginTop: "50px",
-      marginBottom: "100px",
+      marginBottom: "30px",
       position: "relative",
       textAlign: "center"
 })
 const slimButtonSetSt = setStyle({
       marginTop: "20px",
-      marginBottom: "50px"
+      marginBottom: "10px"
 })
 export const buttonSt = setStyle({
       width: "350px",

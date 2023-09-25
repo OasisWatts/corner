@@ -57,15 +57,17 @@ chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true })
 // })
 let prevUrl
 const urlChangeExceptions = [
-      /https:\/\/.*\.firebaseapp\.com\/__\/auth\/handler\?apiKey=.*/,
+      /https:\/\/.*\.firebaseapp\.com\/__\/auth\/handler.*/,
       /https:\/\/accounts\.google\.com\/o\/oauth2\/auth.*/
 ]
 // url 변경 시, 알림
 chrome.tabs.onUpdated.addListener(async () => {
       const { url } = await getTab()
+      console.log("prevUrl", prevUrl, url)
       if (prevUrl != url && !urlChangeExceptions.some((mt) => url.match(mt) || (prevUrl && prevUrl.match(mt)))) {
             chrome.runtime.sendMessage("urlChanged")
             prevUrl = url
+            console.log("sent")
       }
 })
 // context menu 를 눌러 side panel을 킴

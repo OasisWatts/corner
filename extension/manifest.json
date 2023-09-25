@@ -1,10 +1,10 @@
 {
       "name": "Corner",
-      "version": "1.0.1",
+      "version": "1.0.3",
       "description": "Comment on every website and follow people with the same interest",
       "icons": {
-            "48": "img/mdpi-corner-icon.png",
-            "128": "img/xxhdpi-corner-icon.png"
+            "48": "img/48-corner-icon.png",
+            "128": "img/128-corner-icon.png"
       },
       "background": {
             "service_worker": "background.js"

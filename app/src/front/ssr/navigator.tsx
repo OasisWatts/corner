@@ -1,10 +1,10 @@
 
-import { tWriteColor, composeStyle, contentFontSize, setStyle, slimThreshold, lightGray, almostWhite, slimThresholdExceptSize, slimerThreshold } from "front/@lib/style"
+import { tWriteColor, composeStyle, contentFontSize, setStyle, slimThreshold, lightGray, almostWhite, slimThresholdExceptSize, slimerThreshold, tUpColor } from "front/@lib/style"
 import Action from "front/reactCom"
 import React from "react"
-import { Image, Pressable, Text, View } from "reactNative"
+import { Image, Linking, Pressable, Text, View } from "reactNative"
 import { sideBarSt, wideSideBarSt } from "./followList"
-import { CLIENT_SETTINGS } from "front/@lib/util"
+import { CLIENT_SETTINGS, PROPS } from "front/@lib/util"
 import { Page } from "."
 
 
@@ -42,6 +42,9 @@ export default class Navigator extends Action<Props, State> {
       private handlePressSetting = () => {
             Action.trigger("page", Page.setting)
       }
+      private handlePressInstall = () => {
+            Linking.openURL(url)
+      }
 
       render(): React.ReactNode {
             const slim = window.innerWidth < slimThreshold
@@ -68,6 +71,10 @@ export default class Navigator extends Action<Props, State> {
                               <Image style={[imgSt, slimer ? slimerImgSt : slim ? slimImgSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/setting.svg" }} />
                               {slim ? null : <Text style={textSt}>setting</Text>}
                         </Pressable>
+                        {PROPS.data.ext ? null : <Pressable style={[slim ? slimWriteSt : wideButtonSt, slimer ? slimerInstallSt : installSt]} onPress={this.handlePressInstall} >
+                              <Image style={[imgSt, slim ? slimWriteImgSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/cornerIcon.png" }} />
+                              {slim ? null : <Text style={textSt}>install extension</Text>}
+                        </Pressable>}
                   </View>
             )
       }
@@ -140,6 +147,16 @@ const slimWriteSt = setStyle({
       marginLeft: "5px",
       borderRadius: "20px"
 })
+const installSt = setStyle({
+      marginTop: "5px",
+      marginBottom: "5px",
+      borderRadius: "20px",
+      backgroundColor: tUpColor
+})
+const slimerInstallSt = setStyle({
+      borderRadius: "20px",
+      backgroundColor: tUpColor
+})
 const imgSt = setStyle({
       height: "30px",
       width: "30px",
@@ -164,7 +181,7 @@ const textSt = setStyle({
       lineHeight: "40px",
       fontSize: contentFontSize,
       fontWeight: "600",
-      width: "100px",
+      width: "115px",
       right: "0",
       position: "absolute"
 })
