@@ -84,6 +84,7 @@ export class Write extends Action<Props, State> {
             }).then(() => {
                   Action.trigger("page", Page.boardList)
                   Action.trigger("tagReload")
+                  gtag_report_conversion() // google ads 추적 함수 // index.html 참고
             })
       }
       private handlePressBoardUpdate = () => {

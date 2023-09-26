@@ -8,6 +8,26 @@
       <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
       <title>/*{$.title}*/</title>
       <script type="text/javascript">Object['FRONT'] = true; window.__PROPS = "/*{JSON.stringify($)}*/"</script>
+      <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
+
+            gtag('config', 'AW-11350359224');
+
+            function gtag_report_conversion(url) {
+                  var callback = function () {
+                        if (typeof (url) != 'undefined') {
+                              window.location = url;
+                        }
+                  };
+                  gtag('event', 'conversion', {
+                        'send_to': 'AW-11350359224/UULJCNn-4uUYELj5oqQq',
+                        'event_callback': callback
+                  });
+                  return false;
+            }
+      </script>
 </head>
 
 <body>
@@ -18,13 +38,6 @@
       <script type="text/javascript" src="/pages//*{$.page}*/.js"></script>
       <!-- Google tag (gtag.js) -->
       <script async src="https://www.googletagmanager.com/gtag/js?id=AW-11350359224">
-      </script>
-      <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag() { dataLayer.push(arguments); }
-            gtag('js', new Date());
-
-            gtag('config', 'AW-11350359224');
       </script>
 </body>
 

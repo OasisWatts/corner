@@ -208,6 +208,7 @@ export class Board extends Action<Props, State> {
       private handlePressFollow = () => {
             const { writerId, writer } = this.state
             if (writer !== PROPS.data.name) fetch("/follow?id=" + writerId).then((r) => r.json()).then((o) => {
+                  gtag_report_conversion() // google ads 추적 함수 // index.html 참고
                   this.setState({ writerFollowed: o.followed }, () => Action.trigger("followReload", writerId, o.followed))
             })
       }
