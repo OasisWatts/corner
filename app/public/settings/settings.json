@@ -42,5 +42,6 @@
             "cert": "/etc/letsencrypt/live/corner.dance/cert.pem",
             "ca": "/etc/letsencrypt/live/corner.dance/fullchain.pem"
       },
-      "port": 4416
+      "port": 4416,
+      "extension": "https://chrome.google.com/webstore/detail/corner/onkbamknephmfkcbgegadepncekiadae"
 }

@@ -114,6 +114,9 @@
             },
             "port": {
                   "type": "number"
+            },
+            "extension": {
+                  "type": "string"
             }
       }
 }

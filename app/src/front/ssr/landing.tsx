@@ -14,7 +14,7 @@ export default class Landing extends Action<Props, State> {
             super(props)
       }
       private installCorner = () => {
-            Linking.openURL(url)
+            window.open(CLIENT_SETTINGS.extension)
       }
       private googleLogin = () => {
             this.socialLogin(new GoogleAuthProvider(), ["openid", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"]).then((result) => {

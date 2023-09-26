@@ -43,7 +43,7 @@ export default class Navigator extends Action<Props, State> {
             Action.trigger("page", Page.setting)
       }
       private handlePressInstall = () => {
-            Linking.openURL(url)
+            window.open(CLIENT_SETTINGS.extension)
       }
 
       render(): React.ReactNode {
