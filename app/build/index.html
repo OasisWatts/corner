@@ -16,6 +16,16 @@
             type="text/javascript">Object.assign(window.__CLIENT_SETTINGS, "/*{JSON.stringify(CLIENT_SETTINGS)}*/");</script>
       <script type="text/javascript" src="/strings//*{$.locale}*/./*{$.page}*/.js"></script>
       <script type="text/javascript" src="/pages//*{$.page}*/.js"></script>
+      <!-- Google tag (gtag.js) -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=AW-11350359224">
+      </script>
+      <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
+
+            gtag('config', 'AW-11350359224');
+      </script>
 </body>
 
 </html>
