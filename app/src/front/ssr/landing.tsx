@@ -29,9 +29,9 @@ export default class Landing extends Action<Props, State> {
                         if (o.signed) {
                               PROPS.data.name = o.name
                               PROPS.data.image = o.image
-                              Action.trigger("landingOff")
                               Action.trigger("tagReload")
                               Action.trigger("followListTag", null)
+                              Action.trigger("page", Page.boardList, () => Action.trigger("landingOff"))
                         }
                   })
             })

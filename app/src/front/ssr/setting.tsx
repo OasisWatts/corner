@@ -5,6 +5,7 @@ import React from "react"
 import { Pressable, Text, View } from "reactNative"
 import { pageSt, setStyle, slimPageSt, slimThreshold, slimerPageSt, slimerThreshold, whiteSt, widePageSt } from "front/@lib/style"
 import { buttonExSt, buttonSt, buttonTextSt, slimButtonSt, slimButtonTextSt, textSt } from "./landing"
+import { Page } from "."
 
 
 export default class Setting extends Action<Props, State> {
@@ -29,7 +30,9 @@ export default class Setting extends Action<Props, State> {
       private signOut = () => {
             const auth = getAuth()
             signOut(auth).then(() => fetch("/signout").then((r) => r.json()).then((o) => {
-                  if (o.signedOut) Action.trigger("landingOn")
+                  if (o.signedOut) {
+                        Action.trigger("landingOn")
+                  }
             })).catch((err) => console.log("sign out error", err))
       }
 
