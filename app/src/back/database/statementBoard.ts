@@ -95,7 +95,7 @@ export class StatementBoard {
       private static async getBoards(startId: number, userKey: number, blockeds: number[]): Promise<any[]> {
             let whereQuery: string = startId ? `where id < ${startId}` : ""
             let fromQuery: string = "from \`board\`"
-            let orderQuery = `order by id desc limit ${MAX_LIST_LEN * 5}`
+            let orderQuery = `order by id desc limit ${MAX_LIST_LEN}`
             let selectAndQuery = `, (select count(*) from \`user_uped_boards_board\` where userKey = ${userKey} and boardId = a.id) as uped`
 
             const bList = await DB.Manager.query(
@@ -104,8 +104,7 @@ export class StatementBoard {
                               ) b join \`board\` a on b.id = a.id;`,
             ).catch((err) => Logger.errorApp(ErrorCode.board_find_failed).put("getBoards").put(err).out())  // 차단 대상 제외.
             let bListFiltered = bList.filter((b: any) => !blockeds.includes(b.writer))
-            if (bListFiltered.length > MAX_LIST_LEN) return bListFiltered.sort((b1, b2) => b2.up - b1.up).slice(MAX_LIST_LEN)
-            else return bListFiltered.sort((b1, b2) => b2.up - b1.up)
+            return bListFiltered.sort((b1, b2) => b2.up - b1.up)
       }
       private static async getSearchBoards(startId: number, userKey: number, blockeds: number[], search: string): Promise<any[]> {
             if (search[0] === "#") return this.getTagBoards(startId, userKey, blockeds, search)
@@ -208,7 +207,8 @@ export class StatementBoard {
                         } else if (bList.length < MAX_LIST_LEN) {
                               endOfList = true
                         }
-                        const endId = bList[bList.length - 1].id
+                        let endId = startId
+                        bList.forEach((b) => { if (endId < b.id) endId = b.id })
                         for (const item of bList) {
                               where.push({
                                     key: item.writer,
@@ -235,7 +235,7 @@ export class StatementBoard {
                                           updated: item.updated
                                     })
                               }
-                              Logger.passApp("boardList").out()
+                              Logger.passApp("boardList").put(BOARD_CATEGORY[categ]).out()
                               resolve({ boardList, endId, end: endOfList })
                         }).catch((err) => Logger.errorApp(ErrorCode.user_find_failed).put("boardList").put(err).out())
                   } else {

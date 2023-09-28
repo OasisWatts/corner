@@ -4,7 +4,7 @@ import Url from "./url"
 import User from "./user"
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToMany, OneToMany, ManyToOne, JoinColumn, OneToOne } from "typeorm"
 
-@Entity({ name: "userUrlCount", schema: "corner" })
+@Entity({ name: "userurlcount", schema: "corner" })
 export default class UserUrlCount {
       @PrimaryGeneratedColumn("increment")
       public id!: number

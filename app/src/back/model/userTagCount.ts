@@ -4,7 +4,7 @@ import Tag from "./tag"
 import User from "./user"
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToMany, OneToMany, ManyToOne, JoinColumn, OneToOne } from "typeorm"
 
-@Entity({ name: "userTagCount", schema: "corner" })
+@Entity({ name: "usertagcount", schema: "corner" })
 export default class UserTagCount {
       @PrimaryGeneratedColumn("increment")
       public id!: number
