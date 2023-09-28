@@ -1,5 +1,5 @@
 
-import { contentFontSize, setStyle, slimThreshold, tWriteColor } from "front/@lib/style"
+import { contentFontSize, setStyle, slimThreshold, slimerThreshold, tWriteColor } from "front/@lib/style"
 import { CLIENT_SETTINGS } from "front/@lib/util"
 import Action from "front/reactCom"
 import React from "react"
@@ -63,8 +63,9 @@ export default class FollowItem extends Action<Props, State> {
             const { hoverItem, activated } = this.state
             const { name, image } = this.props
             const slim = window.innerWidth < slimThreshold
+            const slimer = window.innerWidth < slimerThreshold
             return (
-                  <Pressable style={[followSt, slim ? null : wideFollowSt]} onPress={this.handlePressFollowItem} onHoverIn={this.handleHoverIn} onHoverOut={this.handleHoverOut} >
+                  <Pressable style={[followSt, slim ? null : wideFollowSt, slimer ? slimerFollowSt : null]} onPress={this.handlePressFollowItem} onHoverIn={this.handleHoverIn} onHoverOut={this.handleHoverOut} >
                         <Image style={[iconSt, hoverItem || activated ? iconBorderSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/profiles/" + image }} />
                         <Text style={[textSt, slim ? null : wideTextSt]}>{name}</Text>
                   </Pressable>
@@ -78,6 +79,9 @@ const followSt = setStyle({
 })
 const wideFollowSt = setStyle({
       height: "35px"
+})
+const slimerFollowSt = setStyle({
+      width: "50px"
 })
 const iconBorderSt = setStyle({
       borderWidth: "5px",

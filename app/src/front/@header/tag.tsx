@@ -1,5 +1,5 @@
 
-import { almostWhiteSt, hoveredComment, mainButtonTextStyle, setStyle, tagButtonTextSt } from "front/@lib/style"
+import { almostWhiteSt, contentFontSize, hoveredComment, mainButtonTextStyle, setStyle, tWhite, whiteSt } from "front/@lib/style"
 import { CLIENT_SETTINGS } from "front/@lib/util"
 import Action from "front/reactCom"
 import { Page } from "front/ssr"
@@ -34,7 +34,8 @@ export default class Tag extends Action<Props, State> {
       protected ACTION_RECEIVER_TABLE: any = {
             boardListTag: (name_) => { // 선택된 태그 외, 다른 태그는 취소.
                   const { name } = this.props
-                  if (name_ !== name) this.setState({ activated: false })
+                  if (name_ === name) this.setState({ activated: true })
+                  else this.setState({ activated: false })
             }
       }
 
@@ -69,5 +70,16 @@ export default class Tag extends Action<Props, State> {
 }
 const tagSt = setStyle({
       display: "inline",
-      marginRight: "10px"
+      marginRight: "10px",
+      marginBottom: "5px"
+})
+const tagButtonTextSt = setStyle({
+      backgroundColor: "white",
+      borderRadius: "20px",
+      paddingLeft: "10px",
+      paddingRight: "10px",
+      lineHeight: "20px",
+      display: "inline-block",
+      fontSize: contentFontSize,
+      color: "black"
 })

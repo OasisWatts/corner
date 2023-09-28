@@ -103,6 +103,7 @@ DB.initialize().then(() => {
             const startId = Number(req.query.sid)
             const url = parseUrl(String(req.query.u))
             const userKey = req.session.userKey
+            console.log("urlboards")
             if (!req.session.isLogined || !userKey) res.redirect("/")
             else {
                   const result = await StatementBoard.boardList(startId, BOARD_CATEGORY.urlBoards, userKey, url)

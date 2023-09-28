@@ -801,13 +801,14 @@ export class StatementBoard {
 
       /** url에 사용된 태그 가져오기. */
       public static async getUrlTag(url: string) {
+            console.log("get url tag")
             return new Promise((resolve, _) => {
                   DB.Manager.findOne(Url, { select: ["id"], where: { name: url } }).then((url_) => {
                         if (url_) {
                               const urlId = url_.id
                               DB.Manager.query(`select name, isUrl from (select tagId from \`urltagcount\` where urlId = ${urlId} and count > 0 order by count desc limit ${TAG_DISPLAY_CNT}) b join corner.tag a on a.id = b.tagid;`)
                                     .then((r) => {
-                                          Logger.passApp("get tag").out()
+                                          Logger.passApp("get tag").put(r.map((i) => i.name)).out()
                                           if (r) {
                                                 resolve(r)
                                                 return

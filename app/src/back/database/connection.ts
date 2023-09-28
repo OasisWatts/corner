@@ -42,7 +42,6 @@ export default class DB {
                   bigNumberStrings: false,
                   ...SETTINGS.database,
                   // synchronize: true, // synchronize: true여야 수정 entity가 반영
-                  logging: ["query"],
                   entities,
                   cache: true,
                   // ssl: SSL_OPTIONS,

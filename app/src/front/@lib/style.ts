@@ -17,9 +17,9 @@ export const almostWhite = "rgb(243, 243, 243)"
 export const tWhite = "rgba(255,255,255,0.8)"
 export const tLightGray = "rgba(220, 220, 220, 0.5)"
 export const tDeepGray = "rgba(120,120,120,0.5)"
-export const tWriteColor = "rgba(0, 160, 233,0.5)"
+export const tWriteColor = "rgb(159 218 240)"
 export const writeColor = "rgb(0, 160, 233)"
-export const tUpColor = "rgba(228,98,98,0.5)"
+export const tUpColor = "rgb(244 174 174)"
 export const upColor = "rgb(228,98,98)"
 export const contentFontSize = "14px"
 export const smallFontSize = "13px"
@@ -163,17 +163,6 @@ export const submitButtonTextSt = setStyle({
       paddingTop: "3px",
       paddingBottom: "3px",
       lineHeight: "20px",
-      color: "black"
-})
-/** 태그 버튼 */
-export const tagButtonTextSt = setStyle({
-      backgroundColor: tWhite,
-      borderRadius: "20px",
-      paddingLeft: "10px",
-      paddingRight: "10px",
-      lineHeight: "30px",
-      display: "inline-block",
-      fontSize: contentFontSize,
       color: "black"
 })
 export const profileImgSt = setStyle({

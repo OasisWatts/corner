@@ -1,0 +1,1 @@
+압축해서 production 게시할 때, host 변수 확인

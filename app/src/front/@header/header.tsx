@@ -3,13 +3,12 @@ import Action from "front/reactCom"
 import React from "react"
 import { Image, Pressable, View } from "reactNative"
 import { Tags } from "./tags"
-import { CLIENT_SETTINGS } from "front/@lib/util"
+import { CLIENT_SETTINGS, PROPS } from "front/@lib/util"
 import { Page } from "../ssr"
 import Search from "./search"
 
 type State = {
-      hoverWrite: boolean,
-      searchToggle: boolean
+      hoverWrite: boolean
 }
 type Props = {
       page: Page
@@ -19,13 +18,7 @@ export default class Header extends Action<Props, State> {
       constructor(props: Props) {
             super(props)
             this.state = {
-                  hoverWrite: false,
-                  searchToggle: false
-            }
-      }
-      protected ACTION_RECEIVER_TABLE: any = {
-            searchShow: (searchToggle) => {
-                  this.setState({ searchToggle })
+                  hoverWrite: false
             }
       }
       componentDidMount(): void {
@@ -43,19 +36,23 @@ export default class Header extends Action<Props, State> {
             } this.previousWidth = window.innerWidth
       }
       private handlePressIcon = () => {
-            Action.trigger("page", Page.boardList)
+            Action.trigger("page", Page.boardList, () => {
+                  if (PROPS.data.ext) {
+                        console.log("boardlisttag url")
+                        Action.trigger("boardListTag", PROPS.data.url, true)
+                  } else Action.trigger("boardListTag", "전체")
+                  Action.trigger("boardList")
+            })
+            Action.trigger("followListTag", null)
       }
       render(): React.ReactNode {
-            const { searchToggle } = this.state
             const slim = window.innerWidth < slimThreshold
             return (
                   <View style={[headerSt, slim ? slimHeaderSt : null, fullSt]}>
                         <Pressable onPress={this.handlePressIcon} style={[iconSt, slim ? slimIconSt : null]} >
                               <Image style={[iconImgSt, slim ? imgSt : null]} source={{ uri: CLIENT_SETTINGS.host + (slim ? "/images/cornerIcon.png" : "/images/cornerIconLong.png") }} />
                         </Pressable>
-                        {searchToggle === true ?
-                              <Search /> : <Tags />
-                        }
+                        <Search />
                   </View>
             )
       }

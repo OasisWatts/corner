@@ -1,3 +1,4 @@
+const host = "https://corner.dance" // "http://localhost:4416"//
 async function getTab() {
       const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true })
       return tab
@@ -8,7 +9,7 @@ chrome.runtime.onMessage.addListener(async function (msg, sender, sendResponse) 
             const { id, url } = await getTab()
             const parsedUrl = new URL(url)
             prevUrl = url
-            document.body.querySelector("#corner_frame").src = "https://corner.dance?ext=1&u=" + url.replaceAll("&", "!oa@sis$").replaceAll("#", "!cor@ner$") + "&h=" + parsedUrl.hostname
+            document.body.querySelector("#corner_frame").src = host + "?ext=1&u=" + url.replaceAll("&", "!oa@sis$").replaceAll("#", "!cor@ner$") + "&h=" + parsedUrl.hostname
       } else if (msg === "urlChanged") {
             const url_change_alert = document.createElement("div")
             url_change_alert.id = "url_change_alert"
@@ -18,7 +19,7 @@ chrome.runtime.onMessage.addListener(async function (msg, sender, sendResponse) 
                   const parsedUrl = new URL(url)
                   prevUrl = url
                   const corner_frame = document.body.querySelector("#corner_frame")
-                  corner_frame.src = "https://corner.dance?ext=1&u=" + url.replaceAll("&", "!oa@sis$").replaceAll("#", "!cor@ner$") + "&h=" + parsedUrl.hostname
+                  corner_frame.src = host + "?ext=1&u=" + url.replaceAll("&", "!oa@sis$").replaceAll("#", "!cor@ner$") + "&h=" + parsedUrl.hostname
                   corner_frame.className = ""
                   while (document.body.querySelector("#url_change_alert")) {
                         const url_change_alert = document.body.querySelector("#url_change_alert")

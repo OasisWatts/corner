@@ -30,9 +30,6 @@ export default class Navigator extends Action<Props, State> {
       private handleWrite = () => {
             Action.trigger("page", Page.write, () => Action.trigger("writeReload"))
       }
-      private handlePressSearch = () => {
-            Action.trigger("searchShow", true)
-      }
       private handlePressMyBoard = () => {
             Action.trigger("page", Page.boardList, () => Action.trigger("boardListMyBoard"))
       }
@@ -50,14 +47,10 @@ export default class Navigator extends Action<Props, State> {
             const slim = window.innerWidth < slimThreshold
             const slimer = window.innerWidth < slimerThreshold
             return (
-                  <View style={[rightSideBar, slimer ? slimerFullSt : slim ? slimFullSt : fullSt, slim ? null : wideSideBarSt, slimer ? slimerRightSideBarSt : slim ? slimRightSideBar : wideRightSideBar]}>
+                  <View style={[rightSideBar, slim ? slimFullSt : fullSt, slim ? null : wideSideBarSt, slimer ? slimerRightSideBarSt : slim ? slimRightSideBar : wideRightSideBar]}>
                         <Pressable style={[slim ? slimWriteSt : wideButtonSt, slimer ? slimerWriteSt : writeSt]} onPress={this.handleWrite}>
                               <Image style={[imgSt, slim ? slimWriteImgSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/write.svg" }} />
                               {slim ? null : <Text style={textSt}>write</Text>}
-                        </Pressable>
-                        <Pressable style={[slim ? slimButtonSt : wideButtonSt]} onPress={this.handlePressSearch} >
-                              <Image style={[imgSt, slimer ? slimerImgSt : slim ? slimImgSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/searchBold.svg" }} />
-                              {slim ? null : <Text style={textSt}>search</Text>}
                         </Pressable>
                         <Pressable style={[slim ? slimButtonSt : wideButtonSt]} onPress={this.handlePressMyBoard} >
                               <Image style={[imgSt, slimer ? slimerImgSt : slim ? slimImgSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/myWrite.svg" }} />
@@ -69,7 +62,7 @@ export default class Navigator extends Action<Props, State> {
                         </Pressable>
                         <Pressable style={[slim ? slimButtonSt : wideButtonSt]} onPress={this.handlePressSetting} >
                               <Image style={[imgSt, slimer ? slimerImgSt : slim ? slimImgSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/setting.svg" }} />
-                              {slim ? null : <Text style={textSt}>setting</Text>}
+                              {slim ? null : <Text style={textSt}>sign out</Text>}
                         </Pressable>
                         {PROPS.data.ext ? null : <Pressable style={[slim ? slimWriteSt : wideButtonSt, slimer ? slimerInstallSt : installSt]} onPress={this.handlePressInstall} >
                               <Image style={[imgSt, slim ? slimWriteImgSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/cornerIcon.png" }} />
@@ -93,14 +86,8 @@ const fullSt = setStyle({
       marginTop: "30px"
 })
 const slimFullSt = setStyle({
-      borderTopLeftRadius: "15px",
-      borderBottomLeftRadius: "15px",
       paddingBottom: "10px",
-      backgroundColor: almostWhite,
-      marginTop: "30px"
-})
-const slimerFullSt = setStyle({
-      backgroundColor: lightGray
+      backgroundColor: almostWhite
 })
 const wideRightSideBar = setStyle({
       right: slimThresholdExceptSize

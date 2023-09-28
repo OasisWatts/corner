@@ -5,6 +5,7 @@ import { FlatList, Text, View } from "reactNative"
 import { BoardItem } from "./boardItem"
 import { PROPS } from "front/@lib/util"
 import { BOARD_CATEGORY } from "common/applicationCode"
+import { Tags } from "front/@header/tags"
 
 type State = {
       startId: number,
@@ -55,7 +56,7 @@ export class BoardList extends Action<Props, State> {
                   this.setState({ startId: 0, boards: [], endOfList: false, categ: BOARD_CATEGORY.userBoards, searchUser }, () => this.getBoards())
             },
             "boardList": () => {
-                  this.getBoards()
+                  this.setState({ startId: 0, boards: [], endOfList: false, categ: BOARD_CATEGORY.boards }, () => this.getBoards())
             }
       }
       componentDidMount(): void {
@@ -123,6 +124,7 @@ export class BoardList extends Action<Props, State> {
             if (boards.length > 0) {
                   return (
                         <View style={[pageSt, slimer ? slimerPageSt : slim ? slimPageSt : widePageSt]}>
+                              <Tags />
                               <FlatList
                                     style={flatListSt}
                                     data={boards}
@@ -136,6 +138,7 @@ export class BoardList extends Action<Props, State> {
             } else {
                   return (
                         <View style={[pageSt, slimer ? slimerPageSt : slim ? slimPageSt : widePageSt]}>
+                              <Tags />
                               <Text style={vacancyTextSt}>{categ === BOARD_CATEGORY.userBoards ? "no board." : "Be the first writer of this place"}</Text>
                         </View>
                   )

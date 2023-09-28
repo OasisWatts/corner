@@ -1,10 +1,10 @@
 
 import { almostWhiteSt, contentFontSize, lightGray, lightGraySt, setStyle, slimThreshold, slimerThreshold, softGray, tWhite } from "front/@lib/style"
-import { CLIENT_SETTINGS, fullStyle } from "front/@lib/util"
+import { CLIENT_SETTINGS } from "front/@lib/util"
 import Action from "front/reactCom"
 import React from "react"
 import { Image, Pressable, TextInput, View } from "reactNative"
-import { slimTagsWrapperSt, slimerTagsWrapperSt, tagsWrapperSt } from "./tags"
+import { tagsWrapperSt } from "./tags"
 import { Page } from "front/ssr"
 
 type State = {
@@ -44,26 +44,34 @@ export default class Search extends Action<Props, State> {
                   Action.trigger("page", Page.boardList, () => Action.trigger("boardListSearch", text))
             }
       }
-      private handlePressCancel = () => {
-            this.setState({ text: "" }, () => {
-                  Action.trigger("searchShow", false)
-            })
-      }
       render(): React.ReactNode {
             const { text } = this.state
             const slim = window.innerWidth < slimThreshold
             const slimer = window.innerWidth < slimerThreshold
             return (
-                  <View style={[tagsWrapperSt, slimer ? slimerTagsWrapperSt : slim ? slimTagsWrapperSt : null]}>
+                  <View style={[searchWrapSt, slimer ? slimerSearchWrapSt : slim ? slimSearchWrapSt : null]}>
                         <Image style={searchImageSt} source={{ uri: CLIENT_SETTINGS.host + "/images/search.svg" }} />
                         <TextInput style={[searchInputSt, almostWhiteSt]} onChangeText={this.handleChangeText} value={text} onKeyPress={this.handleKeyPress} />
-                        <Pressable onPress={this.handlePressCancel} style={cancelButtonSt} >
-                              <Image style={imgSt} source={{ uri: CLIENT_SETTINGS.host + "/images/off.svg" }} />
-                        </Pressable>
                   </View>
             )
       }
 }
+const searchWrapSt = setStyle({
+      display: "block",
+      position: "absolute",
+      top: "10px",
+      left: "225px",
+      width: "calc(100% - 225px)"
+})
+const slimerSearchWrapSt = setStyle({
+      left: "90px",
+      height: "30px",
+      width: "calc(100% - 100px)"
+})
+const slimSearchWrapSt = setStyle({
+      left: "100px",
+      width: "calc(100% - 110px)"
+})
 const searchImageSt = setStyle({
       position: "absolute",
       left: "-30px",
@@ -82,13 +90,4 @@ const searchInputSt = setStyle({
       fontSize: contentFontSize,
       backgroundColor: tWhite,
       outlineStyle: "none"
-})
-const cancelButtonSt = setStyle({
-      position: "absolute",
-      right: "-30px",
-      top: "5px"
-})
-const imgSt = setStyle({
-      height: "20px",
-      width: "20px"
 })

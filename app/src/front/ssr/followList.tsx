@@ -3,7 +3,7 @@ import { lightGray, setStyle, slimThreshold, slimThresholdExceptSize, slimerThre
 import { CLIENT_SETTINGS, PROPS } from "front/@lib/util"
 import Action from "front/reactCom"
 import React from "react"
-import { FlatList, Image, View } from "reactNative"
+import { FlatList, Image, ScrollView, View } from "reactNative"
 import FollowItem from "./followItem"
 
 type State = {
@@ -73,44 +73,26 @@ export default class Follows extends Action<Props, State> {
                   })
             }
       }
-      private handleLoadMore = () => {
-            this.getFollows()
-      }
-      private renderItem = ({ item }) => <FollowItem userKey={item.key} name={item.name} image={item.image} />
+      private renderItem = (item) => <FollowItem userKey={item.key} name={item.name} image={item.image} />
 
       render(): React.ReactNode {
             const { recommends, follows } = this.state
             const slim = window.innerWidth < slimThreshold
             const slimer = window.innerWidth < slimerThreshold
             return (
-                  <View style={[sideBarSt, fullSt, slimer && !recommends.length && !follows.length ? displayNonSt : null, slimer ? slimerLeftSideBarSt : slim ? slimLeftSideBarSt : wideLeftSideBarSt, slim ? null : wideSideBarSt]}>
+                  <ScrollView style={[sideBarSt, fullSt, slimer && !recommends.length && !follows.length ? displayNonSt : null, slimer ? slimerLeftSideBarSt : slim ? slimLeftSideBarSt : wideLeftSideBarSt, slim ? null : wideSideBarSt]} horizontal={slimer ? true : false}>
                         {recommends.length ? <Image style={[iconSt, slimer ? slimerSideBarIconSt : slim ? slimSideBarIconSt : wideSideBarIconSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/hot.svg" }} /> : null}
-                        <View>
-                              <FlatList
-                                    style={slimer ? slimerFlatListSt : null}
-                                    horizontal={slimer ? true : false}
-                                    data={recommends}
-                                    renderItem={this.renderItem}
-                                    keyExtractor={(item: any) => item.key} />
-                        </View>
+                        {recommends.map((i) => this.renderItem(i))}
                         {follows.length ? <Image style={[iconSt, slimer ? slimerSideBarIconSt : slim ? slimSideBarIconSt : wideSideBarIconSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/heartBlack.svg" }} /> : null}
-                        <FlatList
-                              style={slimer ? slimerFlatListSt : null}
-                              horizontal={slimer ? true : false}
-                              data={follows}
-                              renderItem={this.renderItem}
-                              keyExtractor={(item: any) => item.key}
-                              onEndReached={this.handleLoadMore}
-                              onEndReachedThreshold={0.5}
-                        />
-                  </View>
+                        {follows.map((i) => this.renderItem(i))}
+                  </ScrollView>
             )
       }
 }
 export const sideBarSt = setStyle({
       position: "fixed",
       height: "100%",
-      top: "53px"
+      top: "50px"
 })
 const displayNonSt = setStyle({
       display: "none"

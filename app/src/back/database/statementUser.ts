@@ -161,7 +161,7 @@ export class StatementUser {
                               } else Logger.errorApp(ErrorCode.tag_find_failed).put("getFollowRecommend_0").out()
                         }).catch((err) => Logger.errorApp(ErrorCode.tag_find_failed).put("getFollowRecommend_1").put(err).out())
                   } else {
-                        DB.Manager.query(`select userKey, (select name from corner.user where user.key = userKey) name, (select image from corner.user where user.key = userKey) image, count(*) as cnt from corner.usertagcount group by userKey order by cnt desc;`).then((usersO) => {
+                        DB.Manager.query(`select userKey, (select name from corner.user where user.key = userKey) name, (select image from corner.user where user.key = userKey) image, count(*) as cnt from corner.usertagcount group by userKey order by cnt desc limit ${MAX_FOLLOW_RECOMM};`).then((usersO) => {
                               const users = usersO.map((us) => ({ key: us.userKey, name: us.name, image: us.image }))
                               Logger.passApp("getFollowRecommend").out()
                               resolve(users)

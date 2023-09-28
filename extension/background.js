@@ -1,3 +1,4 @@
+const host = "https://corner.dance"// "http://localhost:4416"//
 async function getTab() {
       const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true })
       return tab
@@ -13,7 +14,7 @@ async function create(url, hostname) {
       corner_icon.id = "corner_icon"
       corner_icon.appendChild(corner_img)
       corner_icon.appendChild(board_num)
-      fetch("https://corner.dance/check?u=" + url.replaceAll("&", "!oa@sis$").replaceAll("#", "!cor@ner$") + "&h=" + hostname).then((r) => r.json()).then((r) => {
+      fetch(host + "/check?u=" + url.replaceAll("&", "!oa@sis$").replaceAll("#", "!cor@ner$") + "&h=" + hostname).then((r) => r.json()).then((r) => {
             if (r.u) {
                   corner_img.src = iconBlueImg
                   if (r.u > 99) board_num.innerText = "99+"
