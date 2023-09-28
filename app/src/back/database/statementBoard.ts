@@ -207,8 +207,8 @@ export class StatementBoard {
                         } else if (bList.length < MAX_LIST_LEN) {
                               endOfList = true
                         }
-                        let endId = startId
-                        bList.forEach((b) => { if (endId < b.id) endId = b.id })
+                        let endId = bList[0].id
+                        bList.forEach((b) => { if (endId > b.id) endId = b.id })
                         for (const item of bList) {
                               where.push({
                                     key: item.writer,
