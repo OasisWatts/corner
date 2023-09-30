@@ -6,6 +6,7 @@ import { BoardItem } from "./boardItem"
 import { PROPS } from "front/@lib/util"
 import { BOARD_CATEGORY } from "common/applicationCode"
 import { Tags } from "front/@header/tags"
+import { Write } from "./write"
 
 type State = {
       startId: number,
@@ -57,6 +58,9 @@ export class BoardList extends Action<Props, State> {
             },
             "boardList": () => {
                   this.setState({ startId: 0, boards: [], endOfList: false, categ: BOARD_CATEGORY.boards }, () => this.getBoards())
+            },
+            "boardListReload": () => {
+                  this.setState({ startId: 0, boards: [], endOfList: false }, () => this.getBoards())
             }
       }
       componentDidMount(): void {
@@ -70,7 +74,8 @@ export class BoardList extends Action<Props, State> {
       }
       private previousWidth: number = window.innerWidth
       private resize = () => {
-            if ((this.previousWidth > slimThreshold && window.innerWidth <= slimThreshold) || (this.previousWidth < slimThreshold && window.innerWidth >= slimThreshold)) {
+            if ((this.previousWidth > slimThreshold && window.innerWidth <= slimThreshold) || (this.previousWidth < slimThreshold && window.innerWidth >= slimThreshold)
+                  || (this.previousWidth > slimerThreshold && window.innerWidth <= slimerThreshold) || (this.previousWidth < slimerThreshold && window.innerWidth >= slimerThreshold)) {
                   this.setState({ boards: [], endOfList: false, startId: 0 }, () => this.getBoards()) //this.forceUpdate()
             } this.previousWidth = window.innerWidth
       }
@@ -116,6 +121,7 @@ export class BoardList extends Action<Props, State> {
       }
       private renderItem = ({ item }) => <BoardItem item={item} />
 
+      private renderHeader = () => <Write update={false} boardId={null} />
       render(): React.ReactNode {
             const { boards, categ } = this.state
             const slim = window.innerWidth < slimThreshold
@@ -132,6 +138,7 @@ export class BoardList extends Action<Props, State> {
                                     keyExtractor={(item: any) => item.id}
                                     onEndReached={this.handleLoadMore}
                                     onEndReachedThreshold={0.5}
+                                    ListHeaderComponent={this.renderHeader}
                               />
                         </ View>
                   )
@@ -139,7 +146,7 @@ export class BoardList extends Action<Props, State> {
                   return (
                         <View style={[pageSt, slimer ? slimerPageSt : slim ? slimPageSt : widePageSt]}>
                               <Tags />
-                              <Text style={vacancyTextSt}>{categ === BOARD_CATEGORY.userBoards ? "no board." : "Be the first writer of this place"}</Text>
+                              <Write update={false} boardId={null} />
                         </View>
                   )
             }

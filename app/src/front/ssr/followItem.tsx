@@ -1,5 +1,5 @@
 
-import { contentFontSize, setStyle, slimThreshold, slimerThreshold, tWriteColor } from "front/@lib/style"
+import { contentFontSize, setStyle, slimThreshold, slimerThreshold, lightWriteColor } from "front/@lib/style"
 import { CLIENT_SETTINGS } from "front/@lib/util"
 import Action from "front/reactCom"
 import React from "react"
@@ -40,7 +40,8 @@ export default class FollowItem extends Action<Props, State> {
       }
       private previousWidth: number = window.innerWidth
       private resize = () => {
-            if ((this.previousWidth > slimThreshold && window.innerWidth <= slimThreshold) || (this.previousWidth < slimThreshold && window.innerWidth >= slimThreshold)) {
+            if ((this.previousWidth > slimThreshold && window.innerWidth <= slimThreshold) || (this.previousWidth < slimThreshold && window.innerWidth >= slimThreshold)
+                  || (this.previousWidth > slimerThreshold && window.innerWidth <= slimerThreshold) || (this.previousWidth < slimerThreshold && window.innerWidth >= slimerThreshold)) {
                   this.forceUpdate()
             } this.previousWidth = window.innerWidth
       }
@@ -86,7 +87,7 @@ const slimerFollowSt = setStyle({
 const iconBorderSt = setStyle({
       borderWidth: "5px",
       borderStyle: "solid",
-      borderColor: tWriteColor
+      borderColor: lightWriteColor
 })
 const iconSt = setStyle({
       height: "30px",

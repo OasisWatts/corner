@@ -21,9 +21,6 @@ window.onpopstate = (ev: any) => { // 브라우저 뒤로가기, 앞으로가기
       if (arr.length > 1 && arr[0] === "board") Action.trigger("pageBoard", Number(arr[1]))
       else {
             switch (urlPage) {
-                  case "write":
-                        id = Page.write
-                        break
                   case "update":
                         id = Page.update
                         break
@@ -57,7 +54,6 @@ type State = {
 }
 
 export enum Page {
-      write,
       update,
       boardList,
       board,
@@ -65,7 +61,6 @@ export enum Page {
 }
 
 const windowHistory = {}
-windowHistory[Page.write] = "write"
 windowHistory[Page.update] = "update"
 windowHistory[Page.boardList] = "home"
 windowHistory[Page.board] = "board"
@@ -103,7 +98,7 @@ export default class Index extends Action<Props, State> {
             landingOff: () => {
                   this.setState({ landing: false }, () => {
                         if (!PROPS.data.boardAccess) {
-                              Action.trigger("boardList")
+                              Action.trigger("boardListReload")
                         }
                   })
             },

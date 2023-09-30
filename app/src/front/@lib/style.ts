@@ -14,12 +14,9 @@ export const gray = "rgb(150,150,150)"
 export const softGray = "rgb(180,180,180)"
 export const lightGray = "rgb(220,220,220)"
 export const almostWhite = "rgb(243, 243, 243)"
-export const tWhite = "rgba(255,255,255,0.8)"
-export const tLightGray = "rgba(220, 220, 220, 0.5)"
-export const tDeepGray = "rgba(120,120,120,0.5)"
-export const tWriteColor = "rgb(159 218 240)"
+export const lightWriteColor = "rgb(159 218 240)"
 export const writeColor = "rgb(0, 160, 233)"
-export const tUpColor = "rgb(244 174 174)"
+export const lightUpColor = "rgb(244 174 174)"
 export const upColor = "rgb(228,98,98)"
 export const contentFontSize = "14px"
 export const smallFontSize = "13px"
@@ -73,7 +70,6 @@ export const itemSt = setStyle({
       padding: "10px",
       position: "relative",
       display: "block",
-      backgoundColor: tWhite,
       borderBottomColor: lightGray,
       borderBottomWidth: "1px",
       borderBottomStyle: "solid"
@@ -156,7 +152,7 @@ export const rightButtonSt = setStyle({
 })
 /** 제출 버튼 */
 export const submitButtonTextSt = setStyle({
-      backgroundColor: tWriteColor,
+      backgroundColor: lightWriteColor,
       borderRadius: "20px",
       paddingLeft: "20px",
       paddingRight: "20px",
@@ -211,10 +207,10 @@ export const commentButtonSt = composeStyle(
       }
 )
 export const hoveredComment = setStyle({
-      backgroundColor: tWriteColor
+      backgroundColor: lightWriteColor
 })
 export const hoveredUp = setStyle({
-      backgroundColor: tUpColor
+      backgroundColor: lightUpColor
 })
 /** 중요 버튼 텍스트. */
 export const importantButtonTextStyle = setStyle({

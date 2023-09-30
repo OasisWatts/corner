@@ -1,5 +1,5 @@
 
-import { setStyle, slimThreshold, softGray, tWriteColor, upColor, whiteSt, writeColor } from "front/@lib/style"
+import { setStyle, slimThreshold, softGray, lightWriteColor, upColor, whiteSt, writeColor } from "front/@lib/style"
 import { CLIENT_SETTINGS, PROPS } from "front/@lib/util"
 import Action from "front/reactCom"
 import React from "react"

@@ -45,7 +45,8 @@ export default class Follows extends Action<Props, State> {
       }
       private previousWidth: number = window.innerWidth
       private resize = () => {
-            if ((this.previousWidth > slimThreshold && window.innerWidth <= slimThreshold) || (this.previousWidth < slimThreshold && window.innerWidth >= slimThreshold)) {
+            if ((this.previousWidth > slimThreshold && window.innerWidth <= slimThreshold) || (this.previousWidth < slimThreshold && window.innerWidth >= slimThreshold)
+                  || (this.previousWidth > slimerThreshold && window.innerWidth <= slimerThreshold) || (this.previousWidth < slimerThreshold && window.innerWidth >= slimerThreshold)) {
                   this.forceUpdate()
             } this.previousWidth = window.innerWidth
       }

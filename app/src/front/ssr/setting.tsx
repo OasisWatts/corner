@@ -22,7 +22,8 @@ export default class Setting extends Action<Props, State> {
       }
       private previousWidth: number = window.innerWidth
       private resize = () => {
-            if ((this.previousWidth > slimThreshold && window.innerWidth <= slimThreshold) || (this.previousWidth < slimThreshold && window.innerWidth >= slimThreshold)) {
+            if ((this.previousWidth > slimThreshold && window.innerWidth <= slimThreshold) || (this.previousWidth < slimThreshold && window.innerWidth >= slimThreshold)
+                  || (this.previousWidth > slimerThreshold && window.innerWidth <= slimerThreshold) || (this.previousWidth < slimerThreshold && window.innerWidth >= slimerThreshold)) {
                   this.forceUpdate()
             } this.previousWidth = window.innerWidth
       }
@@ -41,13 +42,20 @@ export default class Setting extends Action<Props, State> {
             const slimer = window.innerWidth < slimerThreshold
             return (
                   <View style={[pageSt, whiteSt, slimer ? slimerPageSt : slim ? slimPageSt : widePageSt, sidePanelSt]}>
-                        <Pressable style={[buttonSt, buttonExSt, slim ? slimButtonSt : null]} onPress={this.signOut}>
+                        <Text style={[textSt, topSt, buttonTextSt, slim ? slimButtonTextSt : null]}>Any feedback or request is welcome (businessoasis322@gmail.com)</Text>
+                        <Pressable style={[buttonSt, topButtonSt, buttonExSt, slim ? slimButtonSt : null]} onPress={this.signOut}>
                               <Text style={[textSt, buttonTextSt, slim ? slimButtonTextSt : null]}>Sign Out</Text>
                         </Pressable>
                   </View>
             )
       }
 }
+const topSt = setStyle({
+      marginTop: "100px"
+})
+const topButtonSt = setStyle({
+      marginTop: "30px"
+})
 const sidePanelSt = setStyle({
       textAlign: "center",
       display: "inline-block"

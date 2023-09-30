@@ -44,7 +44,7 @@ export default class Tag extends Action<Props, State> {
             this.setState({ activated: true }, () => {
                   Action.trigger("page", Page.boardList, () => {
                         Action.trigger("boardListTag", name, isUrl, total)
-                        if (name === "전체") Action.trigger("followListTag", null)
+                        if (total) Action.trigger("followListTag", null)
                         else Action.trigger("followListTag", name)
                   })
             })

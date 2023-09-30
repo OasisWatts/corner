@@ -1,6 +1,6 @@
 // import { setStyle } from "front/common/style"
 // import { CLIENT_SETTINGS } from "front/@lib/util"
-import { composeStyle, inputSt, mainButtonTextStyle, pageSt, rightButtonSt, setStyle, slimPageSt, slimThreshold, widePageSt, contentFontSize, writeColor, whiteSt, submitButtonTextSt, fontBlackSt, slimerPageSt, slimerThreshold, tWriteColor } from "front/@lib/style"
+import { composeStyle, inputSt, mainButtonTextStyle, pageSt, rightButtonSt, setStyle, slimPageSt, slimThreshold, widePageSt, contentFontSize, writeColor, whiteSt, submitButtonTextSt, fontBlackSt, slimerPageSt, slimerThreshold, lightWriteColor, lightGray } from "front/@lib/style"
 import Action from "front/reactCom"
 import React from "react"
 import { View, TextInput, Pressable, Text } from "reactNative"
@@ -46,7 +46,8 @@ export class Write extends Action<Props, State> {
       }
       private previousWidth: number = window.innerWidth
       private resize = () => {
-            if ((this.previousWidth > slimThreshold && window.innerWidth <= slimThreshold) || (this.previousWidth < slimThreshold && window.innerWidth >= slimThreshold)) {
+            if ((this.previousWidth > slimThreshold && window.innerWidth <= slimThreshold) || (this.previousWidth < slimThreshold && window.innerWidth >= slimThreshold)
+                  || (this.previousWidth > slimerThreshold && window.innerWidth <= slimerThreshold) || (this.previousWidth < slimerThreshold && window.innerWidth >= slimerThreshold)) {
                   this.forceUpdate()
             } this.previousWidth = window.innerWidth
       }
@@ -82,9 +83,12 @@ export class Write extends Action<Props, State> {
                   },
                   body: JSON.stringify({ c: contentText, t: hashTag, u: (PROPS.data.ext ? PROPS.data.url : "") || "", h: (PROPS.data.ext ? PROPS.data.hostname : "") || "" })
             }).then(() => {
-                  Action.trigger("page", Page.boardList)
-                  Action.trigger("tagReload")
                   if (PROPS.data.ext) gtag_report_conversion() // google ads 추적 함수 // index.html 참고
+                  this.setState({ contentText: "", hashTag: "#" }, () => {
+                        Action.trigger("page", Page.boardList)
+                        Action.trigger("tagReload")
+                        Action.trigger("boardListReload")
+                  })
             })
       }
       private handlePressBoardUpdate = () => {
@@ -114,17 +118,17 @@ export class Write extends Action<Props, State> {
             const slimer = window.innerWidth < slimerThreshold
 
             return (
-                  <View style={[pageSt, whiteSt, slimer ? slimerPageSt : slim ? slimPageSt : widePageSt]}>
-                        <TextInput style={[inputForWritePageSt, focusedSt]} multiline numberOfLines={3} maxLength={MAX_CONTENTS_LEN} onChangeText={this.onChangeContentText} value={contentText} />
+                  <View style={[update ? updateWrapperSt : writeWrapperSt, whiteSt, update ? (slimer ? slimerPageSt : slim ? slimPageSt : widePageSt) : null]}>
+                        <TextInput style={[updateInputSt, update ? null : writeInputSt, focusedSt]} autoFocus multiline numberOfLines={3} maxLength={MAX_CONTENTS_LEN} onChangeText={this.onChangeContentText} value={contentText} />
                         <Pressable style={[hashTagSt, focusedSt]}>
                               <Text style={hashTagTextSt}> hash tag </Text>
                               <TextInput style={inputHashTagSt} onChangeText={this.onChangeHashTagText} value={hashTag} maxLength={MAX_TAG_LEN * MAX_TAG_CNT} />
                         </Pressable>
-                        <View style={[buttonsForWritePageSt, fullStyleButtonsForWritePageSt]}>
-                              <Pressable style={rightButtonSt} onPress={this.handlePressCancel} >
+                        <View style={[buttonsForWritePageSt]}>
+                              {update ? <Pressable style={rightButtonSt} onPress={this.handlePressCancel} >
                                     <Text style={[mainButtonTextStyle, biggerFontSt, fontBlackSt]}> cancel</Text>
-                              </Pressable>
-                              <Pressable style={rightButtonSt} onPress={update ? this.handlePressBoardUpdate : this.handlePressWrite} >
+                              </Pressable> : null}
+                              <Pressable style={[rightButtonSt, update ? null : writeWriteButtonSt]} onPress={update ? this.handlePressBoardUpdate : this.handlePressWrite} >
                                     <Text style={[mainButtonTextStyle, biggerFontSt, submitButtonTextSt]}> {update ? "update" : "write"}</Text>
                               </Pressable>
                         </View>
@@ -132,37 +136,41 @@ export class Write extends Action<Props, State> {
             )
       }
 }
-const inputForWritePageSt = composeStyle(
-      inputSt,
+const writeWriteButtonSt = setStyle({
+      marginLeft: "0"
+})
+const updateWrapperSt = composeStyle(
+      pageSt,
       {
-            height: "250px",
-            width: "calc(100% - 10px)",
-            left: "5px",
-            top: "5px",
-            borderRadius: "20px",
-            paddingLeft: "20px",
-            paddingRight: "20px",
-            paddingTop: "20px",
-            paddingBottom: "20px",
+            padding: "5px",
       }
 )
-const fullStyleInputForWritePageSt = setStyle({
-      width: "calc(100% - 40px)",
-      left: "20px",
-      top: "20px"
+const writeWrapperSt = setStyle({
+      padding: "5px",
+      width: "100%",
+      borderBottomWidth: "1px",
+      borderBottomStyle: "solid",
+      borderBottomColor: lightGray
+})
+const updateInputSt = setStyle({
+      fontSize: contentFontSize,
+      outlineStyle: "none",
+      height: "250px",
+      borderRadius: "10px",
+      padding: "15px"
+})
+const writeInputSt = setStyle({
+      height: "80px"
 })
 const hashTagSt = setStyle({
-      position: "absolute",
-      top: "260px",
       height: "40px",
-      width: "calc(100% - 10px)",
-      left: "5px",
-      borderRadius: "20px"
+      borderRadius: "10px",
+      marginTop: "5px"
 })
 const focusedSt = setStyle({
       borderWidth: "1px",
       borderStyle: "solid",
-      borderColor: tWriteColor,
+      borderColor: lightWriteColor,
       backgroundColor: "white"
 })
 const fullStyleHashTagSt = setStyle({
@@ -190,14 +198,8 @@ const inputHashTagSt = setStyle({
       left: "115px"
 })
 const buttonsForWritePageSt = setStyle({
-      position: "absolute",
-      top: "310px",
-      right: "0",
+      marginTop: "5px",
       display: "block"
-})
-const fullStyleButtonsForWritePageSt = setStyle({
-      top: "350px",
-      right: "20px"
 })
 const biggerFontSt = setStyle({
       fontSize: contentFontSize

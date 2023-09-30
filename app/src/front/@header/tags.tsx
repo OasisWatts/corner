@@ -5,7 +5,7 @@ import React, { createRef } from "react"
 import { FlatList, Image, Pressable, View } from "reactNative"
 import Tag from "./tag"
 import { CLIENT_SETTINGS, PROPS } from "front/@lib/util"
-import { setStyle, slimThreshold, slimerThreshold, softGray, tWriteColor } from "front/@lib/style"
+import { lightGray, setStyle, slimThreshold, slimerThreshold, softGray, lightWriteColor } from "front/@lib/style"
 
 type State = {
       tags: TagType[]
@@ -28,21 +28,6 @@ export class Tags extends Action<Props, State> {
                   this.getTag()
             }
       }
-      componentDidMount(): void {
-            super.componentDidMount()
-            window.addEventListener("resize", this.resize)
-            this.getTag()
-      }
-      componentWillUnmount() {
-            super.componentWillUnmount()
-            window.removeEventListener("resize", this.resize)
-      }
-      private previousWidth: number = window.innerWidth
-      private resize = () => {
-            if ((this.previousWidth > slimThreshold && window.innerWidth <= slimThreshold) || (this.previousWidth < slimThreshold && window.innerWidth >= slimThreshold)) {
-                  this.forceUpdate()
-            } this.previousWidth = window.innerWidth
-      }
       private getTag = () => { // fetch /tag hot (props.ex 가 아니면 /// tag 만 출력해주면 됨 (+전체 태그))
             if (PROPS.data.ext) {
                   fetch("/tag?u=" + PROPS.data.url).then((r) => typeof r === "object" ? r.json() : null).then((tags) => {
@@ -54,7 +39,7 @@ export class Tags extends Action<Props, State> {
                   })
             } else {
                   fetch("/tag?h=true").then((r) => typeof r === "object" ? r.json() : null).then((tags) => {
-                        this.setState({ tags: [{ name: "전체", isUrl: false, activatedDefault: true, total: true }, ...tags] }) // no extension access -> /boards
+                        this.setState({ tags: [{ name: "total", isUrl: false, activatedDefault: true, total: true }, ...tags] }) // no extension access -> /boards
                   })
             }
       }
@@ -68,9 +53,8 @@ export class Tags extends Action<Props, State> {
             let renderOneTags: any[] = []
             if (renderOne) renderOneTags = [{ name: PROPS.data.url, isUrl: true, isHere: true, activatedDefault: true }, { name: PROPS.data.hostname, isUrl: false, isHere: false, activatedDefault: false }]
             console.log(renderOne ? renderOneTags : tags)
-            const slim = window.innerWidth < slimThreshold
             return (
-                  <View style={[tagsWrapperSt, slim ? slimTagsWrapperSt : null]}>
+                  <View style={[tagsWrapperSt]}>
                         {(renderOne ? renderOneTags : tags).map((t) => t && this.renderItem(t))}
                   </View>
             )
@@ -83,9 +67,4 @@ const tagsWrapperSt = setStyle({
       flexWrap: "wrap",
       paddingLeft: "5px",
       paddingTop: "5px",
-})
-const slimTagsWrapperSt = setStyle({
-      borderBottomWidth: "1px",
-      borderBottomStyle: "solid",
-      borderBottomColor: softGray
 })

@@ -123,7 +123,8 @@ export class Board extends Action<Props, State> {
       }
       private previousWidth: number = window.innerWidth
       private resize = () => {
-            if ((this.previousWidth > slimThreshold && window.innerWidth <= slimThreshold) || (this.previousWidth < slimThreshold && window.innerWidth >= slimThreshold)) {
+            if ((this.previousWidth > slimThreshold && window.innerWidth <= slimThreshold) || (this.previousWidth < slimThreshold && window.innerWidth >= slimThreshold)
+                  || (this.previousWidth > slimerThreshold && window.innerWidth <= slimerThreshold) || (this.previousWidth < slimerThreshold && window.innerWidth >= slimerThreshold)) {
                   this.forceUpdate()
             } this.previousWidth = window.innerWidth
       }
@@ -280,7 +281,7 @@ export class Board extends Action<Props, State> {
                               </View>
                         </View>
                         <Pressable style={[wrapForWriteBoxSt, almostWhiteSt]}  >
-                              <TextInput style={inputForWriteBoxSt} multiline numberOfLines={3} maxLength={MAX_CONTENTS_LEN} onChangeText={this.onChangeComment} value={commentText} />
+                              <TextInput style={inputForWriteBoxSt} autoFocus multiline numberOfLines={3} maxLength={MAX_CONTENTS_LEN} onChangeText={this.onChangeComment} value={commentText} />
                               <View style={buttonsForWriteBoxSt}>
                                     <Pressable style={rightButtonSt} onPress={this.handlePressCommentCancel} >
                                           <Text style={[mainButtonTextStyle, fontBlackSt]}> clear</Text>

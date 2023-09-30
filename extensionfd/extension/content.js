@@ -1,5 +1,5 @@
 chrome.runtime.sendMessage(
-      { type: "connected" }, (res) => {
+      "connect", (res) => {
             if (res) {
                   console.log("done")
             }

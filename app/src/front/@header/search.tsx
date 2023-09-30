@@ -1,5 +1,5 @@
 
-import { almostWhiteSt, contentFontSize, lightGray, lightGraySt, setStyle, slimThreshold, slimerThreshold, softGray, tWhite } from "front/@lib/style"
+import { almostWhite, almostWhiteSt, contentFontSize, lightGray, lightGraySt, setStyle, slimThreshold, slimerThreshold, softGray, tWhite } from "front/@lib/style"
 import { CLIENT_SETTINGS } from "front/@lib/util"
 import Action from "front/reactCom"
 import React from "react"
@@ -28,7 +28,8 @@ export default class Search extends Action<Props, State> {
       }
       private previousWidth: number = window.innerWidth
       private resize = () => {
-            if ((this.previousWidth > slimThreshold && window.innerWidth <= slimThreshold) || (this.previousWidth < slimThreshold && window.innerWidth >= slimThreshold)) {
+            if ((this.previousWidth > slimThreshold && window.innerWidth <= slimThreshold) || (this.previousWidth < slimThreshold && window.innerWidth >= slimThreshold)
+                  || (this.previousWidth > slimerThreshold && window.innerWidth <= slimerThreshold) || (this.previousWidth < slimerThreshold && window.innerWidth >= slimerThreshold)) {
                   this.forceUpdate()
             } this.previousWidth = window.innerWidth
       }
@@ -51,7 +52,7 @@ export default class Search extends Action<Props, State> {
             return (
                   <View style={[searchWrapSt, slimer ? slimerSearchWrapSt : slim ? slimSearchWrapSt : null]}>
                         <Image style={searchImageSt} source={{ uri: CLIENT_SETTINGS.host + "/images/search.svg" }} />
-                        <TextInput style={[searchInputSt, almostWhiteSt]} onChangeText={this.handleChangeText} value={text} onKeyPress={this.handleKeyPress} />
+                        <TextInput style={[searchInputSt]} onChangeText={this.handleChangeText} value={text} onKeyPress={this.handleKeyPress} />
                   </View>
             )
       }
@@ -61,16 +62,16 @@ const searchWrapSt = setStyle({
       position: "absolute",
       top: "10px",
       left: "225px",
-      width: "calc(100% - 225px)"
+      width: "calc(100% - 430px)"
+})
+const slimSearchWrapSt = setStyle({
+      left: "100px",
+      width: "calc(100% - 150px)"
 })
 const slimerSearchWrapSt = setStyle({
       left: "90px",
       height: "30px",
       width: "calc(100% - 100px)"
-})
-const slimSearchWrapSt = setStyle({
-      left: "100px",
-      width: "calc(100% - 110px)"
 })
 const searchImageSt = setStyle({
       position: "absolute",
@@ -88,6 +89,6 @@ const searchInputSt = setStyle({
       borderRadius: "15px",
       paddingLeft: "10px",
       fontSize: contentFontSize,
-      backgroundColor: tWhite,
+      backgroundColor: "white",
       outlineStyle: "none"
 })

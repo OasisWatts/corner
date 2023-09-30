@@ -1,5 +1,5 @@
 
-import { tWriteColor, composeStyle, contentFontSize, setStyle, slimThreshold, lightGray, almostWhite, slimThresholdExceptSize, slimerThreshold, tUpColor } from "front/@lib/style"
+import { lightWriteColor, composeStyle, contentFontSize, setStyle, slimThreshold, lightGray, almostWhite, slimThresholdExceptSize, slimerThreshold, lightUpColor } from "front/@lib/style"
 import Action from "front/reactCom"
 import React from "react"
 import { Image, Linking, Pressable, Text, View } from "reactNative"
@@ -23,12 +23,10 @@ export default class Navigator extends Action<Props, State> {
       }
       private previousWidth: number = window.innerWidth
       private resize = () => {
-            if ((this.previousWidth > slimThreshold && window.innerWidth <= slimThreshold) || (this.previousWidth < slimThreshold && window.innerWidth >= slimThreshold)) {
+            if ((this.previousWidth > slimThreshold && window.innerWidth <= slimThreshold) || (this.previousWidth < slimThreshold && window.innerWidth >= slimThreshold)
+                  || (this.previousWidth > slimerThreshold && window.innerWidth <= slimerThreshold) || (this.previousWidth < slimerThreshold && window.innerWidth >= slimerThreshold)) {
                   this.forceUpdate()
             } this.previousWidth = window.innerWidth
-      }
-      private handleWrite = () => {
-            Action.trigger("page", Page.write, () => Action.trigger("writeReload"))
       }
       private handlePressMyBoard = () => {
             Action.trigger("page", Page.boardList, () => Action.trigger("boardListMyBoard"))
@@ -48,10 +46,6 @@ export default class Navigator extends Action<Props, State> {
             const slimer = window.innerWidth < slimerThreshold
             return (
                   <View style={[rightSideBar, slim ? slimFullSt : fullSt, slim ? null : wideSideBarSt, slimer ? slimerRightSideBarSt : slim ? slimRightSideBar : wideRightSideBar]}>
-                        <Pressable style={[slim ? slimWriteSt : wideButtonSt, slimer ? slimerWriteSt : writeSt]} onPress={this.handleWrite}>
-                              <Image style={[imgSt, slim ? slimWriteImgSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/write.svg" }} />
-                              {slim ? null : <Text style={textSt}>write</Text>}
-                        </Pressable>
                         <Pressable style={[slim ? slimButtonSt : wideButtonSt]} onPress={this.handlePressMyBoard} >
                               <Image style={[imgSt, slimer ? slimerImgSt : slim ? slimImgSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/myWrite.svg" }} />
                               {slim ? null : <Text style={textSt}>my write</Text>}
@@ -62,7 +56,7 @@ export default class Navigator extends Action<Props, State> {
                         </Pressable>
                         <Pressable style={[slim ? slimButtonSt : wideButtonSt]} onPress={this.handlePressSetting} >
                               <Image style={[imgSt, slimer ? slimerImgSt : slim ? slimImgSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/setting.svg" }} />
-                              {slim ? null : <Text style={textSt}>sign out</Text>}
+                              {slim ? null : <Text style={textSt}>setting</Text>}
                         </Pressable>
                         {PROPS.data.ext ? null : <Pressable style={[slim ? slimWriteSt : wideButtonSt, slimer ? slimerInstallSt : installSt]} onPress={this.handlePressInstall} >
                               <Image style={[imgSt, slim ? slimWriteImgSt : null]} source={{ uri: CLIENT_SETTINGS.host + "/images/cornerIcon.png" }} />
@@ -82,11 +76,13 @@ const rightSideBar = composeStyle(
 const fullSt = setStyle({
       borderRadius: "15px",
       paddingBottom: "10px",
+      paddingTop: "10px",
       backgroundColor: almostWhite,
       marginTop: "30px"
 })
 const slimFullSt = setStyle({
       paddingBottom: "10px",
+      paddingTop: "10px",
       backgroundColor: almostWhite
 })
 const wideRightSideBar = setStyle({
@@ -121,11 +117,11 @@ const writeSt = setStyle({
       marginTop: "15px",
       marginBottom: "5px",
       borderRadius: "20px",
-      backgroundColor: tWriteColor
+      backgroundColor: lightWriteColor
 })
 const slimerWriteSt = setStyle({
       borderRadius: "20px",
-      backgroundColor: tWriteColor
+      backgroundColor: lightWriteColor
 })
 const slimWriteSt = setStyle({
       position: "relative",
@@ -138,11 +134,11 @@ const installSt = setStyle({
       marginTop: "5px",
       marginBottom: "5px",
       borderRadius: "20px",
-      backgroundColor: tUpColor
+      backgroundColor: lightUpColor
 })
 const slimerInstallSt = setStyle({
       borderRadius: "20px",
-      backgroundColor: tUpColor
+      backgroundColor: lightUpColor
 })
 const imgSt = setStyle({
       height: "30px",

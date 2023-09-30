@@ -55,6 +55,7 @@ declare type ActionReceiverTable = Partial<{
       "boardListMyUp": Action,
       "boardListUser": Action<[number]>,
       "boardList": Action,
+      "boardListReload": Action,
       "setting": Action,
       "tagReload": Action,
       "followListUser": Action<[string]>,

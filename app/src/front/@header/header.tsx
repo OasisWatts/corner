@@ -1,4 +1,4 @@
-import { lightGray, setStyle, slimThreshold, slimThresholdSize, slimThresholdExceptSize } from "front/@lib/style"
+import { lightGray, setStyle, slimThreshold, slimThresholdSize, slimThresholdExceptSize, slimerThreshold } from "front/@lib/style"
 import Action from "front/reactCom"
 import React from "react"
 import { Image, Pressable, View } from "reactNative"
@@ -40,8 +40,8 @@ export default class Header extends Action<Props, State> {
                   if (PROPS.data.ext) {
                         console.log("boardlisttag url")
                         Action.trigger("boardListTag", PROPS.data.url, true)
-                  } else Action.trigger("boardListTag", "전체")
-                  Action.trigger("boardList")
+                  } else Action.trigger("boardListTag", null, null, true)
+                  Action.trigger("boardListReload")
             })
             Action.trigger("followListTag", null)
       }
