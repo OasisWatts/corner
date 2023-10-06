@@ -11,6 +11,7 @@ import { initializeApp } from "firebase/app"
 import { getAuth } from "firebase/auth"
 import Navigator from "./navigator"
 
+
 window.onpopstate = (ev: any) => { // 브라우저 뒤로가기, 앞으로가기 반영
       let id = Page.boardList
       let urlPage: string = "home"
