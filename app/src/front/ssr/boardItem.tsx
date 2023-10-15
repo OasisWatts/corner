@@ -126,7 +126,7 @@ export class BoardItem extends Action<Props, State> {
                                                 <Text style={mainButtonTextStyle}> edit</Text>
                                           </Pressable> : null}
                               </View>
-                              <Text style={contentFontSizeSt} numberOfLines={3}>{item.contents}</Text>
+                              <Text style={[contentFontSizeSt, contentSize]} numberOfLines={3}>{item.contents}</Text>
                               <View style={buttonSetSt}>
                                     <Pressable style={[upButtonSt, hoverUp ? hoveredUp : null]} onPress={this.handlePressUp} onHoverIn={this.handleHoverInUp} onHoverOut={this.handleHoverOutUp} >
                                           <Image style={importantImageSt} source={{ uri: CLIENT_SETTINGS.host + "/images/" + (hoverUp || uped ? "upPink.svg" : "upGray.svg") }} />
@@ -149,4 +149,7 @@ const boardItemSt = setStyle({
       borderBottomColor: lightGray,
       borderBottomWidth: "1px",
       borderBottomStyle: "solid"
+})
+const contentSize = setStyle({
+      minHeight: "18px"
 })

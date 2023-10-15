@@ -53,6 +53,7 @@ DB.initialize().then(() => {
                   maxAge: SETTINGS.session.maxAge
             },
       }))
+      app.use("/privacy", express.static(path.resolve(__dirname, "./privacy.html"), { maxAge: SETTINGS.cookie.maxAge }), send404)
       app.use("/profiles", express.static(path.resolve(__dirname, "./profiles"), { maxAge: SETTINGS.cookie.maxAge }), send404)
       app.use("/images", express.static(path.resolve(__dirname, "./images"), { maxAge: SETTINGS.cookie.maxAge }), send404)
       app.use("/pages", expressStaticGzip(path.resolve(__dirname, "./pages"), { serveStatic: { maxAge: SETTINGS.cookie.maxAge }, enableBrotli: true }), send404)

@@ -245,12 +245,12 @@ const slimFeatureWrapSt = setStyle({
       marginBottom: "20px"
 })
 const featureImgSt = setStyle({
-      width: "220px",
+      width: "260px",
       height: "160px",
       marginRight: "50px"
 })
 const slimFeatureImgSt = setStyle({
-      width: "165px",
+      width: "195px",
       height: "120px",
       marginRight: "15px",
       marginTop: "15px"
