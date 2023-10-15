@@ -80,7 +80,7 @@ export default class Landing extends Action<Props, State> {
                               </View>
                               <Text style={[textSt, guideTextSt, slim ? slimGuideTextSt : null, whiteFontSt]}> To visit corner as a website, sign in with google</Text>
                               <Text style={[textSt, rightMainTextSt, slim ? slimRightMainTextSt : null, slim ? slimBigGuideTextSt : bigGuideTextSt, whiteFontSt]}>Corner Extension Guide</Text>
-                              <Text style={[textSt, guideTextSt, slim ? slimGuideTextSt : null, whiteFontSt]}> Right click and select 'comment on corner' from the context menu to activate the side panel</Text>
+                              <Text style={[textSt, guideTextSt, slim ? slimGuideTextSt : null, whiteFontSt]}> Right click anywhere on a website and select 'comment on corner' from the context menu to activate the side panel</Text>
                               <Text style={[textSt, guideTextSt, slim ? slimGuideTextSt : null, whiteFontSt]}> Icon on the corner displays the number of comments if any comment exists on the page</Text>
                               <View style={[featureWrapSt, slim ? slimFeatureWrapSt : null]}>
                                     <Image style={[slim ? slimFeatureImgSt : featureImgSt]} source={{ uri: CLIENT_SETTINGS.host + "/images/featureContextmenu.svg" }} />
